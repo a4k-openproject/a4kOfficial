@@ -1,7 +1,10 @@
 import os
+import re
 
 from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
+
+from providerModules.a4kOfficial import dom_parser
 
 PACKAGE_NAME = 'a4kOfficial'
 API_KEY = "91359e7719e3103b8240c769f2e5e79b"
@@ -32,3 +35,19 @@ def get_setting(id):
 
 def set_setting(id, value):
     return provider_tools.set_setting(PACKAGE_NAME, id, value)
+
+
+def parseDOM(html, name='', attrs=None, ret=False):
+
+    if attrs:
+
+        attrs = dict((key, re.compile(value + ('$' if value else ''))) for key, value in attrs.items())
+
+    results = dom_parser.parse_dom(html, name, attrs, ret)
+
+    if ret:
+        results = [result.attrs[ret.lower()] for result in results]
+    else:
+        results = [result.content for result in results]
+
+    return results
