@@ -1,0 +1,18 @@
+{
+  "author": "a4k-openproject",
+  "version": "1.0.0",
+  "name": "a4kOfficial",
+  "update_directory": "",
+  "remote_meta": "",
+  "seren_version": "2.2.0",
+  "services": [],
+  "settings": [
+    {
+      "id": "justwatch.country",
+      "type": "string",
+      "default": "US",
+      "visible": true,
+      "label": "JustWatch Country"
+    }
+  ]
+}
