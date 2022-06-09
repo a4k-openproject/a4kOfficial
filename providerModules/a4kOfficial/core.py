@@ -115,10 +115,13 @@ class Core:
 
     def _get_service_id(self, item):
         offers = item["offers"]
-        if not offers:
+        service_offers = [
+            o for o in offers if o['package_short_name'] in self._providers
+        ]
+        if not service_offers:
             return None
 
-        offer = offers[0]
+        offer = service_offers[0]
         url = offer['urls'][self._scheme]
         id = url.rstrip('/').split('/')[-1]
 
@@ -224,9 +227,9 @@ class Core:
             )
 
             for item in items:
-                nf_source = self._process_movie_item(item, all_info)
-                if nf_source is not None:
-                    sources.append(nf_source)
+                source = self._process_movie_item(item, all_info)
+                if source is not None:
+                    sources.append(source)
         except PreemptiveCancellation:
             return self._return_results("movie", sources, preemptive=True)
 
