@@ -38,11 +38,11 @@ def set_setting(id, value):
 
 
 def parseDOM(html, name='', attrs=None, ret=False):
-
     if attrs:
-
-        attrs = dict((key, re.compile(value + ('$' if value else ''))) for key, value in attrs.items())
-
+        attrs = dict(
+            (key, re.compile(value + ('$' if value else '')))
+            for key, value in attrs.items()
+        )
     results = dom_parser.parse_dom(html, name, attrs, ret)
 
     if ret:
