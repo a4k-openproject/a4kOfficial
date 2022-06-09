@@ -7,9 +7,9 @@ install_aliases()
 from providerModules.a4kOfficial.core import Core
 
 
-class DisneyPlus(Core):
+class sources(Core):
     def __init__(self):
-        super(self, DisneyPlus).__init__()
+        super(sources, self).__init__()
         self._providers = ["dnp"]
         self._scraper = "disneyplus"
         self._service = "disneyplus"

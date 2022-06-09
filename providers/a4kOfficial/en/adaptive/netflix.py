@@ -4,12 +4,12 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-from providerModules.a4kOfficial import Core
+from providerModules.a4kOfficial.core import Core
 
 
-class Netflix(Core):
+class sources(Core):
     def __init__(self):
-        super(self, Netflix).__init__()
+        super(sources, self).__init__()
         self._providers = ["nfx", "nff", "nfk"]
         self._scraper = "netflix"
         self._service = "netflix"
