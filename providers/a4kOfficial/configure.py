@@ -9,18 +9,21 @@ from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
 
 for provider in ADDON_IDS:
-    status = "enabled"
+    status = True
     try:
         xbmcaddon.Addon(ADDON_IDS[provider])
-        status = "enabled"
-    except Exception as e:
-        common.log(e, 'info')
-        common.log(
-            "a4kOfficial: '{}' is not installed; disabling '{}'".format(
-                ADDON_IDS[provider], provider
-            ),
-            'info',
-        )
-        status = "disabled"
+    except Exception:
+        status = False
 
-    ProviderInstallManager().flip_provider_status('a4kOfficial', provider, status)
+    common.log(
+        "a4kOfficial: '{}' is{} installed; {}abling '{}'".format(
+            ADDON_IDS[provider],
+            '' if status else ' not',
+            'en' if status else 'dis',
+            provider,
+        ),
+        'info',
+    )
+    ProviderInstallManager().flip_provider_status(
+        'a4kOfficial', provider, "enabled" if status else "disabled"
+    )
