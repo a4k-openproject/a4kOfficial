@@ -54,7 +54,7 @@ INSTANT_WATCHER_COUNTRIES = {
 class sources(Core):
     def __init__(self):
         super(sources, self).__init__()
-        self._providers = ["nfx", "nff", "nfk"]
+        self._providers = ["nfx", "nfk"]
         self._scraper = "netflix"
         self._service = "netflix"
         self._movie_url = "plugin://plugin.video.netflix/play_strm/{}/"
