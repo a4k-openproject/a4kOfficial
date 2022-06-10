@@ -5,6 +5,7 @@
   "update_directory": "",
   "remote_meta": "",
   "seren_version": "2.2.0",
+  "setup_extension": "configure.py",
   "services": [],
   "settings": [
     {
