@@ -92,7 +92,7 @@ class Core:
                 "size": 0,
                 "quality": "Variable",
                 "url": self._episode_url.format(
-                    self._get_service_ep_id(tmdb_id, season, episode, e)
+                    self._get_service_ep_id(service_id, season, episode, e)
                 )
                 if type == "show"
                 else self._movie_url.format(service_id),
