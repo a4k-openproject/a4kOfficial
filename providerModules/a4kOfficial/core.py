@@ -89,9 +89,11 @@ class Core:
             source = {
                 "scraper": self._scraper,
                 "release_title": e['title'] if type == "show" else provider['title'],
-                "info": "",
-                "size": 0,
-                "quality": "Variable",
+                "info": {},
+                "size": "Variable",
+                "quality": self._get_offered_resolutions(
+                    e if type == "show" else provider
+                ),
                 "url": self._episode_url.format(
                     ADDON_IDS[self._scraper],
                     self._get_service_ep_id(service_id, season, episode, e),
@@ -116,11 +118,16 @@ class Core:
         )
         return source
 
-    def _get_service_id(self, item):
+    def _get_service_offers(self, item):
         offers = item["offers"]
         service_offers = [
             o for o in offers if o['package_short_name'] in self._providers
         ]
+
+        return service_offers
+
+    def _get_service_id(self, item):
+        service_offers = self._get_service_offers(item)
         if not service_offers:
             return None
 
@@ -130,12 +137,32 @@ class Core:
 
         return id
 
+    def _get_offered_resolutions(self, item):
+        resolutions = set()
+        service_offers = self._get_service_offers(item)
+        if not service_offers:
+            return None
+        
+        for offer in service_offers:
+            resolutions.update(self._get_quality(offer))
+
+        order = {key: i for i, key in enumerate(["4K", "1080p", "720p", "SD"])}
+
+        return '/'.join(sorted(list(resolutions), key=lambda x: order[x]))
+
     def _get_service_ep_id(self, show_id, season, episode, item):
         return self._get_service_id(item=item)
 
     @staticmethod
     def _get_quality(offer):
-        types = {"4K": "4K", "HD": "1080p", "SD": "SD"}
+        types = {
+            "4K": ("4K",),
+            "HD": (
+                "1080p",
+                "720p",
+            ),
+            "SD": ("SD",),
+        }
         return types[offer["presentation_type"].upper()]
 
     def episode(self, simple_info, all_info):
