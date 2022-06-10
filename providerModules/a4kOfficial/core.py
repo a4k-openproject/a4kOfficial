@@ -89,8 +89,6 @@ class Core:
             source = {
                 "scraper": self._scraper,
                 "release_title": e['title'] if type == "show" else provider['title'],
-                "info": {},
-                "size": "Variable",
                 "quality": self._get_offered_resolutions(
                     e if type == "show" else provider
                 ),
@@ -142,7 +140,7 @@ class Core:
         service_offers = self._get_service_offers(item)
         if not service_offers:
             return None
-        
+
         for offer in service_offers:
             resolutions.update(self._get_quality(offer))
 
