@@ -44,34 +44,49 @@ class Core:
 
         return sources
 
-    def _make_movie_query(self, title, year):
+    def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
+            query=clean_title(query),
+            content_types=[type],
+            providers=self._providers,
+            **kwargs
+        ).get("items")
+
+        return items
+
+    def _make_movie_query(self, title, year):
+        items = self.__make_query(
             query=title,
-            content_types=["movie"],
+            type="movie",
             release_year_from=int(year) - 1,
             release_year_until=int(year) + 1,
-            providers=self._providers,
-        ).get("items")
+        )
 
         return items
 
-    def _make_show_query(self, query):
-        items = self._api.search_for_item(
-            query=query, content_types=["show"], providers=self._providers
-        ).get("items")
+    def _make_show_query(self, show_title):
+        items = self.__make_query(query=show_title, type="show")
 
         return items
 
-    def _process_movie_item(self, provider, all_info):
+    def _process_item(self, provider, tmdb_id, type, season=0, episode=0):
         source = None
-        jw_title = self._api.get_title(title_id=provider['id'], content_type="movie")
-        external_ids = jw_title.get("external_ids", {})
-        tmdb_id = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
 
-        if len(tmdb_id) == 1 and int(tmdb_id[0]) == all_info['info']['tmdb_id']:
+        jw_title = self._api.get_title(title_id=provider['id'], content_type=type)
+        external_ids = jw_title.get("external_ids", {})
+        tmdb_ids = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
+
+        if len(tmdb_ids) == 1 and int(tmdb_ids[0]) == tmdb_id:
             service_id = self._get_service_id(provider)
             if not service_id:
                 return None
+
+            if type == "show":
+                s = self._api.get_season(jw_title['seasons'][season - 1]['id'])
+                e = s['episodes'][episode - 1]
+                episode_id = self._get_service_id(e)
+                if not episode_id:
+                    return None
 
             source = {
                 "scraper": self._scraper,
@@ -79,40 +94,27 @@ class Core:
                 "info": "",
                 "size": 0,
                 "quality": "Variable",
-                "url": self._movie_url.format(service_id),
+                "url": self._episode_url.format(
+                    self._get_service_ep_id(tmdb_id, season, episode, e)
+                )
+                if type == "show"
+                else self._movie_url.format(service_id),
             }
 
         return source
 
-    def _process_show_item(self, provider, show_id, season, episode):
-        source = None
+    def _process_movie_item(self, provider, simple_info, all_info):
+        source = self._process_item(provider, all_info['info']['tmdb_id'], "movie")
+        return source
 
-        jw_title = self._api.get_title(title_id=provider['id'], content_type="show")
-        external_ids = jw_title.get("external_ids", {})
-        tmdb_id = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
-
-        if len(tmdb_id) >= 1 and int(tmdb_id[0]) == show_id:
-            show_id = self._get_service_id(provider)
-            if not show_id:
-                return None
-
-            s = self._api.get_season(jw_title['seasons'][season - 1]['id'])
-            e = s['episodes'][episode - 1]
-            episode_id = self._get_service_id(e)
-            if not episode_id:
-                return None
-
-            source = {
-                "scraper": self._scraper,
-                "release_title": e['title'],
-                "info": "",
-                "quality": "Variable",
-                "size": 0,
-                "url": self._episode_url.format(
-                    self._get_service_ep_id(show_id, season, episode, e)
-                ),
-            }
-
+    def _process_show_item(self, provider, simple_info, all_info):
+        source = self._process_item(
+            provider,
+            all_info['info']['tmdb_show_id'],
+            "show",
+            simple_info["season_number"],
+            simple_info["episode_number"],
+        )
         return source
 
     def _get_service_id(self, item):
@@ -199,20 +201,20 @@ class Core:
         sources = []
 
         show_title = simple_info["show_title"]
-        show_id = all_info['info']['tmdb_show_id']
         season = simple_info["season_number"]
         episode = simple_info["episode_number"]
 
         try:
             self._api = JustWatch(country=self._country)
-            items = self._make_show_query(show_title.lower())
+            items = self._make_show_query(show_title)
 
             for item in items:
                 source = self._process_show_item(
-                    item, clean_title(show_id), int(season), int(episode)
+                    item, show_title, int(season), int(episode)
                 )
                 if source is not None:
                     sources.append(source)
+                    break
         except PreemptiveCancellation:
             return self._return_results("episode", sources, preemptive=True)
 
@@ -224,21 +226,18 @@ class Core:
         queries = []
         queries.append(simple_info['title'])
         queries.extend(simple_info.get('aliases', []))
-        
+
         try:
             self._api = JustWatch(country=self._country)
             items = []
             for query in queries:
-                common.log('query: ' + clean_title(query), 'info')
-                items.extend(self._make_movie_query(
-                    clean_title(query), simple_info['year']
-                ))
+                items.extend(self._make_movie_query(query, simple_info['year']))
 
             for item in items:
-                common.log('result: ' + item['title'], 'info')
-                source = self._process_movie_item(item, all_info)
+                source = self._process_movie_item(item, simple_info, all_info)
                 if source is not None:
                     sources.append(source)
+                    break
         except PreemptiveCancellation:
             return self._return_results("movie", sources, preemptive=True)
 
