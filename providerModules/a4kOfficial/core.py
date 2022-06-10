@@ -8,6 +8,7 @@ import requests
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.justwatch import JustWatch
 
+from resources.lib.common.source_utils import clean_title
 from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
@@ -63,10 +64,11 @@ class Core:
 
     def _process_movie_item(self, provider, all_info):
         source = None
-        scoring = provider.get("scoring", {})
-        tmdb_id = [i['value'] for i in scoring if i['provider_type'] == 'tmdb:id']
+        jw_title = self._api.get_title(title_id=provider['id'], content_type="movie")
+        external_ids = jw_title.get("external_ids", {})
+        tmdb_id = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
 
-        if len(tmdb_id) == 1 and tmdb_id[0] == all_info['info']['tmdb_id']:
+        if len(tmdb_id) == 1 and int(tmdb_id[0]) == all_info['info']['tmdb_id']:
             service_id = self._get_service_id(provider)
             if not service_id:
                 return None
@@ -207,7 +209,7 @@ class Core:
 
             for item in items:
                 source = self._process_show_item(
-                    item, show_id, int(season), int(episode)
+                    item, clean_title(show_id), int(season), int(episode)
                 )
                 if source is not None:
                     sources.append(source)
@@ -219,14 +221,21 @@ class Core:
     def movie(self, simple_info, all_info):
         self.start_time = time.time()
         sources = []
-
+        queries = []
+        queries.append(simple_info['title'])
+        queries.extend(simple_info.get('aliases', []))
+        
         try:
             self._api = JustWatch(country=self._country)
-            items = self._make_movie_query(
-                simple_info['title'].lower(), simple_info['year']
-            )
+            items = []
+            for query in queries:
+                common.log('query: ' + clean_title(query), 'info')
+                items.extend(self._make_movie_query(
+                    clean_title(query), simple_info['year']
+                ))
 
             for item in items:
+                common.log('result: ' + item['title'], 'info')
                 source = self._process_movie_item(item, all_info)
                 if source is not None:
                     sources.append(source)
