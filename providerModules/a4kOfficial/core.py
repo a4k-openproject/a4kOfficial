@@ -109,8 +109,8 @@ class Core:
             provider,
             all_info['info']['tmdb_show_id'],
             "show",
-            simple_info["season_number"],
-            simple_info["episode_number"],
+            int(simple_info["season_number"]),
+            int(simple_info["episode_number"]),
         )
         return source
 
