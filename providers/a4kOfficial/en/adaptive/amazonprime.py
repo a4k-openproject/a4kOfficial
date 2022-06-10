@@ -11,10 +11,9 @@ class sources(Core):
     def __init__(self):
         super(sources, self).__init__()
         self._providers = ['amp', 'amz']
-        self._scraper = "amazonprime"
-        self._service = "amazonprime"
-        self._movie_url = "plugin://plugin.video.amazon-test/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
-        self._episode_url = "plugin://plugin.video.amazon-test/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
+        self._scheme = "standard_web"
+        self._movie_url = "plugin://{}/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
+        self._episode_url = "plugin://{}/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
 
     def _get_service_id(self, item):
         offers = item["offers"]

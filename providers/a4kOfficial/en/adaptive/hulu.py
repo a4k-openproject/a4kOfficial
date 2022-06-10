@@ -11,7 +11,6 @@ class sources(Core):
     def __init__(self):
         super(sources, self).__init__()
         self._providers = ["hlu"]
-        self._scraper = "hulu"
-        self._service = "hulu"
-        self._movie_url = "plugin://slyguy.hulu/?_=play&id={}"
-        self._episode_url = "plugin://slyguy.hulu/?_=play&id={}"
+        self._scheme = "standard_web"
+        self._movie_url = "plugin://{}/?_=play&id={}"
+        self._episode_url = "plugin://{}/?_=play&id={}"

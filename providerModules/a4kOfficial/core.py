@@ -3,6 +3,7 @@ import xbmcgui
 import time
 
 from providerModules.a4kOfficial import common
+from providerModules.a4kOfficial.common import ADDON_IDS
 from providerModules.a4kOfficial.justwatch import JustWatch
 
 from resources.lib.common.source_utils import clean_title
@@ -13,10 +14,10 @@ class Core:
     def __init__(self):
         self._country = common.get_setting("justwatch.country")
         self.start_time = 0
+        self._scraper = self.__module__.split('.')[-1]
+
         self._providers = None
-        self._scraper = None
-        self._service = None
-        self._scheme = "standard_web"
+        self._scheme = None
         self._movie_url = None
         self._episode_url = None
 
@@ -92,10 +93,11 @@ class Core:
                 "size": 0,
                 "quality": "Variable",
                 "url": self._episode_url.format(
-                    self._get_service_ep_id(service_id, season, episode, e)
+                    ADDON_IDS[self._scraper],
+                    self._get_service_ep_id(service_id, season, episode, e),
                 )
                 if type == "show"
-                else self._movie_url.format(service_id),
+                else self._movie_url.format(ADDON_IDS[self._scraper], service_id),
             }
 
         return source

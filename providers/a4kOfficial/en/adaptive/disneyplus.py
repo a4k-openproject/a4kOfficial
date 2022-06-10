@@ -11,8 +11,6 @@ class sources(Core):
     def __init__(self):
         super(sources, self).__init__()
         self._providers = ["dnp"]
-        self._scraper = "disneyplus"
-        self._service = "disneyplus"
         self._scheme = "deeplink_web"
-        self._movie_url = "plugin://slyguy.disney.plus/?_=play&_play=1&content_id={}"
-        self._episode_url = "plugin://slyguy.disney.plus/?_=play&_play=1&content_id={}"
+        self._movie_url = "plugin://{}/?_=play&_play=1&content_id={}"
+        self._episode_url = "plugin://{}/?_=play&_play=1&content_id={}"

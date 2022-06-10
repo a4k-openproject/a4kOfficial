@@ -7,7 +7,15 @@ from resources.lib.modules.globals import g
 from providerModules.a4kOfficial import dom_parser
 
 PACKAGE_NAME = 'a4kOfficial'
-API_KEY = "91359e7719e3103b8240c769f2e5e79b"
+ADDON_IDS = {
+    "amazonprime": "plugin.video.amazon-test",
+    "disneyplus": "slyguy.disney.plus",
+    "hulu": "slyguy.hulu",
+    "netflix": "plugin.video.netflix",
+    "hbomax": "slyguy.hbo.max",
+    "paramountplus": "slyguy.paramount.plus",
+    "curiositystream": "slyguy.curiositystream",
+}
 
 
 def log(msg, level='info'):

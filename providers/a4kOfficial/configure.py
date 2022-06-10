@@ -6,7 +6,7 @@ import xbmcaddon
 from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 from providerModules.a4kOfficial import common
-from providers.a4kOfficial.en.adaptive import ADDON_IDS
+from providerModules.a4kOfficial.common import ADDON_IDS
 
 for provider in ADDON_IDS:
     status = "enabled"

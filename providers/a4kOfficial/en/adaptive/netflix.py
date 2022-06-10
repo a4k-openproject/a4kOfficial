@@ -55,16 +55,13 @@ class sources(Core):
     def __init__(self):
         super(sources, self).__init__()
         self._providers = ["nfx", "nfk"]
-        self._scraper = "netflix"
-        self._service = "netflix"
-        self._movie_url = "plugin://plugin.video.netflix/play_strm/{}/"
-        self._episode_url = "plugin://plugin.video.netflix/play_strm/{}/"
+        self._scheme = "standard_web"
+        self._movie_url = "plugin://{}/play_strm/{}/"
+        self._episode_url = "plugin://{}/play_strm/{}/"
 
     def _get_service_ep_id(self, show_id, season, episode, item):
         code = INSTANT_WATCHER_COUNTRIES.get(self._country, '78')
-        url = "https://www.instantwatcher.com/{}/{}/title/{}".format(
-            self._service, code, show_id
-        )
+        url = "https://www.instantwatcher.com/netflix/{}/title/{}".format(code, show_id)
         r = requests.get(url, timeout=10).text
         r = common.parseDOM(r, 'div', attrs={'class': 'tdChildren-titles'})[0]
         seasons = re.findall(
