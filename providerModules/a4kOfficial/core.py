@@ -149,7 +149,7 @@ class Core:
             items = self._make_show_query(show_title)
 
             for item in items:
-                source = self._process_show_item(item, int(season), int(episode))
+                source = self._process_show_item(item, simple_info, all_info)
                 if source is not None:
                     sources.append(source)
                     break
