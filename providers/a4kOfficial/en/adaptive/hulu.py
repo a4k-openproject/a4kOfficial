@@ -15,6 +15,3 @@ class sources(Core):
         self._service = "hulu"
         self._movie_url = "plugin://slyguy.hulu/?_=play&id={}"
         self._episode_url = "plugin://slyguy.hulu/?_=play&id={}"
-
-    def _get_service_ep_id(self, show_id, season, episode, item):
-        return self._get_service_id(item=item)
