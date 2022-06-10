@@ -6,7 +6,7 @@ import time
 import requests
 
 from providerModules.a4kOfficial import common
-from providerModules.justwatch import JustWatch
+from providerModules.a4kOfficial.justwatch import JustWatch
 
 from resources.lib.modules.exceptions import PreemptiveCancellation
 
