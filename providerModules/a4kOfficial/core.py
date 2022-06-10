@@ -73,7 +73,7 @@ class Core:
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
 
-        if len(tmdb_ids) == 1 and int(tmdb_ids[0]) == tmdb_id:
+        if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
             service_id = self._get_service_id(provider)
             if not service_id:
                 return None
@@ -141,8 +141,6 @@ class Core:
         sources = []
 
         show_title = simple_info["show_title"]
-        season = simple_info["season_number"]
-        episode = simple_info["episode_number"]
 
         try:
             self._api = JustWatch(country=self._country)
