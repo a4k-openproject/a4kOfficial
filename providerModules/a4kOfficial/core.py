@@ -87,7 +87,7 @@ class Core:
 
             source = {
                 "scraper": self._scraper,
-                "release_title": provider['title'],
+                "release_title": e['title'] if type == "show" else provider['title'],
                 "info": "",
                 "size": 0,
                 "quality": "Variable",
