@@ -15,6 +15,7 @@ class Core:
         self._country = common.get_setting("justwatch.country")
         self.start_time = 0
         self._scraper = self.__module__.split('.')[-1]
+        self._monetization_types = ["free", "flatrate"]
 
         self._providers = None
         self._scheme = None
@@ -47,6 +48,7 @@ class Core:
             query=clean_title(query),
             content_types=[type],
             providers=self._providers,
+            monetization_types=self._monetization_types,
             **kwargs
         ).get("items")
 
@@ -119,7 +121,10 @@ class Core:
     def _get_service_offers(self, item):
         offers = item["offers"]
         service_offers = [
-            o for o in offers if o['package_short_name'] in self._providers
+            o
+            for o in offers
+            if o['package_short_name'] in self._providers
+            and o['monetization_type'] in self._monetization_types
         ]
 
         return service_offers
