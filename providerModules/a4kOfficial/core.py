@@ -81,6 +81,14 @@ class Core:
             if not service_id:
                 return None
 
+            source = {
+                "scraper": self._scraper,
+                "video_id": service_id,
+                "release_title": provider['title'],
+                "quality": self._get_offered_resolutions(provider),
+                "url": self._movie_url.format(ADDON_IDS[self._scraper], service_id),
+            }
+
             if type == "show":
                 s = self._api.get_season(jw_title['seasons'][season - 1]['id'])
                 e = s['episodes'][episode - 1]
@@ -88,19 +96,16 @@ class Core:
                 if not episode_id:
                     return None
 
-            source = {
-                "scraper": self._scraper,
-                "release_title": e['title'] if type == "show" else provider['title'],
-                "quality": self._get_offered_resolutions(
-                    e if type == "show" else provider
-                ),
-                "url": self._episode_url.format(
-                    ADDON_IDS[self._scraper],
-                    self._get_service_ep_id(service_id, season, episode, e),
+                source.update(
+                    {
+                        "video_id": episode_id,
+                        "release_title": e['title'],
+                        "url": self._episode_url.format(
+                            ADDON_IDS[self._scraper],
+                            self._get_service_ep_id(service_id, season, episode, e),
+                        ),
+                    }
                 )
-                if type == "show"
-                else self._movie_url.format(ADDON_IDS[self._scraper], service_id),
-            }
 
         return source
 
