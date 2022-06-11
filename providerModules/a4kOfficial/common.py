@@ -1,10 +1,7 @@
 import os
-import re
 
 from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
-
-from providerModules.a4kOfficial import dom_parser
 
 PACKAGE_NAME = 'a4kOfficial'
 ADDON_IDS = {
@@ -47,10 +44,14 @@ def set_setting(id, value):
 
 def parseDOM(html, name='', attrs=None, ret=False):
     if attrs:
+        import re
+
         attrs = dict(
             (key, re.compile(value + ('$' if value else '')))
             for key, value in attrs.items()
         )
+    from providerModules.a4kOfficial import dom_parser
+
     results = dom_parser.parse_dom(html, name, attrs, ret)
 
     if ret:
