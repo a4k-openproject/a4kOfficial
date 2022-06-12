@@ -33,11 +33,10 @@ class sources(Core):
         return super(sources, self).movie(simple_info, all_info, id_format=quote_plus)
 
     def _get_service_id(self, item, season=0, episode=0):
-        service_offers = self._get_service_offers(item)
-        if not service_offers:
+        if not self._current_offers:
             return None
 
-        offer = service_offers[0]
+        offer = self._current_offers[0]
         url = offer['urls'][self._scheme]
         if '/episodes/' in url:
             id = self._get_service_ep_id(url, season, episode)

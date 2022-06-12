@@ -18,14 +18,10 @@ class sources(Core):
         self._episode_url = "plugin://{}/?_=play&id={}"
 
     def _get_service_id(self, item, season=0, episode=0):
-        offers = item["offers"]
-        service_offers = [
-            o for o in offers if o['package_short_name'] in self._providers
-        ]
-        if not service_offers:
+        if not self._current_offers:
             return None
 
-        offer = service_offers[0]
+        offer = self._current_offers[0]
         url = offer['urls'][self._scheme]
         id = (
             url.split('?')[0].split('/')[-1]
