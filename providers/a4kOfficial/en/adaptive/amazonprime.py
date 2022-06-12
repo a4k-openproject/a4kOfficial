@@ -15,7 +15,7 @@ class sources(Core):
         self._movie_url = "plugin://{}/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
         self._episode_url = "plugin://{}/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
 
-    def _get_service_id(self, item):
+    def _get_service_id(self, item, season=0, episode=0):
         offers = item["offers"]
         service_offers = [
             o for o in offers if o['package_short_name'] in self._providers

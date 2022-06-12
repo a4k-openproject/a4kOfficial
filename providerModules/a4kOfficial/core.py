@@ -69,7 +69,9 @@ class Core:
 
         return items
 
-    def _process_item(self, provider, tmdb_id, type, season=0, episode=0):
+    def _process_item(
+        self, provider, tmdb_id, type, season=0, episode=0, id_format=None
+    ):
         source = None
 
         jw_title = self._api.get_title(title_id=provider['id'], content_type=type)
@@ -77,7 +79,7 @@ class Core:
         tmdb_ids = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
 
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
-            service_id = self._get_service_id(provider)
+            service_id = self._get_service_id(provider, season, episode)
             if not service_id:
                 return None
 
@@ -86,40 +88,49 @@ class Core:
                 "video_id": service_id,
                 "release_title": provider['title'],
                 "quality": self._get_offered_resolutions(provider),
-                "url": self._movie_url.format(ADDON_IDS[self._scraper], service_id),
+                "url": self._movie_url.format(
+                    ADDON_IDS[self._scraper],
+                    id_format(service_id) if id_format is not None else service_id,
+                ),
             }
 
             if type == "show":
                 s = self._api.get_season(jw_title['seasons'][season - 1]['id'])
                 e = s['episodes'][episode - 1]
-                episode_id = self._get_service_id(e)
+                episode_id = self._get_service_id(e, season, episode)
                 if not episode_id:
                     return None
 
+                service_ep_id = self._get_service_ep_id(service_id, season, episode, e)
                 source.update(
                     {
                         "video_id": episode_id,
                         "release_title": e['title'],
                         "url": self._episode_url.format(
                             ADDON_IDS[self._scraper],
-                            self._get_service_ep_id(service_id, season, episode, e),
+                            id_format(service_ep_id)
+                            if id_format is not None
+                            else service_ep_id,
                         ),
                     }
                 )
 
         return source
 
-    def _process_movie_item(self, provider, simple_info, all_info):
-        source = self._process_item(provider, all_info['info']['tmdb_id'], "movie")
+    def _process_movie_item(self, provider, simple_info, all_info, id_format=None):
+        source = self._process_item(
+            provider, all_info['info']['tmdb_id'], "movie", id_format=id_format
+        )
         return source
 
-    def _process_show_item(self, provider, simple_info, all_info):
+    def _process_show_item(self, provider, simple_info, all_info, id_format=None):
         source = self._process_item(
             provider,
             all_info['info']['tmdb_show_id'],
             "show",
             int(simple_info["season_number"]),
             int(simple_info["episode_number"]),
+            id_format=id_format,
         )
         return source
 
@@ -134,7 +145,7 @@ class Core:
 
         return service_offers
 
-    def _get_service_id(self, item):
+    def _get_service_id(self, item, season, episode):
         service_offers = self._get_service_offers(item)
         if not service_offers:
             return None
@@ -173,7 +184,7 @@ class Core:
         }
         return types[offer["presentation_type"].upper()]
 
-    def episode(self, simple_info, all_info):
+    def episode(self, simple_info, all_info, id_format=None):
         self.start_time = time.time()
         sources = []
 
@@ -184,7 +195,9 @@ class Core:
             items = self._make_show_query(show_title)
 
             for item in items:
-                source = self._process_show_item(item, simple_info, all_info)
+                source = self._process_show_item(
+                    item, simple_info, all_info, id_format=None
+                )
                 if source is not None:
                     sources.append(source)
                     break
@@ -193,7 +206,7 @@ class Core:
 
         return self._return_results("episode", sources)
 
-    def movie(self, simple_info, all_info):
+    def movie(self, simple_info, all_info, id_format=None):
         self.start_time = time.time()
         sources = []
         queries = []
@@ -207,7 +220,9 @@ class Core:
                 items.extend(self._make_movie_query(query, simple_info['year']))
 
             for item in items:
-                source = self._process_movie_item(item, simple_info, all_info)
+                source = self._process_movie_item(
+                    item, simple_info, all_info, id_format
+                )
                 if source is not None:
                     sources.append(source)
                     break

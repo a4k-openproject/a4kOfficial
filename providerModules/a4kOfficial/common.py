@@ -12,6 +12,7 @@ ADDON_IDS = {
     "hbomax": "slyguy.hbo.max",
     "paramountplus": "slyguy.paramount.plus",
     "curiositystream": "slyguy.curiositystream",
+    "iplayer": "plugin.video.iplayerwww",
 }
 
 
