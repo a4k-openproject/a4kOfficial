@@ -9,7 +9,7 @@ import re
 import requests
 
 from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.core import Core
+from providerModules.a4kOfficial.core_justwatch import JustWatchCore
 
 
 INSTANT_WATCHER_COUNTRIES = {
@@ -51,7 +51,7 @@ INSTANT_WATCHER_COUNTRIES = {
 }
 
 
-class sources(Core):
+class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__()
         self._providers = ["nfx", "nfk"]

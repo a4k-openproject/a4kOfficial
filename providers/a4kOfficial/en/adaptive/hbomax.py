@@ -4,10 +4,10 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-from providerModules.a4kOfficial.core import Core
+from providerModules.a4kOfficial.core_justwatch import JustWatchCore
 
 
-class sources(Core):
+class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__()
         self._providers = ['hmf', 'hbm', 'hbo', 'hbn']

@@ -11,10 +11,10 @@ from urllib.parse import quote_plus
 import requests
 
 from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.core import Core
+from providerModules.a4kOfficial.core_justwatch import JustWatchCore
 
 
-class sources(Core):
+class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__()
         self._providers = ["bbc"]
