@@ -11,7 +11,9 @@ from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
 def get_quality(width):
-    if width >= 2160:
+    if width == 0:
+        return "Unknown"
+    elif width >= 2160:
         return "4K"
     elif width >= 1920:
         return "1080p"
@@ -19,6 +21,7 @@ def get_quality(width):
         return "720p"
     elif width < 1280:
         return "SD"
+        
 
 
 def get_file_info(db_details):
@@ -39,8 +42,10 @@ def get_file_info(db_details):
     file_info['size'] = de_string_size(common.convert_size(size))
 
     stream_details = db_details.get("streamdetails", {})
-    audio_details = stream_details.get("audio", [{}])[0]
-    video_details = stream_details.get("video", [{}])[0]
+    audio_details = stream_details.get("audio", [])
+    audio_details = audio_details[0] if len(audio_details) > 0 else {}
+    video_details = stream_details.get("video", [])
+    video_details = video_details[0] if len(video_details) > 0 else {}
 
     file_info['info'] = set()
     if audio_channels := audio_details.get("channels"):
