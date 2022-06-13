@@ -14,8 +14,8 @@ class sources(JustWatchCore):
         super(sources, self).__init__()
         self._providers = ['pmp']
         self._scheme = "standard_web"
-        self._movie_url = "plugin://{}/?_=play&id={}"
-        self._episode_url = "plugin://{}/?_=play&id={}"
+        self._movie_url = "plugin://{}/?_=play&video_id={}"
+        self._episode_url = "plugin://{}/?_=play&video_id={}"
 
     def _get_service_id(self, item, season=0, episode=0):
         if not self._current_offers:
