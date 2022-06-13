@@ -4,13 +4,8 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-from providerModules.a4kOfficial.core_justwatch import Core
+from providerModules.a4kOfficial.core_library import LibraryCore
 
 
-class sources(Core):
-    def __init__(self):
-        super(sources, self).__init__()
-        self._providers = ["dnp"]
-        self._scheme = "deeplink_web"
-        self._movie_url = "plugin://{}/?_=play&_play=1&content_id={}"
-        self._episode_url = "plugin://{}/?_=play&_play=1&content_id={}"
+class sources(LibraryCore):
+    pass

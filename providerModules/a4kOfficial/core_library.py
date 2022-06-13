@@ -6,7 +6,7 @@ import time
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core import Core
 
-from resources.lib.common.source_utils import clean_title
+from resources.lib.common.source_utils import clean_title, de_string_size
 from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
@@ -36,15 +36,15 @@ def get_file_info(db_details):
         .get("filedetails", {})
         .get("size", 0)
     )
-    file_info['size'] = common.convert_size(size)
+    file_info['size'] = de_string_size(common.convert_size(size))
 
     stream_details = db_details.get("streamdetails", {})
-    audio_details = stream_details.get("audio", {})
-    video_details = stream_details.get("video", {})
+    audio_details = stream_details.get("audio", [{}])[0]
+    video_details = stream_details.get("video", [{}])[0]
 
-    file_info['info'] = {}
+    file_info['info'] = set()
     if audio_channels := audio_details.get("channels"):
-        file_info['info'].add(audio_channels + "ch")
+        file_info['info'].add("{}ch".format(audio_channels))
     if audio_codec := audio_details.get("codec"):
         file_info['info'].add("dts" if audio_codec == "dca" else audio_codec)
     if video_codec := video_details.get("codec"):
@@ -53,6 +53,8 @@ def get_file_info(db_details):
         file_info['info'].add("3D")
 
     file_info['quality'] = get_quality(video_details.get("width", 0))
+
+    return file_info
 
 
 class LibraryCore(Core):
@@ -76,9 +78,17 @@ class LibraryCore(Core):
                         {"field": "title", "operator": "startswith", "value": title},
                         {
                             "or": [
-                                {"field": "year", "operator": "is", "value": year - 1},
-                                {"field": "year", "operator": "is", "value": year},
-                                {"field": "year", "operator": "is", "value": year + 1},
+                                {
+                                    "field": "year",
+                                    "operator": "is",
+                                    "value": str(year - 1),
+                                },
+                                {"field": "year", "operator": "is", "value": str(year)},
+                                {
+                                    "field": "year",
+                                    "operator": "is",
+                                    "value": str(year + 1),
+                                },
                             ]
                         },
                     ]
@@ -96,14 +106,18 @@ class LibraryCore(Core):
         db_details = self.__make_query(
             method="VideoLibrary.GetMovieDetails",
             params={
-                "properties": ["streamdetails", "file"],
-                "movieid": db_item.get("movie_id", ""),
+                "properties": ["streamdetails", "file", "uniqueid"],
+                "movieid": db_item.get("movieid", ""),
             },
         ).get("moviedetails", {})
         external_ids = db_details.get("uniqueid", {})
-        movie_ids = all_info['uniqueIDs']
+        movie_ids = {
+            "tmdb": all_info['info'].get("tmdb_id"),
+            "imdb": all_info['info'].get("imdb_id"),
+            "trakt": all_info['info'].get("trakt_id"),
+        }
 
-        if all([external_ids[i] == movie_ids[i] for i in movie_ids]):
+        if all([external_ids.get(i) in [None, movie_ids[i]] for i in movie_ids]):
             source_info = get_file_info(db_details)
             source = {
                 "scraper": self._scraper,
@@ -146,10 +160,10 @@ class LibraryCore(Core):
         try:
             items = []
             for query in queries:
-                items.extend(self._make_movie_query(query, simple_info['year']))
+                items.extend(self._make_movie_query(query, int(simple_info['year'])))
 
             for item in items:
-                source = self._process_movie_item(item, simple_info, all_info)
+                source = self._process_movie_item(item, all_info)
                 if source is not None:
                     sources.append(source)
                     break
