@@ -73,6 +73,16 @@ class LibraryCore(Core):
 
         return result
 
+    def _make_show_query(self):
+        result = self.__make_query(
+            method="VideoLibrary.GetTVShows",
+            params={
+                "properties": ["uniqueid", "title"],
+            },
+        )
+
+        return result.get("tvshows", {})
+
     def _make_movie_query(self, title, year):
         result = self.__make_query(
             method="VideoLibrary.GetMovies",
@@ -102,6 +112,56 @@ class LibraryCore(Core):
         )
 
         return result.get("movies", {})
+
+    def _process_show_item(self, db_item, all_info):
+        source = None
+        
+        db_details = self.__make_query(
+            method="VideoLibrary.GetEpisodes",
+            params={
+                "properties": ["streamdetails", "file", "uniqueid"],
+                "tvshowid": db_item.get("tvshowid", ""),
+                "filter": {
+                    "and": [
+                        {
+                            "field": "season",
+                            "operator": "is",
+                            "value": str(all_info['info']["season"]),
+                        },
+                        {
+                            "field": "episode",
+                            "operator": "is",
+                            "value": str(all_info['info']["episode"]),
+                        },
+                    ]
+                },
+            },
+        )
+        
+        db_details = db_details.get("episodes", [])
+        if not db_details:
+            return None
+        
+        db_details = db_details[0]
+        external_ids = db_item.get("uniqueid", {})
+        show_ids = {
+            "tmdb": all_info['info'].get("tmdb_show_id"),
+            "tvdb": all_info['info'].get("tvdb_show_id"),
+            "trakt": all_info['info'].get("trakt_show_id"),
+        }
+
+        if all([int(external_ids.get(i, -1)) in [-1, show_ids[i]] for i in show_ids]):
+            source_info = get_file_info(db_details)
+            source = {
+                "scraper": self._scraper,
+                "release_title": db_details['label'],
+                "info": source_info['info'],
+                "size": source_info['size'],
+                "quality": source_info['quality'],
+                "url": db_details.get('file', ''),
+            }
+
+        return source
 
     def _process_movie_item(self, db_item, all_info):
         source = None
@@ -135,25 +195,22 @@ class LibraryCore(Core):
 
         return source
 
-    # def episode(self, simple_info, all_info):
-    #     self.start_time = time.time()
-    #     sources = []
+    def episode(self, simple_info, all_info):
+        self.start_time = time.time()
+        sources = []
 
-    #     show_title = simple_info["show_title"]
+        try:
+            items = self._make_show_query()
 
-    #     try:
-    #         self._api = JustWatch(country=self._country)
-    #         items = self._make_show_query(show_title)
+            for item in items:
+                source = self._process_show_item(item, all_info)
+                if source is not None:
+                    sources.append(source)
+                    break
+        except PreemptiveCancellation:
+            return self._return_results("episode", sources, preemptive=True)
 
-    #         for item in items:
-    #             source = self._process_show_item(item, simple_info, all_info)
-    #             if source is not None:
-    #                 sources.append(source)
-    #                 break
-    #     except PreemptiveCancellation:
-    #         return self._return_results("episode", sources, preemptive=True)
-
-    #     return self._return_results("episode", sources)
+        return self._return_results("episode", sources)
 
     def movie(self, simple_info, all_info):
         self.start_time = time.time()
