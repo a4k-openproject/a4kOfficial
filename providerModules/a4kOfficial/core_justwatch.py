@@ -58,9 +58,9 @@ class JustWatchCore(Core):
 
         self._current_offers = []
         for item in items:
-            self._current_offers.append(self._get_service_offers(item))
+            self._current_offers.extend(self._get_service_offers(item))
 
-        return self._current_offers
+        return items
 
     def _make_movie_query(self, title, year):
         items = self.__make_query(
