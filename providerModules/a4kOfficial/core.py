@@ -1,5 +1,3 @@
-import xbmcgui
-
 import time
 
 from providerModules.a4kOfficial import common
@@ -9,7 +7,8 @@ from resources.lib.modules.exceptions import PreemptiveCancellation
 
 class Core:
     def __init__(self):
-        self.start_time = 0
+        self.start_time = time.time()
+        self.sources = []
         self._scraper = self.__module__.split('.')[-1]
 
     def _return_results(self, source_type, sources, preemptive=False):

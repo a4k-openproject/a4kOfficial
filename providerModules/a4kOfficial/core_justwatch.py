@@ -1,8 +1,6 @@
 import xbmcaddon
 import xbmcgui
 
-import time
-
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
 from providerModules.a4kOfficial.core import Core
@@ -180,9 +178,6 @@ class JustWatchCore(Core):
         return self._get_service_id(item=item)
 
     def episode(self, simple_info, all_info, id_format=None):
-        self.start_time = time.time()
-        sources = []
-
         show_title = simple_info["show_title"]
 
         try:
@@ -194,16 +189,14 @@ class JustWatchCore(Core):
                     item, simple_info, all_info, id_format=None
                 )
                 if source is not None:
-                    sources.append(source)
+                    self.sources.append(source)
                     break
         except PreemptiveCancellation:
-            return self._return_results("episode", sources, preemptive=True)
+            return self._return_results("episode", self.sources, preemptive=True)
 
-        return self._return_results("episode", sources)
+        return self._return_results("episode", self.sources)
 
     def movie(self, simple_info, all_info, id_format=None):
-        self.start_time = time.time()
-        sources = []
         queries = []
         queries.append(simple_info['title'])
         queries.extend(simple_info.get('aliases', []))
@@ -219,12 +212,12 @@ class JustWatchCore(Core):
                     item, simple_info, all_info, id_format
                 )
                 if source is not None:
-                    sources.append(source)
+                    self.sources.append(source)
                     break
         except PreemptiveCancellation:
-            return self._return_results("movie", sources, preemptive=True)
+            return self._return_results("movie", self.sources, preemptive=True)
 
-        return self._return_results("movie", sources)
+        return self._return_results("movie", self.sources)
 
     @staticmethod
     def get_listitem(return_data):
