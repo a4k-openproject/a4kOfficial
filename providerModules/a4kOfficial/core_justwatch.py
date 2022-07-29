@@ -3,6 +3,7 @@ import xbmcgui
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
+from providerModules.a4kOfficial.configure import fix_provider_status
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.exceptions import AddonNotInstalledError
 from providerModules.a4kOfficial.justwatch import JustWatch
@@ -221,11 +222,9 @@ class JustWatchCore(Core):
 
     @staticmethod
     def get_listitem(return_data):
-        _check_for_addon(return_data['scraper'], return_data['plugin'])
-
-        list_item = xbmcgui.ListItem(path=return_data["url"], offscreen=True)
-        list_item.setContentLookup(False)
-        list_item.setProperty('isFolder', 'false')
-        list_item.setProperty('isPlayable', 'true')
-
-        return list_item
+        try:
+            _check_for_addon(return_data['scraper'], return_data['plugin'])
+        except AddonNotInstalledError as anie:
+            fix_provider_status(return_data['scraper'], return_data['plugin'])
+        finally:
+            return super(JustWatchCore).get_listitem(return_data)

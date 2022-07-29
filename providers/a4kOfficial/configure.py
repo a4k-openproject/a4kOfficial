@@ -8,22 +8,27 @@ from resources.lib.modules.providers.install_manager import ProviderInstallManag
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
 
-for provider in ADDON_IDS:
+
+def fix_provider_status(scraper=None, plugin=None):
     status = True
     try:
-        xbmcaddon.Addon(ADDON_IDS[provider])
-    except Exception:
+        xbmcaddon.Addon(plugin)
+    except RuntimeError:
         status = False
 
     common.log(
         "a4kOfficial: '{}' is{} installed; {}abling '{}'".format(
-            ADDON_IDS[provider],
+            plugin,
             '' if status else ' not',
             'en' if status else 'dis',
-            provider,
+            scraper,
         ),
         'info',
     )
     ProviderInstallManager().flip_provider_status(
-        'a4kOfficial', provider, "enabled" if status else "disabled"
+        'a4kOfficial', scraper, "enabled" if status else "disabled"
     )
+
+
+for scraper, plugin in ADDON_IDS.items():
+    fix_provider_status(scraper, plugin)

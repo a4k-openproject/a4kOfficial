@@ -2,8 +2,6 @@ import time
 
 from providerModules.a4kOfficial import common
 
-from resources.lib.modules.exceptions import PreemptiveCancellation
-
 
 class Core:
     def __init__(self):
