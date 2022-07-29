@@ -14,13 +14,13 @@ from resources.lib.modules.globals import g
 
 PACKAGE_NAME = 'a4kOfficial'
 ADDON_IDS = {
-    "amazonprime": "plugin.video.amazon-test",
-    "disneyplus": "slyguy.disney.plus",
+    "amazon prime": "plugin.video.amazon-test",
+    "disney+": "slyguy.disney.plus",
     "hulu": "slyguy.hulu",
     "netflix": "plugin.video.netflix",
-    "hbomax": "slyguy.hbo.max",
-    "paramountplus": "slyguy.paramount.plus",
-    "curiositystream": "slyguy.curiositystream",
+    "hbo max": "slyguy.hbo.max",
+    "paramount+": "slyguy.paramount.plus",
+    "curiosity stream": "slyguy.curiositystream",
     "iplayer": "plugin.video.iplayerwww",
 }
 

@@ -8,20 +8,12 @@ import xbmcaddon
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
-from providers.a4kOfficial.configure import fix_provider_status
+from providers.a4kOfficial.configure import check_for_addon, change_provider_status
 from providerModules.a4kOfficial.core import Core
-from providerModules.a4kOfficial.exceptions import AddonNotInstalledError
 from providerModules.a4kOfficial.justwatch import JustWatch
 
 from resources.lib.common.source_utils import clean_title
 from resources.lib.modules.exceptions import PreemptiveCancellation
-
-
-def _check_for_addon(scraper, plugin):
-    try:
-        xbmcaddon.Addon(plugin)
-    except RuntimeError:
-        raise AddonNotInstalledError(scraper, plugin)
 
 
 def get_quality(offer):
@@ -49,7 +41,7 @@ class JustWatchCore(Core):
         self._movie_url = None
         self._episode_url = None
 
-        _check_for_addon(self._scraper, self._plugin)
+        check_for_addon(self._scraper, self._plugin)
 
     def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
@@ -227,9 +219,15 @@ class JustWatchCore(Core):
 
     @staticmethod
     def get_listitem(return_data):
-        try:
-            _check_for_addon(return_data['scraper'], return_data['plugin'])
-        except AddonNotInstalledError as anie:
-            fix_provider_status(return_data['scraper'], return_data['plugin'])
-        finally:
-            return super(JustWatchCore).get_listitem(return_data)
+        scraper = return_data['scraper']
+        if not check_for_addon(scraper):
+            common.log(
+                "a4kOfficial: '{}' is not installed; disabling '{}'".format(
+                    ADDON_IDS[scraper],
+                    scraper,
+                ),
+                'info',
+            )
+            change_provider_status(scraper, "disabled")
+        else:
+            return super(JustWatchCore, JustWatchCore).get_listitem(return_data)
