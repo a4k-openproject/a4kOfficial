@@ -30,5 +30,7 @@ def fix_provider_status(scraper=None, plugin=None):
     )
 
 
-for scraper, plugin in ADDON_IDS.items():
-    fix_provider_status(scraper, plugin)
+if common.get_setting("general.firstrun") == "true":
+    for scraper, plugin in ADDON_IDS.items():
+        fix_provider_status(scraper, plugin)
+    common.set_setting("general.firstrun", "false")
