@@ -1,5 +1,7 @@
 import time
 
+import xbmcgui
+
 from providerModules.a4kOfficial import common
 
 
@@ -30,17 +32,11 @@ class Core:
 
         return sources
 
-    def episode(self, simple_info, all_info):
-        self.start_time = time.time()
-        sources = []
-
-        return self._return_results("episode", sources)
-
     def movie(self, simple_info, all_info):
-        self.start_time = time.time()
-        sources = []
+        raise NotImplementedError
 
-        return self._return_results("movie", sources)
+    def episode(self, simple_info, all_info):
+        raise NotImplementedError
 
     @staticmethod
     def get_listitem(return_data):
