@@ -3,7 +3,7 @@ import xbmcgui
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
-from providerModules.a4kOfficial.configure import fix_provider_status
+from providers.a4kOfficial.configure import fix_provider_status
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.exceptions import AddonNotInstalledError
 from providerModules.a4kOfficial.justwatch import JustWatch
