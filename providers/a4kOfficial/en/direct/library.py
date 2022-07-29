@@ -182,7 +182,14 @@ class sources(Core):
             "trakt": all_info['info'].get("trakt_id"),
         }
 
-        if all([int(external_ids.get(i, -1)) in [-1, movie_ids[i]] for i in movie_ids]):
+        if all(
+            [
+                int(external_ids.get(i, -1))
+                if not i == "imdb"
+                else external_ids.get(i, -1) in [-1, movie_ids[i]]
+                for i in movie_ids
+            ]
+        ):
             source_info = get_file_info(db_details)
             source = {
                 "scraper": self._scraper,
