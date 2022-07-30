@@ -25,6 +25,8 @@ def setup():
 class sources(Core):
     def __init__(self):
         super(sources, self).__init__()
+        self._api = Plex()
+        self._resources = self._api.get_resources()
 
     def __make_query(self, method, params, **kwargs):
         result = {}

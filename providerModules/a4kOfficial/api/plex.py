@@ -39,8 +39,10 @@ class Plex:
             "X-Plex-Device": common.get_platform_system(),
             "X-Plex-Model": common.get_platform_machine(),
             "X-Plex-Provides": "player",
-            "X-Plex-Client-Identifier": str(hex(uuid.getnode())),
+            "X-Plex-Client-Identifier": self._client_id or str(hex(uuid.getnode())),
         }
+        if self._token:
+            self._headers["X-Plex-Token"] = self._token
 
     def auth(self):
         self.progress = xbmcgui.DialogProgress()
@@ -119,21 +121,24 @@ class Plex:
 
         if self._token:
             self.progress.close()
+            self._headers.update(
+                {
+                    "X-Plex-Client-Identifier": self._client_id,
+                    "X-Plex-Token": self._token,
+                }
+            )
+
             common.set_setting("plex.token", self._token)
             common.set_setting("plex.client_id", self._client_id)
-            xbmc.sleep(500)
 
             device_id = self.get_device_id()
             if device_id is not None:
                 common.set_setting("plex.device_id", device_id)
 
+            self.dialog.ok("a4kOfficial", "Successfully authenticated with Plex.")
+
     def get_device_id(self):
-        url = (
-            self._base_url
-            + "/devices.xml?X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
-                self._client_id, self._token
-            )
-        )
+        url = self._base_url + "/devices.xml"
         results = requests.get(url, headers=self._headers)
 
         if results.status_code != 200:
@@ -148,17 +153,58 @@ class Plex:
             container = ElementTree.fromstring(results.text)
             devices = container.findall("Device")
             for device in devices:
-                device_token = device.get("token")
+                device_token = device.get("token", "")
                 if device_token == self._token:
                     return device.get("id")
         except Exception as e:
             common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")
             return
 
+    def get_resources(self):
+        url = self._base_url + "/api/v2/resources"
+        results = requests.get(url, params={"includeHttps": 1}, headers=self._headers)
+
+        if results.status_code != 200:
+            common.log(
+                "Failed to list Plex resources: {} response from {}".format(
+                    results.status_code, url
+                )
+            )
+            return
+
+        listings = []
+        try:
+            data = ElementTree.fromstring(results.text)
+            resources = data.findall("resource")
+            for resource in resources:
+                if "server" in resource.get("provides", ""):
+                    access_token = resource.get("accessToken", "")
+                    if not access_token:
+                        continue
+
+                    name = resource.get("name", "")
+                    connections = resource.find("connections")
+                    for connection in connections.findall("connection"):
+                        url = connection.get("uri", "")
+                        local = int(connection.get("local", "1"))
+
+                        if ".plex.direct" in url and local == 0:
+                            listings.append(
+                                (
+                                    url,
+                                    name,
+                                )
+                            )
+        except Exception as e:
+            common.log(
+                "a4kOfficial: Failed to list Plex resources: {}".format(e), "error"
+            )
+            return
+
+        return listings
+
     def revoke(self):
-        url = "https://www.plex.tv/devices/{}.xml?X-Plex-Token={}".format(
-            self._device_id, self._token
-        )
+        url = "https://www.plex.tv/devices/{}.xml".format(self._device_id)
         result = requests.delete(url)
 
         if result.status_code != 200:
