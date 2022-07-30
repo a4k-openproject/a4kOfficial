@@ -46,7 +46,11 @@ class Plex:
         data = requests.post(url, headers=self._headers)
 
         if data.status_code != 201:
-            raise Exception
+            common.log(
+                "Failed to authorize Plex: {} response from {}".format(
+                    data.status_code, url
+                )
+            )
 
         code = re.search(r"<code>(.*?)</code>", data.text, re.I).group(1)
         self._device_id = re.search(r"<id.+?>(.*?)</id>", data.text, re.I).group(1)
@@ -73,7 +77,11 @@ class Plex:
         data = requests.get(self._check_url, headers=self._headers)
 
         if data.status_code != 200:
-            raise Exception
+            common.log(
+                "Failed to authorize Plex: {} response from {}".format(
+                    data.status_code, self._check_url
+                )
+            )
 
         try:
             self._token = re.search(
@@ -104,7 +112,11 @@ class Plex:
         results = requests.get(url, headers=self._headers)
 
         if results.status_code != 200:
-            raise Exception
+            common.log(
+                "Failed to authorize Plex: {} response from {}".format(
+                    results.status_code, url
+                )
+            )
 
         devices = re.findall(
             r"(<Device\s.+?</Device>)", results.text, flags=re.M | re.S
@@ -115,3 +127,19 @@ class Plex:
                 continue
 
             return common.parseDOM(device, "Device", ret="id")[0]
+
+    def revoke(self):
+        url = "https://www.plex.tv/devices/{}.xml?X-Plex-Token={}".format(
+            self._device_id, self._token
+        )
+        result = requests.delete(url)
+
+        if result.status_code != 200:
+            common.log(
+                "Failed to revoke Plex authorization: {} response from {}".format(
+                    result.status_code, url
+                )
+            )
+
+        for setting in ["plex.token", "plex.client_id", "plex.device_id"]:
+            common.set_setting(setting, "")

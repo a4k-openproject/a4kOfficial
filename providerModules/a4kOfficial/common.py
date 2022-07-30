@@ -14,15 +14,16 @@ from resources.lib.modules.globals import g
 
 PACKAGE_NAME = 'a4kOfficial'
 ADDON_IDS = {
-    "primevideo": {"plugin": "plugin.video.amazon-test", "name": "Prime Video"},
-    "disneyplus": {"plugin": "slyguy.disney.plus", "name": "Disney+"},
-    "hulu": {"plugin": "slyguy.hulu", "name": "Hulu"},
-    "netflix": {"plugin": "plugin.video.netflix", "name": "Netflix"},
-    "hbomax": {"plugin": "slyguy.hbo.max", "name": "HBO Max"},
-    "paramountplus": {"plugin": "slyguy.paramount.plus", "name": "Paramount+"},
+    "iplayer": {"plugin": "plugin.video.iplayerwww", "name": "BBC iPlayer"},
     "curiositystream": {"plugin": "slyguy.curiositystream", "name": "CuriosityStream"},
-    "iplayer": {"plugin": "plugin.video.iplayerwww", "name": "iPlayer"},
-    "library": {"plugin": None, "name": "Library"}
+    "disneyplus": {"plugin": "slyguy.disney.plus", "name": "Disney+"},
+    "hbomax": {"plugin": "slyguy.hbo.max", "name": "HBO Max"},
+    "hulu": {"plugin": "slyguy.hulu", "name": "Hulu"},
+    "library": {"plugin": None, "name": "Library"},
+    "netflix": {"plugin": "plugin.video.netflix", "name": "Netflix"},
+    "paramountplus": {"plugin": "slyguy.paramount.plus", "name": "Paramount+"},
+    "plex": {"plugin": None, "name": "Plex"},
+    "primevideo": {"plugin": "plugin.video.amazon-test", "name": "Prime Video"},
 }
 
 

@@ -21,6 +21,27 @@
       "default": "true",
       "visible": false,
       "label": "First Run"
+    },
+    {
+      "id": "plex.token",
+      "type": "string",
+      "default": "",
+      "visible": false,
+      "label": "Plex Token"
+    },
+    {
+      "id": "plex.client_id",
+      "type": "string",
+      "default": "",
+      "visible": false,
+      "label": "Plex Client ID"
+    },
+    {
+      "id": "plex.device_id",
+      "type": "string",
+      "default": "",
+      "visible": false,
+      "label": "Plex Device ID"
     }
   ]
 }

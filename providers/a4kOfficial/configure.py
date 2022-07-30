@@ -78,6 +78,8 @@ if common.get_setting("general.firstrun") == "true":
                     ),
                 ):
                     success = provider.setup()
+                    if not success:
+                        common.log("a4kOfficial.{}: Setup not complete; disabling".format(scraper))
                     change_provider_status(
                         scraper, "{}abled".format("en" if success else "dis")
                     )
