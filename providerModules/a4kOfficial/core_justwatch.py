@@ -220,7 +220,7 @@ class JustWatchCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data['scraper']
-        if not check_for_addon(scraper):
+        if not check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 "a4kOfficial: '{}' is not installed; disabling '{}'".format(
                     ADDON_IDS[scraper]["plugin"],
