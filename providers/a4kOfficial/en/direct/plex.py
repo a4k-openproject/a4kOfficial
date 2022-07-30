@@ -27,22 +27,25 @@ class sources(Core):
         self._api = Plex()
         self._resources = self._api.get_resources()
 
-    def __make_query(self, base_url, query, **kwargs):
-        result = self._api.search(base_url, query, **kwargs)
+    def __make_query(self, resource, query, **kwargs):
+        result = self._api.search(resource, query, **kwargs)
 
         return result
 
-    def _make_show_query(self, base_url, show_title):
+    def _make_show_query(self, resource, show_title):
         result = {}
 
         return result.get("tvshows", {})
 
-    def _make_movie_query(self, base_url, title, year):
-        result = self.__make_query(base_url, title, year=year, type="movie")
+    def _make_movie_query(self, resource, title, year):
+        result = self.__make_query(resource, title, year=year, type="movie")
+
+        if result == None:
+            return []
 
         return result.findall("Video")
 
-    def _process_show_item(self, base_url, item, all_info):
+    def _process_show_item(self, resource, item, all_info):
         source = None
 
         # source = {
@@ -56,7 +59,7 @@ class sources(Core):
 
         return source
 
-    def _process_movie_item(self, base_url, item, all_info):
+    def _process_movie_item(self, resource, item, all_info):
         source = None
 
         # source = {
@@ -86,7 +89,7 @@ class sources(Core):
     #     return self._return_results("episode", self.sources)
 
     def movie(self, simple_info, all_info):
-        for url in self._resources:
+        for resource in self._resources:
             queries = []
             queries.append(simple_info['title'])
             queries.extend(simple_info.get('aliases', []))
@@ -95,11 +98,13 @@ class sources(Core):
                 items = []
                 for query in queries:
                     items.extend(
-                        self._make_movie_query(url, query, int(simple_info['year']))
+                        self._make_movie_query(
+                            resource, query, int(simple_info['year'])
+                        )
                     )
 
                 for item in items:
-                    source = self._process_movie_item(url, item, all_info)
+                    source = self._process_movie_item(resource, item, all_info)
                     if source is not None:
                         self.sources.append(source)
                         break
