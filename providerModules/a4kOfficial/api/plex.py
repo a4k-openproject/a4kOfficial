@@ -4,6 +4,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
+from datetime import datetime
 import uuid
 from xml.etree import ElementTree
 
@@ -43,6 +44,7 @@ class Plex:
 
     def auth(self):
         self.progress = xbmcgui.DialogProgress()
+        self._start_auth_time = datetime.utcnow().timestamp()
 
         self._token = None
         url = self._base_url + "/pins.xml"
@@ -59,32 +61,53 @@ class Plex:
             pin = ElementTree.fromstring(data.text)
             code = pin.find("code").text
             self._device_id = pin.find("id").text
+            self._expire_auth_time = datetime.strptime(
+                pin.find("expires-at").text, "%Y-%m-%dT%H:%M:%SZ"
+            ).timestamp()
         except Exception as e:
             common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")
             return
 
         tools.copy2clip(code)
+        self._check_url = self._base_url + "/pins/{}.xml".format(self._device_id)
+
         self.progress.create("a4kOfficial: Plex Authorization")
+
+        while self._token is None:
+            if self.progress.iscanceled():
+                self.progress.close()
+                break
+            self.auth_loop(code)
+
+        return self._token is not None
+
+    def auth_loop(self, code):
+        current_auth_time = datetime.utcnow().timestamp()
         self.progress.update(
-            0,
+            int(
+                (
+                    float(current_auth_time - self._start_auth_time)
+                    / float(self._expire_auth_time - self._start_auth_time)
+                )
+                * 100
+            ),
             g.get_language_string(30018).format(g.color_string(self._auth_url))
             + '\n'
             + g.get_language_string(30019).format(g.color_string(code))
             + '\n'
             + g.get_language_string(30047),
         )
-        self._check_url = self._base_url + "/pins/{}.xml".format(self._device_id)
-        xbmc.sleep(2000)
-
-        while self._token is None:
-            if self.progress.iscanceled():
-                self.progress.close()
-                break
-            self.auth_loop()
-
-        return self._token is not None
-
-    def auth_loop(self):
+        common.log(
+            "{}".format(
+                int(
+                    (
+                        float(current_auth_time - self._start_auth_time)
+                        / float(self._expire_auth_time - self._start_auth_time)
+                    )
+                    * 100
+                )
+            )
+        )
         xbmc.sleep(5000)
         data = requests.get(self._check_url, headers=self._headers)
 
