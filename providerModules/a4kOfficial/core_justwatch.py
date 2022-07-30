@@ -4,8 +4,6 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-import xbmcaddon
-
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
 from providers.a4kOfficial.configure import check_for_addon, change_provider_status
@@ -40,8 +38,6 @@ class JustWatchCore(Core):
         self._scheme = None
         self._movie_url = None
         self._episode_url = None
-
-        check_for_addon(self._plugin)
 
     def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
