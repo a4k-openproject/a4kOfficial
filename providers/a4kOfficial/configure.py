@@ -63,9 +63,9 @@ if common.get_setting("general.firstrun") == "true":
     choices = dialog.multiselect(
         "a4kOfficial: Choose providers to enable",
         [ADDON_IDS[i[0]]["name"] for i in automatic],
-        preselect=[i for i in range(len(automatic)) if automatic[i]],
+        preselect=[i for i in range(len(automatic)) if automatic[i][1]],
     )
-    
+
     for i in range(len(automatic)):
         scraper, status = automatic[i][:2]
         if ADDON_IDS[scraper]["plugin"] is None and i in choices:
