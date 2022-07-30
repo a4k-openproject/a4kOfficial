@@ -74,15 +74,15 @@ class Plex:
         self.progress.create("a4kOfficial: Plex Authorization")
 
         while self._token is None:
-            if self.progress.iscanceled():
+            current_auth_time = datetime.utcnow().timestamp()
+            if self.progress.iscanceled() or current_auth_time > self._expire_auth_time:
                 self.progress.close()
                 break
-            self.auth_loop(code)
+            self.auth_loop(code, current_auth_time)
 
         return self._token is not None
 
-    def auth_loop(self, code):
-        current_auth_time = datetime.utcnow().timestamp()
+    def auth_loop(self, code, current_auth_time):
         self.progress.update(
             int(
                 (
@@ -97,17 +97,7 @@ class Plex:
             + '\n'
             + g.get_language_string(30047),
         )
-        common.log(
-            "{}".format(
-                int(
-                    (
-                        float(current_auth_time - self._start_auth_time)
-                        / float(self._expire_auth_time - self._start_auth_time)
-                    )
-                    * 100
-                )
-            )
-        )
+
         xbmc.sleep(5000)
         data = requests.get(self._check_url, headers=self._headers)
 
