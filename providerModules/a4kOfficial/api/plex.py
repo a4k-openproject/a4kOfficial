@@ -41,7 +41,7 @@ class Plex:
     def auth(self):
         self.progress = xbmcgui.DialogProgress()
 
-        self._token = ''
+        self._token = None
         url = self._base_url + "/pins.xml"
         data = requests.post(url, headers=self._headers)
 
@@ -60,11 +60,13 @@ class Plex:
         self._check_url = self._base_url + "/pins/{}.xml".format(self._device_id)
         xbmc.sleep(2000)
 
-        while not self._token:
+        while self._token is None:
             if self.progress.iscanceled():
                 self.progress.close()
                 break
             self.auth_loop()
+
+        return self._token is not None
 
     def auth_loop(self):
         xbmc.sleep(5000)
@@ -78,9 +80,9 @@ class Plex:
                 r"<auth_token>(.*?)</auth_token>", data.text, re.I
             ).group(1)
         except Exception:
-            self.token = ''
+            self._token = None
 
-        if self._token:
+        if self._token is not None:
             self._client_id = re.search(
                 r"<client-identifier>(.*?)</client-identifier>", data.text, re.I
             ).group(1)
