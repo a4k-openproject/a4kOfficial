@@ -14,6 +14,13 @@
       "default": "US",
       "visible": true,
       "label": "JustWatch Country"
+    },
+    {
+      "id": "general.firstrun",
+      "type": "string",
+      "default": "true",
+      "visible": false,
+      "label": "First Run"
     }
   ]
 }

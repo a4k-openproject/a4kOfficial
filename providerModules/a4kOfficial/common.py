@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+from future.standard_library import install_aliases
+
+install_aliases()
+
 import xbmc
 
 import math
@@ -8,14 +14,15 @@ from resources.lib.modules.globals import g
 
 PACKAGE_NAME = 'a4kOfficial'
 ADDON_IDS = {
-    "amazonprime": "plugin.video.amazon-test",
-    "disneyplus": "slyguy.disney.plus",
-    "hulu": "slyguy.hulu",
-    "netflix": "plugin.video.netflix",
-    "hbomax": "slyguy.hbo.max",
-    "paramountplus": "slyguy.paramount.plus",
-    "curiositystream": "slyguy.curiositystream",
-    "iplayer": "plugin.video.iplayerwww",
+    "primevideo": {"plugin": "plugin.video.amazon-test", "name": "Prime Video"},
+    "disneyplus": {"plugin": "slyguy.disney.plus", "name": "Disney+"},
+    "hulu": {"plugin": "slyguy.hulu", "name": "Hulu"},
+    "netflix": {"plugin": "plugin.video.netflix", "name": "Netflix"},
+    "hbomax": {"plugin": "slyguy.hbo.max", "name": "HBO Max"},
+    "paramountplus": {"plugin": "slyguy.paramount.plus", "name": "Paramount+"},
+    "curiositystream": {"plugin": "slyguy.curiositystream", "name": "CuriosityStream"},
+    "iplayer": {"plugin": "plugin.video.iplayerwww", "name": "iPlayer"},
+    "library": {"plugin": None, "name": "Library"}
 }
 
 

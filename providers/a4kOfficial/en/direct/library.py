@@ -1,12 +1,13 @@
-import xbmcaddon
-import xbmcgui
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+from future.standard_library import install_aliases
 
-import time
+install_aliases()
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core import Core
 
-from resources.lib.common.source_utils import clean_title, de_string_size
+from resources.lib.common.source_utils import de_string_size
 from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
@@ -21,7 +22,6 @@ def get_quality(width):
         return "720p"
     elif width < 1280:
         return "SD"
-        
 
 
 def get_file_info(db_details):
@@ -62,9 +62,9 @@ def get_file_info(db_details):
     return file_info
 
 
-class LibraryCore(Core):
+class sources(Core):
     def __init__(self):
-        super(LibraryCore, self).__init__()
+        super(sources, self).__init__()
 
     def __make_query(self, method, params, **kwargs):
         result = common.execute_jsonrpc(method=method, params=params, **kwargs).get(
@@ -115,7 +115,7 @@ class LibraryCore(Core):
 
     def _process_show_item(self, db_item, all_info):
         source = None
-        
+
         db_details = self.__make_query(
             method="VideoLibrary.GetEpisodes",
             params={
@@ -137,11 +137,11 @@ class LibraryCore(Core):
                 },
             },
         )
-        
+
         db_details = db_details.get("episodes", [])
         if not db_details:
             return None
-        
+
         db_details = db_details[0]
         external_ids = db_item.get("uniqueid", {})
         show_ids = {
@@ -182,7 +182,14 @@ class LibraryCore(Core):
             "trakt": all_info['info'].get("trakt_id"),
         }
 
-        if all([int(external_ids.get(i, -1)) in [-1, movie_ids[i]] for i in movie_ids]):
+        if all(
+            [
+                int(external_ids.get(i, -1))
+                if not i == "imdb"
+                else external_ids.get(i, -1) in [-1, movie_ids[i]]
+                for i in movie_ids
+            ]
+        ):
             source_info = get_file_info(db_details)
             source = {
                 "scraper": self._scraper,
@@ -196,25 +203,20 @@ class LibraryCore(Core):
         return source
 
     def episode(self, simple_info, all_info):
-        self.start_time = time.time()
-        sources = []
-
         try:
             items = self._make_show_query()
 
             for item in items:
                 source = self._process_show_item(item, all_info)
                 if source is not None:
-                    sources.append(source)
+                    self.sources.append(source)
                     break
         except PreemptiveCancellation:
-            return self._return_results("episode", sources, preemptive=True)
+            return self._return_results("episode", self.sources, preemptive=True)
 
-        return self._return_results("episode", sources)
+        return self._return_results("episode", self.sources)
 
     def movie(self, simple_info, all_info):
-        self.start_time = time.time()
-        sources = []
         queries = []
         queries.append(simple_info['title'])
         queries.extend(simple_info.get('aliases', []))
@@ -227,9 +229,9 @@ class LibraryCore(Core):
             for item in items:
                 source = self._process_movie_item(item, all_info)
                 if source is not None:
-                    sources.append(source)
+                    self.sources.append(source)
                     break
         except PreemptiveCancellation:
-            return self._return_results("movie", sources, preemptive=True)
+            return self._return_results("movie", self.sources, preemptive=True)
 
-        return self._return_results("movie", sources)
+        return self._return_results("movie", self.sources)

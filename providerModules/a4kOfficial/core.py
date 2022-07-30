@@ -1,15 +1,20 @@
-import xbmcgui
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+from future.standard_library import install_aliases
+
+install_aliases()
 
 import time
 
-from providerModules.a4kOfficial import common
+import xbmcgui
 
-from resources.lib.modules.exceptions import PreemptiveCancellation
+from providerModules.a4kOfficial import common
 
 
 class Core:
     def __init__(self):
-        self.start_time = 0
+        self.start_time = time.time()
+        self.sources = []
         self._scraper = self.__module__.split('.')[-1]
 
     def _return_results(self, source_type, sources, preemptive=False):
@@ -33,17 +38,11 @@ class Core:
 
         return sources
 
-    def episode(self, simple_info, all_info):
-        self.start_time = time.time()
-        sources = []
-
-        return self._return_results("episode", sources)
-
     def movie(self, simple_info, all_info):
-        self.start_time = time.time()
-        sources = []
+        raise NotImplementedError
 
-        return self._return_results("movie", sources)
+    def episode(self, simple_info, all_info):
+        raise NotImplementedError
 
     @staticmethod
     def get_listitem(return_data):

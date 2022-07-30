@@ -1,23 +1,19 @@
-import xbmcaddon
-import xbmcgui
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+from future.standard_library import install_aliases
 
-import time
+install_aliases()
+
+import xbmcaddon
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
+from providers.a4kOfficial.configure import check_for_addon, change_provider_status
 from providerModules.a4kOfficial.core import Core
-from providerModules.a4kOfficial.exceptions import AddonNotInstalledError
 from providerModules.a4kOfficial.justwatch import JustWatch
 
 from resources.lib.common.source_utils import clean_title
 from resources.lib.modules.exceptions import PreemptiveCancellation
-
-
-def _check_for_addon(scraper, plugin):
-    try:
-        xbmcaddon.Addon(plugin)
-    except RuntimeError:
-        raise AddonNotInstalledError(scraper, plugin)
 
 
 def get_quality(offer):
@@ -37,7 +33,7 @@ class JustWatchCore(Core):
         super(JustWatchCore, self).__init__()
         self._country = common.get_setting("justwatch.country")
         self._monetization_types = ["free", "flatrate"]
-        self._plugin = ADDON_IDS[self._scraper]
+        self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._current_offers = None
 
         self._providers = None
@@ -45,7 +41,7 @@ class JustWatchCore(Core):
         self._movie_url = None
         self._episode_url = None
 
-        _check_for_addon(self._scraper, self._plugin)
+        check_for_addon(self._plugin)
 
     def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
@@ -180,9 +176,6 @@ class JustWatchCore(Core):
         return self._get_service_id(item=item)
 
     def episode(self, simple_info, all_info, id_format=None):
-        self.start_time = time.time()
-        sources = []
-
         show_title = simple_info["show_title"]
 
         try:
@@ -194,16 +187,14 @@ class JustWatchCore(Core):
                     item, simple_info, all_info, id_format=None
                 )
                 if source is not None:
-                    sources.append(source)
+                    self.sources.append(source)
                     break
         except PreemptiveCancellation:
-            return self._return_results("episode", sources, preemptive=True)
+            return self._return_results("episode", self.sources, preemptive=True)
 
-        return self._return_results("episode", sources)
+        return self._return_results("episode", self.sources)
 
     def movie(self, simple_info, all_info, id_format=None):
-        self.start_time = time.time()
-        sources = []
         queries = []
         queries.append(simple_info['title'])
         queries.extend(simple_info.get('aliases', []))
@@ -219,20 +210,24 @@ class JustWatchCore(Core):
                     item, simple_info, all_info, id_format
                 )
                 if source is not None:
-                    sources.append(source)
+                    self.sources.append(source)
                     break
         except PreemptiveCancellation:
-            return self._return_results("movie", sources, preemptive=True)
+            return self._return_results("movie", self.sources, preemptive=True)
 
-        return self._return_results("movie", sources)
+        return self._return_results("movie", self.sources)
 
     @staticmethod
     def get_listitem(return_data):
-        _check_for_addon(return_data['scraper'], return_data['plugin'])
-
-        list_item = xbmcgui.ListItem(path=return_data["url"], offscreen=True)
-        list_item.setContentLookup(False)
-        list_item.setProperty('isFolder', 'false')
-        list_item.setProperty('isPlayable', 'true')
-
-        return list_item
+        scraper = return_data['scraper']
+        if not check_for_addon(scraper):
+            common.log(
+                "a4kOfficial: '{}' is not installed; disabling '{}'".format(
+                    ADDON_IDS[scraper]["plugin"],
+                    scraper,
+                ),
+                'info',
+            )
+            change_provider_status(scraper, "disabled")
+        else:
+            return super(JustWatchCore, JustWatchCore).get_listitem(return_data)

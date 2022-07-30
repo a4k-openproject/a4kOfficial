@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, unicode_literals
 
-from . import adaptive
+from . import adaptive, direct
 
 
 def get_torrent():
@@ -14,3 +14,7 @@ def get_hosters():
 
 def get_adaptive():
     return adaptive.__all__
+
+
+def get_direct():
+    return direct.__all__
