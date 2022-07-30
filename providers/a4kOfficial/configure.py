@@ -15,8 +15,7 @@ from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
 
 
-def check_for_addon(scraper):
-    plugin = ADDON_IDS[scraper]
+def check_for_addon(plugin):
     if plugin is None:
         return False
 
