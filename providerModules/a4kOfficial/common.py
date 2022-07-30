@@ -5,25 +5,51 @@ from future.standard_library import install_aliases
 install_aliases()
 
 import xbmc
+import xbmcaddon
 
 import math
 import os
 
 from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
+from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 PACKAGE_NAME = 'a4kOfficial'
 ADDON_IDS = {
-    "iplayer": {"plugin": "plugin.video.iplayerwww", "name": "BBC iPlayer"},
-    "curiositystream": {"plugin": "slyguy.curiositystream", "name": "CuriosityStream"},
-    "disneyplus": {"plugin": "slyguy.disney.plus", "name": "Disney+"},
-    "hbomax": {"plugin": "slyguy.hbo.max", "name": "HBO Max"},
-    "hulu": {"plugin": "slyguy.hulu", "name": "Hulu"},
-    "library": {"plugin": None, "name": "Library"},
-    "netflix": {"plugin": "plugin.video.netflix", "name": "Netflix"},
-    "paramountplus": {"plugin": "slyguy.paramount.plus", "name": "Paramount+"},
-    "plex": {"plugin": None, "name": "Plex"},
-    "primevideo": {"plugin": "plugin.video.amazon-test", "name": "Prime Video"},
+    "iplayer": {
+        "plugin": "plugin.video.iplayerwww",
+        "name": "BBC iPlayer",
+        "type": "adaptive",
+    },
+    "curiositystream": {
+        "plugin": "slyguy.curiositystream",
+        "name": "CuriosityStream",
+        "type": "adaptive",
+    },
+    "disneyplus": {
+        "plugin": "slyguy.disney.plus",
+        "name": "Disney+",
+        "type": "adaptive",
+    },
+    "hbomax": {"plugin": "slyguy.hbo.max", "name": "HBO Max", "type": "adaptive"},
+    "hulu": {"plugin": "slyguy.hulu", "name": "Hulu", "type": "adaptive"},
+    "library": {"plugin": None, "name": "Library", "type": "direct"},
+    "netflix": {
+        "plugin": "plugin.video.netflix",
+        "name": "Netflix",
+        "type": "adaptive",
+    },
+    "paramountplus": {
+        "plugin": "slyguy.paramount.plus",
+        "name": "Paramount+",
+        "type": "adaptive",
+    },
+    "plex": {"plugin": None, "name": "Plex", "type": "direct"},
+    "primevideo": {
+        "plugin": "plugin.video.amazon-test",
+        "name": "Prime Video",
+        "type": "adaptive",
+    },
 }
 
 
@@ -107,3 +133,20 @@ def get_platform_machine():
     from platform import machine
 
     return machine()
+
+
+def check_for_addon(plugin):
+    if plugin is None:
+        return False
+
+    status = True
+    try:
+        xbmcaddon.Addon(plugin)
+    except RuntimeError:
+        status = False
+    finally:
+        return status
+
+
+def change_provider_status(scraper=None, status="enabled"):
+    ProviderInstallManager().flip_provider_status('a4kOfficial', scraper, status)

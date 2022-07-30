@@ -6,7 +6,6 @@ install_aliases()
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
-from providers.a4kOfficial.configure import check_for_addon, change_provider_status
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.justwatch import JustWatch
 
@@ -216,7 +215,7 @@ class JustWatchCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data['scraper']
-        if not check_for_addon(ADDON_IDS[scraper]["plugin"]):
+        if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 "a4kOfficial: '{}' is not installed; disabling '{}'".format(
                     ADDON_IDS[scraper]["plugin"],
@@ -224,6 +223,6 @@ class JustWatchCore(Core):
                 ),
                 'info',
             )
-            change_provider_status(scraper, "disabled")
+            common.change_provider_status(scraper, "disabled")
         else:
             return super(JustWatchCore, JustWatchCore).get_listitem(return_data)
