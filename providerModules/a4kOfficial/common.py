@@ -90,3 +90,19 @@ def convert_size(size_bytes):
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
     return "{}{}".format(s, size_name[i])
+
+
+def get_kodi_version():
+    return xbmc.getInfoLabel("System.BuildVersion")
+
+
+def get_platform_system():
+    from platform import system
+
+    return system()
+
+
+def get_platform_machine():
+    from platform import machine
+
+    return machine()
