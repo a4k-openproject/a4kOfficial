@@ -68,18 +68,20 @@ if common.get_setting("general.firstrun") == "true":
 
     for i in range(len(automatic)):
         scraper, status = automatic[i][:2]
-        if ADDON_IDS[scraper]["plugin"] is None and i in choices:
-            if dialog.yesno(
-                "a4kOfficial",
-                "Do you want to enable and setup {}?".format(
-                    ADDON_IDS[scraper]["name"]
-                ),
-            ):
-                provider = importlib.import_module(scraper)
-                provider.setup()
+        if i in choices:
+            provider = importlib.import_module(scraper)
+            if hasattr(provider, "setup"):
+                if dialog.yesno(
+                    "a4kOfficial",
+                    "Do you want to enable and setup {}?".format(
+                        ADDON_IDS[scraper]["name"]
+                    ),
+                ):
+                    success = provider.setup()
+                    change_provider_status(
+                        scraper, "{}abled".format("en" if success else "dis")
+                    )
             else:
-                change_provider_status(scraper, "disabled")
+                change_provider_status(scraper, "enabled")
         else:
-            change_provider_status(
-                scraper, "{}abled".format("en" if i in choices else "dis")
-            )
+            change_provider_status(scraper, "disabled")
