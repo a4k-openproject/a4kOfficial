@@ -4,8 +4,8 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-import re
 import uuid
+from xml.etree import ElementTree
 
 import requests
 
@@ -17,7 +17,7 @@ from providerModules.a4kOfficial import common
 
 class Plex:
     def __init__(self):
-        self._base_url = "https://www.plex.tv"
+        self._base_url = "https://plex.tv"
         self._auth_url = self._base_url + "/link/"
         self._token = common.get_setting("plex.token")
         self._client_id = common.get_setting("plex.client_id")
@@ -28,8 +28,8 @@ class Plex:
 
         self._headers = {
             "X-Plex-Device-Name": "a4kOfficial",
-            "X-Plex-Product": "PlexNet",
-            "X-Plex-Version": "0.3.4",
+            "X-Plex-Product": "Seren",
+            "X-Plex-Version": "1.1.1",
             "X-Plex-Platform": "Kodi",
             "X-Plex-Platform-Version": common.get_kodi_version(),
             "X-Plex-Device": common.get_platform_system(),
@@ -52,8 +52,14 @@ class Plex:
                 )
             )
 
-        code = re.search(r"<code>(.*?)</code>", data.text, re.I).group(1)
-        self._device_id = re.search(r"<id.+?>(.*?)</id>", data.text, re.I).group(1)
+        try:
+            pin = ElementTree.fromstring(data.text)
+            code = pin.find("code").text
+            self._device_id = pin.find("id").text
+        except Exception as e:
+            common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")
+            return
+
         self.progress.create("a4kOfficial: Plex Authorization")
         self.progress.update(
             0,
@@ -85,29 +91,27 @@ class Plex:
             return
 
         try:
-            self._token = re.search(
-                r"<auth_token>(.*?)</auth_token>", data.text, re.I
-            ).group(1)
+            pin = ElementTree.fromstring(data.text)
+            self._token = pin.find("auth_token").text
+            self._client_id = pin.find("client-identifier").text
         except Exception:
             self._token = None
+            self._client_id = None
 
-        if self._token is not None:
-            self._client_id = re.search(
-                r"<client-identifier>(.*?)</client-identifier>", data.text, re.I
-            ).group(1)
+        if self._token:
             self.progress.close()
             common.set_setting("plex.token", self._token)
             common.set_setting("plex.client_id", self._client_id)
             xbmc.sleep(500)
 
-            new_id = self.get_auth_id()
-            if new_id is not None:
-                common.set_setting("plex.device_id", new_id)
+            device_id = self.get_device_id()
+            if device_id is not None:
+                common.set_setting("plex.device_id", device_id)
 
-    def get_auth_id(self):
+    def get_device_id(self):
         url = (
             self._base_url
-            + "/devices.xml?&X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
+            + "/devices.xml?X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
                 self._client_id, self._token
             )
         )
@@ -121,15 +125,16 @@ class Plex:
             )
             return
 
-        devices = re.findall(
-            r"(<Device\s.+?</Device>)", results.text, flags=re.M | re.S
-        )
-        for device in devices:
-            device_token = common.parseDOM(device, "Device", ret="token")[0]
-            if device_token != self._token:
-                continue
-
-            return common.parseDOM(device, "Device", ret="id")[0]
+        try:
+            container = ElementTree.fromstring(results.text)
+            devices = container.findall("Device")
+            for device in devices:
+                device_token = device.get("token")
+                if device_token == self._token:
+                    return device.get("id")
+        except Exception as e:
+            common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")
+            return
 
     def revoke(self):
         url = "https://www.plex.tv/devices/{}.xml?X-Plex-Token={}".format(
