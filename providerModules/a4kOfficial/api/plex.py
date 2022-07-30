@@ -82,6 +82,7 @@ class Plex:
                     data.status_code, self._check_url
                 )
             )
+            return
 
         try:
             self._token = re.search(
@@ -100,7 +101,8 @@ class Plex:
             xbmc.sleep(500)
 
             new_id = self.get_auth_id()
-            common.set_setting("plex.device_id", new_id)
+            if new_id is not None:
+                common.set_setting("plex.device_id", new_id)
 
     def get_auth_id(self):
         url = (
@@ -117,6 +119,7 @@ class Plex:
                     results.status_code, url
                 )
             )
+            return
 
         devices = re.findall(
             r"(<Device\s.+?</Device>)", results.text, flags=re.M | re.S
