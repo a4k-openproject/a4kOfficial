@@ -14,6 +14,9 @@ import xbmcgui
 
 from providerModules.a4kOfficial import common
 
+from resources.lib.modules.globals import g
+from resources.lib.common import tools
+
 
 class Plex:
     def __init__(self):
@@ -60,12 +63,15 @@ class Plex:
             common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")
             return
 
+        tools.copy2clip(code)
         self.progress.create("a4kOfficial: Plex Authorization")
         self.progress.update(
             0,
-            "To authorize, visit the following page:\n{}\nAnd enter the code: {}".format(
-                self._auth_url, code
-            ),
+            g.get_language_string(30018).format(g.color_string(self._auth_url))
+            + '\n'
+            + g.get_language_string(30019).format(g.color_string(code))
+            + '\n'
+            + g.get_language_string(30047),
         )
         self._check_url = self._base_url + "/pins/{}.xml".format(self._device_id)
         xbmc.sleep(2000)

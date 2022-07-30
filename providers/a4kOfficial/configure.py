@@ -11,6 +11,8 @@ import xbmcgui
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.common import ADDON_IDS
 
+from resources.lib.modules.globals import g
+
 
 def _get_initial_provider_status(scraper=None):
     status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
@@ -18,7 +20,6 @@ def _get_initial_provider_status(scraper=None):
 
 
 if common.get_setting("general.firstrun") == "true":
-    common.set_setting("general.firstrun", "false")
     dialog = xbmcgui.Dialog()
     automatic = [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
 
@@ -40,7 +41,7 @@ if common.get_setting("general.firstrun") == "true":
                 if dialog.yesno(
                     "a4kOfficial",
                     "Do you want to enable and setup {}?".format(
-                        ADDON_IDS[scraper]["name"]
+                        g.color_string(ADDON_IDS[scraper]["name"])
                     ),
                 ):
                     success = provider.setup()
@@ -57,3 +58,5 @@ if common.get_setting("general.firstrun") == "true":
                 common.change_provider_status(scraper, "enabled")
         else:
             common.change_provider_status(scraper, "disabled")
+
+    common.set_setting("general.firstrun", "false")
