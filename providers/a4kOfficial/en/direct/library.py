@@ -201,37 +201,3 @@ class sources(Core):
             }
 
         return source
-
-    def episode(self, simple_info, all_info):
-        try:
-            items = self._make_show_query()
-
-            for item in items:
-                source = self._process_show_item(item, all_info)
-                if source is not None:
-                    self.sources.append(source)
-                    break
-        except PreemptiveCancellation:
-            return self._return_results("episode", self.sources, preemptive=True)
-
-        return self._return_results("episode", self.sources)
-
-    def movie(self, simple_info, all_info):
-        queries = []
-        queries.append(simple_info['title'])
-        queries.extend(simple_info.get('aliases', []))
-
-        try:
-            items = []
-            for query in queries:
-                items.extend(self._make_movie_query(query, int(simple_info['year'])))
-
-            for item in items:
-                source = self._process_movie_item(item, all_info)
-                if source is not None:
-                    self.sources.append(source)
-                    break
-        except PreemptiveCancellation:
-            return self._return_results("movie", self.sources, preemptive=True)
-
-        return self._return_results("movie", self.sources)

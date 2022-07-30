@@ -10,7 +10,6 @@ from providerModules.a4kOfficial.api.plex import Plex
 
 from resources.lib.modules.exceptions import PreemptiveCancellation
 
-
 _api = Plex()
 
 
@@ -28,22 +27,22 @@ class sources(Core):
         self._api = Plex()
         self._resources = self._api.get_resources()
 
-    def __make_query(self, method, params, **kwargs):
-        result = {}
+    def __make_query(self, base_url, query, **kwargs):
+        result = self._api.search(base_url, query, **kwargs)
 
         return result
 
-    def _make_show_query(self):
-        result = {}  # self.__make_query(...)
+    def _make_show_query(self, base_url, show_title):
+        result = {}
 
         return result.get("tvshows", {})
 
-    def _make_movie_query(self, title, year):
-        result = {}  # self.__make_query(...)
+    def _make_movie_query(self, base_url, title, year):
+        result = self.__make_query(base_url, title, year=year, type="movie")
 
-        return result.get("movies", {})
+        return result.findall("Video")
 
-    def _process_show_item(self, db_item, all_info):
+    def _process_show_item(self, base_url, item, all_info):
         source = None
 
         # source = {
@@ -57,7 +56,7 @@ class sources(Core):
 
         return source
 
-    def _process_movie_item(self, db_item, all_info):
+    def _process_movie_item(self, base_url, item, all_info):
         source = None
 
         # source = {
@@ -71,36 +70,40 @@ class sources(Core):
 
         return source
 
-    def episode(self, simple_info, all_info):
-        try:
-            items = self._make_show_query()
+    # def episode(self, simple_info, all_info):
+    #     for url in self._resources:
+    #         try:
+    #             items = self._make_show_query(url, simple_info["show_title"])
 
-            for item in items:
-                source = self._process_show_item(item, all_info)
-                if source is not None:
-                    self.sources.append(source)
-                    break
-        except PreemptiveCancellation:
-            return self._return_results("episode", self.sources, preemptive=True)
+    #             for item in items:
+    #                 source = self._process_show_item(url, item, all_info)
+    #                 if source is not None:
+    #                     self.sources.append(source)
+    #                     break
+    #         except PreemptiveCancellation:
+    #             return self._return_results("episode", self.sources, preemptive=True)
 
-        return self._return_results("episode", self.sources)
+    #     return self._return_results("episode", self.sources)
 
     def movie(self, simple_info, all_info):
-        queries = []
-        queries.append(simple_info['title'])
-        queries.extend(simple_info.get('aliases', []))
+        for url in self._resources:
+            queries = []
+            queries.append(simple_info['title'])
+            queries.extend(simple_info.get('aliases', []))
 
-        try:
-            items = []
-            for query in queries:
-                items.extend(self._make_movie_query(query, int(simple_info['year'])))
+            try:
+                items = []
+                for query in queries:
+                    items.extend(
+                        self._make_movie_query(url, query, int(simple_info['year']))
+                    )
 
-            for item in items:
-                source = self._process_movie_item(item, all_info)
-                if source is not None:
-                    self.sources.append(source)
-                    break
-        except PreemptiveCancellation:
-            return self._return_results("movie", self.sources, preemptive=True)
+                for item in items:
+                    source = self._process_movie_item(url, item, all_info)
+                    if source is not None:
+                        self.sources.append(source)
+                        break
+            except PreemptiveCancellation:
+                return self._return_results("movie", self.sources, preemptive=True)
 
         return self._return_results("movie", self.sources)

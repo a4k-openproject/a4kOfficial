@@ -189,12 +189,7 @@ class Plex:
                         local = int(connection.get("local", "1"))
 
                         if ".plex.direct" in url and local == 0:
-                            listings.append(
-                                (
-                                    url,
-                                    name,
-                                )
-                            )
+                            listings.append(url)
         except Exception as e:
             common.log(
                 "a4kOfficial: Failed to list Plex resources: {}".format(e), "error"
@@ -202,6 +197,16 @@ class Plex:
             return
 
         return listings
+
+    def search(self, base_url, query, **kwargs):
+        media_type = kwargs.pop("type", "movie")
+        url = base_url + "/{}search".format("hubs/" if media_type == "episode" else "")
+        params = {"query": query}
+        params.update(**kwargs)
+
+        results = requests.get(url, params=params, headers=self._headers)
+        if results.ok:
+            return ElementTree.fromstring(results.text)
 
     def revoke(self):
         url = "https://www.plex.tv/devices/{}.xml".format(self._device_id)
