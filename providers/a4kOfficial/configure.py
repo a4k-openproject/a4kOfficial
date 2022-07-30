@@ -60,8 +60,8 @@ if common.get_setting("general.firstrun") == "true":
     automatic = [get_initial_provider_status(scraper) for scraper in ADDON_IDS]
 
     choices = dialog.multiselect(
-        "Choose providers to enable",
-        [i[0] for i in automatic],
+        "a4kOfficial: Choose providers to enable",
+        [i[0].title() for i in automatic],
         preselect=[i for i in range(len(automatic)) if automatic[i]],
     )
 
