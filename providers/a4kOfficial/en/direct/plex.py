@@ -19,6 +19,7 @@ from resources.lib.common.source_utils import (
 )
 
 
+PLEX_AUDIO = {'dca': 'dts', 'dca-ma': 'hdma'}
 _api = Plex()
 
 
@@ -77,9 +78,18 @@ class sources(Core):
             year = media.get("year", all_info["year"])
             source_title = media.get("sourceTitle", "")
             part = media.find("Part")
-            size = int(part.get("size", 0)) / 1024 / 1024
+            size = str(int(part.get("size", 0)) / 1024 / 1024) + "MiB"
             key = part.get("key", "")
             quality = part.get("videoResolution", "Unknown")
+            info = ' '.join(
+                [
+                    media.get("audioChannels", "2") + "ch",
+                    media.get("videoCodec"),
+                    PLEX_AUDIO.get(media.get("audioCodec"), media.get("audioCodec")),
+                    media.get("audioProfile"),
+                    media.get("container"),
+                ]
+            )
         except Exception as e:
             common.log(
                 "a4kOfficial: Failed to process Plex source: {}".format(e), "error"
@@ -101,12 +111,11 @@ class sources(Core):
         source = {
             "scraper": self._scraper,
             "release_title": filename,
-            "info": get_info(filename),
-            "size": size,
-            "quality": quality,
-            "url": self._base_link
-            + "{}/{}?X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
-                key, filename, self._client_id, resource[1]
+            "info": get_info(filename) + get_info(info),
+            "size": de_string_size(size),
+            "quality": get_quality(quality),
+            "url": "{}{}/{}?X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
+                resource[0], key, filename, self._client_id, resource[1]
             ),
             "provider_name_override": source_title,
         }
