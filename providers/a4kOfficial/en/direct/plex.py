@@ -69,18 +69,19 @@ class sources(Core):
 
         return source
 
-    def _process_movie_item(self, resource, item, all_info):
+    def _process_movie_item(self, resource, item, simple_info):
         source = None
 
         try:
             type = item.get("type", "")
             media = item.find("Media")
-            year = media.get("year", all_info["year"])
-            source_title = media.get("sourceTitle", "")
+            year = int(media.get("year", simple_info["year"]))
+            source_title = item.get("sourceTitle", "")
+            quality = media.get("videoResolution", "Unknown")
             part = media.find("Part")
             size = str(int(part.get("size", 0)) / 1024 / 1024) + "MiB"
             key = part.get("key", "")
-            quality = part.get("videoResolution", "Unknown")
+            file = part.get("file", "")
             info = ' '.join(
                 [
                     media.get("audioChannels", "2") + "ch",
@@ -96,28 +97,31 @@ class sources(Core):
             )
             return
 
-        filename = part.get("file", "").split('/')[-1]
+        filename = file.split('/')[-1]
         if type != "movie":
             return
-        elif year < all_info["year"] - 1 or year > all_info["year"] + 1:
+        elif year < int(simple_info["year"]) - 1 or year > int(simple_info["year"]) + 1:
             return
         elif not check_title_match(
-            clean_title(all_info["title"]).split(" "),
+            clean_title(simple_info["title"]).split(" "),
             clean_title(filename),
-            all_info,
+            simple_info,
         ):
             return
 
         source = {
             "scraper": self._scraper,
             "release_title": filename,
-            "info": get_info(filename) + get_info(info),
+            "info": get_info(filename).union(get_info(info)),
             "size": de_string_size(size),
             "quality": get_quality(quality),
-            "url": "{}{}/{}?X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
-                resource[0], key, filename, self._client_id, resource[1]
+            "url": "{}{}?X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
+                resource[0],
+                key,
+                common.get_setting("plex.client_id"),
+                resource[1],
             ),
-            "provider_name_override": source_title,
+            "debrid_provider": source_title,
         }
 
         return source
@@ -153,7 +157,7 @@ class sources(Core):
                     )
 
                 for item in items:
-                    source = self._process_movie_item(resource, item, all_info)
+                    source = self._process_movie_item(resource, item, simple_info)
                     if source is not None:
                         self.sources.append(source)
                         break
