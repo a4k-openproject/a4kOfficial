@@ -8,7 +8,6 @@ from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core import Core
 
 from resources.lib.common.source_utils import de_string_size
-from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
 def get_quality(width):

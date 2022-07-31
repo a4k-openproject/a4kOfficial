@@ -9,6 +9,15 @@ from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.plex import Plex
 
 from resources.lib.modules.exceptions import PreemptiveCancellation
+from resources.lib.common.source_utils import (
+    check_episode_number_match,
+    check_title_match,
+    clean_title,
+    get_info,
+    get_quality,
+    de_string_size,
+)
+
 
 _api = Plex()
 
@@ -62,14 +71,39 @@ class sources(Core):
     def _process_movie_item(self, resource, item, all_info):
         source = None
 
-        # source = {
-        #     "scraper": self._scraper,
-        #     "release_title": db_details['label'],
-        #     "info": source_info['info'],
-        #     "size": source_info['size'],
-        #     "quality": source_info['quality'],
-        #     "url": db_details.get('file', ''),
-        # }
+        try:
+            media = item.find("Media")
+            part = media.find("Part")
+        except Exception as e:
+            common.log(
+                "a4kOfficial: Failed to process Plex source: {}".format(e), "error"
+            )
+            return
+
+        filename = part.get("file", "").split('/')[-1]
+        if media.get("type") != "movie":
+            return
+        elif (
+            media.get("year", all_info["year"]) < all_info["year"] - 1
+            or media.get("year", all_info["year"]) > all_info["year"] + 1
+        ):
+            return
+        elif not check_title_match(
+            clean_title(all_info["title"]).split(" "),
+            clean_title(filename),
+            all_info,
+        ):
+            return
+
+        source = {
+            "scraper": self._scraper,
+            "release_title": filename,
+            "info": get_info(filename),
+            "size": part.get("size", 0),
+            "quality": part.get("videoResolution", "Unknown"),
+            "url": "",
+            "provider_name_override": media.get("sourceTitle", ""),
+        }
 
         return source
 
