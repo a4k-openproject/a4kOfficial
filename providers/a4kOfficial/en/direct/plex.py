@@ -84,11 +84,14 @@ class sources(Core):
             file = part.get("file", "")
             info = ' '.join(
                 [
+                    media.get("container", ''),
+                    media.get("videoCodec", ''),
+                    media.get("videoProfile", ''),
+                    PLEX_AUDIO.get(
+                        media.get("audioCodec"), media.get("audioCodec", '')
+                    ),
+                    media.get("audioProfile", ''),
                     media.get("audioChannels", "2") + "ch",
-                    media.get("videoCodec"),
-                    PLEX_AUDIO.get(media.get("audioCodec"), media.get("audioCodec")),
-                    media.get("audioProfile"),
-                    media.get("container"),
                 ]
             )
         except Exception as e:
@@ -97,7 +100,12 @@ class sources(Core):
             )
             return
 
-        filename = file.split('/')[-1]
+        filename = file
+        if '/' in file:
+            filename = file.rsplit('/', 1)[-1]
+        elif '\\' in file:
+            filename = file.rsplit('\\', 1)[-1]
+
         if type != "movie":
             return
         elif year < int(simple_info["year"]) - 1 or year > int(simple_info["year"]) + 1:
