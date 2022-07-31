@@ -72,8 +72,14 @@ class sources(Core):
         source = None
 
         try:
+            type = item.get("type", "")
             media = item.find("Media")
+            year = media.get("year", all_info["year"])
+            source_title = media.get("sourceTitle", "")
             part = media.find("Part")
+            size = int(part.get("size", 0)) / 1024 / 1024
+            key = part.get("key", "")
+            quality = part.get("videoResolution", "Unknown")
         except Exception as e:
             common.log(
                 "a4kOfficial: Failed to process Plex source: {}".format(e), "error"
@@ -81,12 +87,9 @@ class sources(Core):
             return
 
         filename = part.get("file", "").split('/')[-1]
-        if media.get("type") != "movie":
+        if type != "movie":
             return
-        elif (
-            media.get("year", all_info["year"]) < all_info["year"] - 1
-            or media.get("year", all_info["year"]) > all_info["year"] + 1
-        ):
+        elif year < all_info["year"] - 1 or year > all_info["year"] + 1:
             return
         elif not check_title_match(
             clean_title(all_info["title"]).split(" "),
@@ -99,10 +102,13 @@ class sources(Core):
             "scraper": self._scraper,
             "release_title": filename,
             "info": get_info(filename),
-            "size": part.get("size", 0),
-            "quality": part.get("videoResolution", "Unknown"),
-            "url": "",
-            "provider_name_override": media.get("sourceTitle", ""),
+            "size": size,
+            "quality": quality,
+            "url": self._base_link
+            + "{}/{}?X-Plex-Client-Identifier={}&X-Plex-Token={}".format(
+                key, filename, self._client_id, resource[1]
+            ),
+            "provider_name_override": source_title,
         }
 
         return source
