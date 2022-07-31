@@ -40,6 +40,7 @@ class Plex:
             "X-Plex-Model": common.get_platform_machine(),
             "X-Plex-Provides": "player",
             "X-Plex-Client-Identifier": self._client_id or str(hex(uuid.getnode())),
+            "Accept": "application/json",
         }
         if self._token:
             self._headers["X-Plex-Token"] = self._token
@@ -49,7 +50,7 @@ class Plex:
         self._start_auth_time = datetime.utcnow().timestamp()
 
         self._token = None
-        url = self._base_url + "/pins.xml"
+        url = self._base_url + "/pins"
         data = requests.post(url, headers=self._headers)
 
         if data.status_code != 201:
@@ -60,18 +61,18 @@ class Plex:
             )
 
         try:
-            pin = ElementTree.fromstring(data.text)
-            code = pin.find("code").text
-            self._device_id = pin.find("id").text
+            pin = data.json().get("pin", {})
+            code = pin.get("code", "")
+            self._device_id = pin.get("id", "")
             self._expire_auth_time = datetime.strptime(
-                pin.find("expires-at").text, "%Y-%m-%dT%H:%M:%SZ"
+                pin.get("expires-at", ""), "%Y-%m-%dT%H:%M:%SZ"
             ).timestamp()
         except Exception as e:
             common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")
             return
 
         tools.copy2clip(code)
-        self._check_url = self._base_url + "/pins/{}.xml".format(self._device_id)
+        self._check_url = self._base_url + "/pins/{}".format(self._device_id)
 
         self.progress.create("a4kOfficial: Plex Authorization")
 
@@ -112,9 +113,9 @@ class Plex:
             return
 
         try:
-            pin = ElementTree.fromstring(data.text)
-            self._token = pin.find("auth_token").text
-            self._client_id = pin.find("client-identifier").text
+            pin = data.json().get("pin", {})
+            self._token = pin.get("auth_token", "")
+            self._client_id = pin.get("client_identifier", "")
         except Exception:
             self._token = None
             self._client_id = None
@@ -174,21 +175,19 @@ class Plex:
 
         listings = []
         try:
-            data = ElementTree.fromstring(results.text)
-            resources = data.findall("resource")
-            for resource in resources:
+            data = results.json()
+            for resource in data:
                 if "server" in resource.get("provides", ""):
                     access_token = resource.get("accessToken", "")
                     if not access_token:
                         continue
 
-                    name = resource.get("name", "")
-                    connections = resource.find("connections")
-                    for connection in connections.findall("connection"):
+                    connections = resource.get("connections", [])
+                    for connection in connections:
                         url = connection.get("uri", "")
-                        local = int(connection.get("local", "1"))
+                        local = int(connection.get("local", True))
 
-                        if ".plex.direct" in url and local == 0:
+                        if ".plex.direct" in url and not local:
                             listings.append((url, access_token))
         except Exception as e:
             common.log(
@@ -210,7 +209,7 @@ class Plex:
         results = requests.get(url, params=params, headers=self._headers)
         self._headers["X-Plex-Token"] = self._token
         if results.ok:
-            return ElementTree.fromstring(results.text)
+            return results.json().get("MediaContainer", {}).get("Metadata", [])
 
     def revoke(self):
         url = "https://www.plex.tv/devices/{}.xml".format(self._device_id)

@@ -50,10 +50,7 @@ class sources(Core):
     def _make_movie_query(self, resource, title, year):
         result = self.__make_query(resource, title, year=year, type="movie")
 
-        if result == None:
-            return []
-
-        return result.findall("Video")
+        return result
 
     def _process_show_item(self, resource, item, all_info):
         source = None
@@ -74,11 +71,11 @@ class sources(Core):
 
         try:
             type = item.get("type", "")
-            media = item.find("Media")
+            media = item.get("Media", [{}])[0]
             year = int(media.get("year", simple_info["year"]))
             source_title = item.get("sourceTitle", "")
             quality = media.get("videoResolution", "Unknown")
-            part = media.find("Part")
+            part = media.get("Part", [{}])[0]
             size = str(int(part.get("size", 0)) / 1024 / 1024) + "MiB"
             key = part.get("key", "")
             file = part.get("file", "")
