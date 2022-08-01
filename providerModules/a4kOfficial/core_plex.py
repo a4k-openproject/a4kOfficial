@@ -393,4 +393,4 @@ class PlexCore(Core):
             )
             common.change_provider_status(scraper, "disabled")
         else:
-            return super(Core, Core).get_listitem(return_data)
+            return super(PlexCore, PlexCore).get_listitem(return_data)
