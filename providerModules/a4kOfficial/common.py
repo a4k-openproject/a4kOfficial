@@ -10,51 +10,11 @@ import xbmcaddon
 import math
 import os
 
+from providerModules.a4kOfficial import PACKAGE_NAME
+
 from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.install_manager import ProviderInstallManager
-
-PACKAGE_NAME = 'a4kOfficial'
-ADDON_IDS = {
-    "iplayer": {
-        "plugin": "plugin.video.iplayerwww",
-        "name": "BBC iPlayer",
-        "type": "adaptive",
-    },
-    "curiositystream": {
-        "plugin": "slyguy.curiositystream",
-        "name": "CuriosityStream",
-        "type": "adaptive",
-    },
-    "disneyplus": {
-        "plugin": "slyguy.disney.plus",
-        "name": "Disney+",
-        "type": "adaptive",
-    },
-    "hbomax": {"plugin": "slyguy.hbo.max", "name": "HBO Max", "type": "adaptive"},
-    "hulu": {"plugin": "slyguy.hulu", "name": "Hulu", "type": "adaptive"},
-    "library": {"plugin": None, "name": "Library", "type": "direct"},
-    "netflix": {
-        "plugin": "plugin.video.netflix",
-        "name": "Netflix",
-        "type": "adaptive",
-    },
-    "paramountplus": {
-        "plugin": "slyguy.paramount.plus",
-        "name": "Paramount+",
-        "type": "adaptive",
-    },
-    "plex": {
-        "plugin": "plugin.video.composite_for_plex",
-        "name": "Plex",
-        "type": "adaptive",
-    },
-    "primevideo": {
-        "plugin": "plugin.video.amazon-test",
-        "name": "Prime Video",
-        "type": "adaptive",
-    },
-}
 
 
 def log(msg, level='info'):

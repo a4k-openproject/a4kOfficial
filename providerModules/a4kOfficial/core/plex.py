@@ -4,11 +4,15 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
+import pickle
+import os
 from urllib.parse import quote
 
-from providerModules.a4kOfficial import common
+import xbmcaddon
+import xbmcvfs
+
+from providerModules.a4kOfficial import ADDON_IDS, common
 from providerModules.a4kOfficial.api.plex import Plex
-from providerModules.a4kOfficial.common import ADDON_IDS
 from providerModules.a4kOfficial.core import Core
 
 from resources.lib.common.source_utils import (
@@ -26,9 +30,25 @@ PLEX_AUDIO = {'dca': 'dts', 'dca-ma': 'hdma'}
 class PlexCore(Core):
     def __init__(self):
         super(PlexCore, self).__init__()
-        self._api = Plex()
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
+        client_id, token = self._get_auth()
+        self._api = Plex(client_id, token)
         self._resources = self._api.get_resources()
+
+    def _get_auth(self):
+        addon = xbmcaddon.Addon(self._plugin)
+        client_id = addon.getSetting("client_id")
+
+        addon_path = xbmcvfs.translatePath(addon.getAddonInfo("profile"))
+        cache_path = os.path.join(
+            addon_path, "cache", "servers", "plexhome_user.pcache"
+        )
+        with open(cache_path, "rb") as f:
+            cache = pickle.load(f)
+
+        token = cache.get("myplex_user_cache").split('|')[1]
+
+        return client_id, token
 
     def __make_query(self, resource, query, **kwargs):
         result = self._api.search(resource, query, **kwargs)

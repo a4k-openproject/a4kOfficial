@@ -8,15 +8,15 @@ from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.api.plex import Plex
 from providerModules.a4kOfficial.core.plex import PlexCore
 
-_api = Plex()
+# _api = Plex()
 
 
-def setup():
-    success = _api.auth()
-    for setting in ["plex.token", "plex.client_id", "plex.device_id"]:
-        common.log(common.get_setting(setting))
+# def setup():
+#     success = _api.auth()
+#     for setting in ["plex.token", "plex.client_id", "plex.device_id"]:
+#         common.log(common.get_setting(setting))
 
-    return success
+#     return success
 
 
 class sources(PlexCore):

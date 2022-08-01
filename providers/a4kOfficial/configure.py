@@ -8,8 +8,7 @@ import importlib
 
 import xbmcgui
 
-from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.common import ADDON_IDS
+from providerModules.a4kOfficial import common, ADDON_IDS
 
 from resources.lib.modules.globals import g
 

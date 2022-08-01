@@ -4,9 +4,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial import drm
-from providerModules.a4kOfficial.common import ADDON_IDS
+from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.justwatch import JustWatch
 
