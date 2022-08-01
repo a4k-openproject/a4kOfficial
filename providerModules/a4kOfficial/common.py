@@ -44,7 +44,11 @@ ADDON_IDS = {
         "name": "Paramount+",
         "type": "adaptive",
     },
-    "plex": {"plugin": None, "name": "Plex", "type": "direct"},
+    "plex": {
+        "plugin": "plugin.video.composite_for_plex",
+        "name": "Plex",
+        "type": "adaptive",
+    },
     "primevideo": {
         "plugin": "plugin.video.amazon-test",
         "name": "Prime Video",
