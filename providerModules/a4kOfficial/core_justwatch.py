@@ -5,24 +5,13 @@ from future.standard_library import install_aliases
 install_aliases()
 
 from providerModules.a4kOfficial import common
+from providerModules.a4kOfficial import drm
 from providerModules.a4kOfficial.common import ADDON_IDS
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.justwatch import JustWatch
 
 from resources.lib.common.source_utils import clean_title
 from resources.lib.modules.exceptions import PreemptiveCancellation
-
-
-def get_quality(offer):
-    types = {
-        "4K": ("4K",),
-        "HD": (
-            "1080p",
-            "720p",
-        ),
-        "SD": ("SD",),
-    }
-    return types[offer["presentation_type"].upper()]
 
 
 class JustWatchCore(Core):
@@ -134,6 +123,19 @@ class JustWatchCore(Core):
         )
         return source
 
+    @staticmethod
+    def _get_quality(offer):
+        types = {
+            "4K": ("4K",),
+            "HD": (
+                "1080p",
+                "720p",
+            ),
+            "SD": ("SD",),
+        }
+
+        return types[offer["presentation_type"].upper()]
+
     def _get_service_offers(self, item):
         offers = item["offers"]
         service_offers = [
@@ -151,7 +153,9 @@ class JustWatchCore(Core):
 
         resolutions = set()
         for offer in self._current_offers:
-            resolutions.update(get_quality(offer))
+            resolutions.update(self._get_quality(offer))
+        if drm.get_widevine_level() == "L3":
+            resolutions.discard("4K")
 
         order = {key: i for i, key in enumerate(["4K", "1080p", "720p", "SD"])}
 

@@ -123,8 +123,11 @@ def convert_size(size_bytes):
     return "{}{}".format(s, size_name[i])
 
 
-def get_kodi_version():
-    return xbmc.getInfoLabel("System.BuildVersion")
+def get_kodi_version(short=False):
+    version = xbmc.getInfoLabel("System.BuildVersion")
+    if short:
+        version = int(version[:2])
+    return version
 
 
 def get_platform_system():
