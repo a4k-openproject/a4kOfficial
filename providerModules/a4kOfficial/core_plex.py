@@ -212,10 +212,8 @@ class Plex:
         return listings
 
     def search(self, resource, query, **kwargs):
-        media_type = kwargs.pop("type", "movie")
-        url = resource[0] + "/{}search".format(
-            "hubs/" if media_type == "episode" else ""
-        )
+        kwargs.pop("type", "movie")
+        url = resource[0] + "/search"
         params = {"query": query}
         params.update(**kwargs)
         self._headers["X-Plex-Token"] = resource[1]
