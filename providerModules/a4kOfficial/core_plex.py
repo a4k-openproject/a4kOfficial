@@ -310,16 +310,8 @@ class PlexCore(Core):
         ):
             return
         elif not (
-            check_title_match(
-                clean_title(simple_info["show_title"]),
-                clean_title(show_title),
-                simple_info,
-            )
-            and check_title_match(
-                clean_title(simple_info["episode_title"]),
-                clean_title(episode_title),
-                simple_info,
-            )
+            clean_title(simple_info["show_title"]) == clean_title(show_title)
+            and clean_title(simple_info["episode_title"]) == clean_title(episode_title)
         ):
             return
 
