@@ -90,7 +90,7 @@ class JustWatchCore(Core):
                 if not episode_id:
                     return None
 
-                service_ep_id = self._get_service_ep_id(service_id, season, episode, e)
+                service_ep_id = self._get_service_ep_id(service_id, e, season, episode)
                 source.update(
                     {
                         "video_id": episode_id,
@@ -161,7 +161,7 @@ class JustWatchCore(Core):
 
         return '/'.join(sorted(list(resolutions), key=lambda x: order[x]))
 
-    def _get_service_id(self, item, season, episode):
+    def _get_service_id(self, item, season=0, episode=0):
         if not self._current_offers:
             return None
 
@@ -171,8 +171,8 @@ class JustWatchCore(Core):
 
         return id
 
-    def _get_service_ep_id(self, show_id, season, episode, item):
-        return self._get_service_id(item=item)
+    def _get_service_ep_id(self, show_id, item, season, episode):
+        return self._get_service_id(item)
 
     def episode(self, simple_info, all_info, id_format=None):
         show_title = simple_info["show_title"]

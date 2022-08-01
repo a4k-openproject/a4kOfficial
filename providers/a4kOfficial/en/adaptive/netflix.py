@@ -59,7 +59,7 @@ class sources(JustWatchCore):
         self._movie_url = "plugin://{}/play_strm/{}/"
         self._episode_url = "plugin://{}/play_strm/{}/"
 
-    def _get_service_ep_id(self, show_id, season, episode, item):
+    def _get_service_ep_id(self, show_id, item, season, episode):
         code = INSTANT_WATCHER_COUNTRIES.get(self._country, '78')
         url = "https://www.instantwatcher.com/netflix/{}/title/{}".format(code, show_id)
         r = requests.get(url, timeout=10).text

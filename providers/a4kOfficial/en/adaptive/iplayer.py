@@ -10,7 +10,6 @@ from urllib.parse import quote_plus
 
 import requests
 
-from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core_justwatch import JustWatchCore
 
 
@@ -39,13 +38,13 @@ class sources(JustWatchCore):
         offer = self._current_offers[0]
         url = offer['urls'][self._scheme]
         if '/episodes/' in url:
-            id = self._get_service_ep_id(url, season, episode)
+            id = self._get_service_ep_id(url, item, season, episode)
         else:
             id = url
 
         return id
 
-    def _get_service_ep_id(self, show_id, season, episode, item):
+    def _get_service_ep_id(self, show_id, item, season, episode):
         seriesId = None
         series_split = show_id.split('seriesId=')
         if type(series_split == list) and len(series_split) > 1:
