@@ -42,10 +42,10 @@ class Core:
 
     def episode(self, simple_info, all_info):
         try:
-            items = self._make_show_query()
+            items = self._make_show_query(simple_info["episode_title"])
 
             for item in items:
-                source = self._process_show_item(item, all_info)
+                source = self._process_show_item(item, simple_info, all_info)
                 if source is not None:
                     self.sources.append(source)
                     break
@@ -65,7 +65,7 @@ class Core:
                 items.extend(self._make_movie_query(query, int(simple_info['year'])))
 
             for item in items:
-                source = self._process_movie_item(item, all_info)
+                source = self._process_movie_item(item, simple_info, all_info)
                 if source is not None:
                     self.sources.append(source)
                     break

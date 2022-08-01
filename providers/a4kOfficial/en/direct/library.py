@@ -72,7 +72,7 @@ class sources(Core):
 
         return result
 
-    def _make_show_query(self):
+    def _make_show_query(self, query):
         result = self.__make_query(
             method="VideoLibrary.GetTVShows",
             params={
@@ -112,7 +112,7 @@ class sources(Core):
 
         return result.get("movies", {})
 
-    def _process_show_item(self, db_item, all_info):
+    def _process_show_item(self, db_item, simple_info, all_info):
         source = None
 
         db_details = self.__make_query(
@@ -162,7 +162,7 @@ class sources(Core):
 
         return source
 
-    def _process_movie_item(self, db_item, all_info):
+    def _process_movie_item(self, db_item, simple_info, all_info):
         source = None
         if db_item.get("file", "").endswith(".strm"):
             return None

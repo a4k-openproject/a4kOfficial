@@ -22,3 +22,4 @@ class sources(PlexCore):
     def __init__(self):
         super(sources, self).__init__()
         self._movie_url = "plugin://{}/?url={}&mode=5"
+        self._episode_url = "plugin://{}/?url={}&mode=6"
