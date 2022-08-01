@@ -178,10 +178,6 @@ class PlexCore(Core):
             return
         elif year < int(simple_info["year"]) - 1 or year > int(simple_info["year"]) + 1:
             return
-        elif not check_title_match(
-            clean_title(simple_info["title"]), clean_title(title), simple_info
-        ):
-            return
 
         url = quote(resource[0] + key)
 
