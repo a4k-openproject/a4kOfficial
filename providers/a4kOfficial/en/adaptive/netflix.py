@@ -9,7 +9,7 @@ import re
 import requests
 
 from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.core_justwatch import JustWatchCore
+from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 
 INSTANT_WATCHER_COUNTRIES = {

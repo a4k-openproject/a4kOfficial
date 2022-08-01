@@ -6,7 +6,7 @@ install_aliases()
 
 import re
 
-from providerModules.a4kOfficial.core_justwatch import JustWatchCore
+from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 
 class sources(JustWatchCore):

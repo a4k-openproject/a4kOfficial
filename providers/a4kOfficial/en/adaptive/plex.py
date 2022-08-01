@@ -5,7 +5,8 @@ from future.standard_library import install_aliases
 install_aliases()
 
 from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.core_plex import Plex, PlexCore
+from providerModules.a4kOfficial.api.plex import Plex
+from providerModules.a4kOfficial.core.plex import PlexCore
 
 _api = Plex()
 

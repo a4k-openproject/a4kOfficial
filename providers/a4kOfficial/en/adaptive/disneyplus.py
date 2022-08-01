@@ -4,7 +4,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-from providerModules.a4kOfficial.core_justwatch import JustWatchCore
+from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 
 class sources(JustWatchCore):
