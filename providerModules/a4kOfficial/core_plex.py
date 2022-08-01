@@ -297,7 +297,7 @@ class PlexCore(Core):
                         media.get("audioCodec"), media.get("audioCodec", '')
                     ),
                     media.get("audioProfile", ''),
-                    media.get("audioChannels", "2") + "ch",
+                    str(media.get("audioChannels", "2")) + "ch",
                 ]
             )
 
