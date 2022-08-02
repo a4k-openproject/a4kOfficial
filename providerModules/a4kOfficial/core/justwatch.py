@@ -32,7 +32,7 @@ class JustWatchCore(Core):
             providers=self._providers,
             monetization_types=self._monetization_types,
             **kwargs
-        ).get("items")
+        ).get("items", [])
 
         self._current_offers = []
         for item in items:
@@ -72,7 +72,6 @@ class JustWatchCore(Core):
             source = {
                 "scraper": self._scraper,
                 "plugin": self._plugin,
-                "video_id": service_id,
                 "release_title": provider['title'],
                 "quality": self._get_offered_resolutions(provider),
                 "url": self._movie_url.format(
@@ -83,17 +82,27 @@ class JustWatchCore(Core):
             }
 
             if type == "show":
-                s = self._api.get_season(jw_title['seasons'][season - 1]['id'])
-                e = s['episodes'][episode - 1]
-                episode_id = self._get_service_id(e, season, episode)
-                if not episode_id:
+                episodes = self._api.get_episodes(provider['id'])['items']
+                episode_item = [
+                    i
+                    for i in episodes
+                    if i['season_number'] == int(season)
+                    and i['episode_number'] == int(episode)
+                ]
+
+                if not episode_item:
+                    return None
+                episode_item = episode_item[0]
+
+                service_ep_id = self._get_service_ep_id(
+                    service_id, episode_item, season, episode
+                )
+                if not service_ep_id:
                     return None
 
-                service_ep_id = self._get_service_ep_id(service_id, e, season, episode)
                 source.update(
                     {
-                        "video_id": episode_id,
-                        "release_title": e['title'],
+                        "release_title": episode_item['title'],
                         "url": self._episode_url.format(
                             self._plugin,
                             id_format(service_ep_id)
@@ -164,8 +173,8 @@ class JustWatchCore(Core):
         if not self._current_offers:
             return None
 
-        offer = self._current_offers[0]
-        url = offer['urls'][self._scheme]
+        offer = item.get("offers", [{}])[0]
+        url = offer.get('urls', {}).get(self._scheme, '')
         id = url.rstrip('/').split('/')[-1]
 
         return id
