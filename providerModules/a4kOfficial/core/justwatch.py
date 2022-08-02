@@ -36,7 +36,7 @@ class JustWatchCore(Core):
 
         self._current_offers = []
         for item in items:
-            self._current_offers.extend(self._get_service_offers(item))
+            self._current_offers.extend(item.get("offers", {}))
 
         return items
 
@@ -144,23 +144,24 @@ class JustWatchCore(Core):
 
         return types[offer["presentation_type"].upper()]
 
-    def _get_service_offers(self, item):
-        offers = item["offers"]
+    def _get_service_offers(self, item, offers=None):
+        offers = offers or item.get("offers", [])
         service_offers = [
             o
             for o in offers
-            if o['package_short_name'] in self._providers
-            and o['monetization_type'] in self._monetization_types
+            if o.get('package_short_name') in self._providers
+            and o.get('monetization_type') in self._monetization_types
         ]
 
         return service_offers
 
     def _get_offered_resolutions(self, item):
-        if not self._current_offers:
+        offers = self._get_service_offers(None, self._current_offers)
+        if not offers:
             return None
 
         resolutions = set()
-        for offer in self._current_offers:
+        for offer in offers:
             resolutions.update(self._get_quality(offer))
         if drm.get_widevine_level() == "L3":
             resolutions.discard("4K")
@@ -173,7 +174,7 @@ class JustWatchCore(Core):
         if not self._current_offers:
             return None
 
-        offer = item.get("offers", [{}])[0]
+        offer = self._get_service_offers(item)[0]
         url = offer.get('urls', {}).get(self._scheme, '')
         id = url.rstrip('/').split('/')[-1]
 
