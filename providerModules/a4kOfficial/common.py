@@ -5,25 +5,16 @@ from future.standard_library import install_aliases
 install_aliases()
 
 import xbmc
+import xbmcaddon
 
 import math
 import os
 
+from providerModules.a4kOfficial import PACKAGE_NAME
+
 from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
-
-PACKAGE_NAME = 'a4kOfficial'
-ADDON_IDS = {
-    "primevideo": {"plugin": "plugin.video.amazon-test", "name": "Prime Video"},
-    "disneyplus": {"plugin": "slyguy.disney.plus", "name": "Disney+"},
-    "hulu": {"plugin": "slyguy.hulu", "name": "Hulu"},
-    "netflix": {"plugin": "plugin.video.netflix", "name": "Netflix"},
-    "hbomax": {"plugin": "slyguy.hbo.max", "name": "HBO Max"},
-    "paramountplus": {"plugin": "slyguy.paramount.plus", "name": "Paramount+"},
-    "curiositystream": {"plugin": "slyguy.curiositystream", "name": "CuriosityStream"},
-    "iplayer": {"plugin": "plugin.video.iplayerwww", "name": "iPlayer"},
-    "library": {"plugin": None, "name": "Library"}
-}
+from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 
 def log(msg, level='info'):
@@ -90,3 +81,39 @@ def convert_size(size_bytes):
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
     return "{}{}".format(s, size_name[i])
+
+
+def get_kodi_version(short=False):
+    version = xbmc.getInfoLabel("System.BuildVersion")
+    if short:
+        version = int(version[:2])
+    return version
+
+
+def get_platform_system():
+    from platform import system
+
+    return system()
+
+
+def get_platform_machine():
+    from platform import machine
+
+    return machine()
+
+
+def check_for_addon(plugin):
+    if plugin is None:
+        return False
+
+    status = True
+    try:
+        xbmcaddon.Addon(plugin)
+    except RuntimeError:
+        status = False
+    finally:
+        return status
+
+
+def change_provider_status(scraper=None, status="enabled"):
+    ProviderInstallManager().flip_provider_status('a4kOfficial', scraper, status)

@@ -6,59 +6,21 @@ install_aliases()
 
 import importlib
 
-import xbmcaddon
 import xbmcgui
 
-from resources.lib.modules.providers.install_manager import ProviderInstallManager
+from providerModules.a4kOfficial import common, ADDON_IDS
 
-from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.common import ADDON_IDS
-
-
-def check_for_addon(plugin):
-    if plugin is None:
-        return False
-
-    status = True
-    try:
-        xbmcaddon.Addon(plugin)
-    except RuntimeError:
-        status = False
-    finally:
-        return status
+from resources.lib.modules.globals import g
 
 
-def get_initial_provider_status(scraper=None):
-    status = check_for_addon(ADDON_IDS[scraper]["plugin"])
-    return (scraper, status)
-
-
-def change_provider_status(scraper=None, status="enabled"):
-    ProviderInstallManager().flip_provider_status('a4kOfficial', scraper, status)
-
-
-def fix_provider_status(scraper=None):
-    status = check_for_addon(scraper)
-
-    common.log(
-        "a4kOfficial: '{}' is{} installed; {}abling '{}'".format(
-            ADDON_IDS[scraper]["plugin"],
-            '' if status else ' not',
-            'en' if status else 'dis',
-            scraper,
-        ),
-        'info',
-    )
-
-    change_provider_status(scraper, "{}abled".format("en" if status else "dis"))
-
+def _get_initial_provider_status(scraper=None):
+    status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
     return (scraper, status)
 
 
 if common.get_setting("general.firstrun") == "true":
-    common.set_setting("general.firstrun", "false")
     dialog = xbmcgui.Dialog()
-    automatic = [get_initial_provider_status(scraper) for scraper in ADDON_IDS]
+    automatic = [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
 
     choices = dialog.multiselect(
         "a4kOfficial: Choose providers to enable",
@@ -68,18 +30,32 @@ if common.get_setting("general.firstrun") == "true":
 
     for i in range(len(automatic)):
         scraper, status = automatic[i][:2]
-        if ADDON_IDS[scraper]["plugin"] is None and i in choices:
-            if dialog.yesno(
-                "a4kOfficial",
-                "Do you want to enable and setup {}?".format(
-                    ADDON_IDS[scraper]["name"]
-                ),
-            ):
-                provider = importlib.import_module(scraper)
-                provider.setup()
-            else:
-                change_provider_status(scraper, "disabled")
-        else:
-            change_provider_status(
-                scraper, "{}abled".format("en" if i in choices else "dis")
+        if i in choices:
+            module = "providers.a4kOfficial.en.{}.{}".format(
+                ADDON_IDS[scraper]["type"], scraper
             )
+            provider = importlib.import_module(module)
+
+            if hasattr(provider, "setup"):
+                if dialog.yesno(
+                    "a4kOfficial",
+                    "Do you want to enable and setup {}?".format(
+                        g.color_string(ADDON_IDS[scraper]["name"])
+                    ),
+                ):
+                    success = provider.setup()
+                    if not success:
+                        common.log(
+                            "a4kOfficial.{}: Setup not complete; disabling".format(
+                                scraper
+                            )
+                        )
+                    common.change_provider_status(
+                        scraper, "{}abled".format("en" if success else "dis")
+                    )
+            else:
+                common.change_provider_status(scraper, "enabled")
+        else:
+            common.change_provider_status(scraper, "disabled")
+
+    common.set_setting("general.firstrun", "false")

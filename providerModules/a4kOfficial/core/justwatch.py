@@ -4,28 +4,12 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-import xbmcaddon
-
-from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.common import ADDON_IDS
-from providers.a4kOfficial.configure import check_for_addon, change_provider_status
+from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.justwatch import JustWatch
 
 from resources.lib.common.source_utils import clean_title
 from resources.lib.modules.exceptions import PreemptiveCancellation
-
-
-def get_quality(offer):
-    types = {
-        "4K": ("4K",),
-        "HD": (
-            "1080p",
-            "720p",
-        ),
-        "SD": ("SD",),
-    }
-    return types[offer["presentation_type"].upper()]
 
 
 class JustWatchCore(Core):
@@ -41,8 +25,6 @@ class JustWatchCore(Core):
         self._movie_url = None
         self._episode_url = None
 
-        check_for_addon(self._plugin)
-
     def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
             query=clean_title(query),
@@ -50,7 +32,7 @@ class JustWatchCore(Core):
             providers=self._providers,
             monetization_types=self._monetization_types,
             **kwargs
-        ).get("items")
+        ).get("items", [])
 
         self._current_offers = []
         for item in items:
@@ -90,27 +72,37 @@ class JustWatchCore(Core):
             source = {
                 "scraper": self._scraper,
                 "plugin": self._plugin,
-                "video_id": service_id,
                 "release_title": provider['title'],
                 "quality": self._get_offered_resolutions(provider),
                 "url": self._movie_url.format(
                     self._plugin,
                     id_format(service_id) if id_format is not None else service_id,
                 ),
+                "debrid_provider": self._plugin,
             }
 
             if type == "show":
-                s = self._api.get_season(jw_title['seasons'][season - 1]['id'])
-                e = s['episodes'][episode - 1]
-                episode_id = self._get_service_id(e, season, episode)
-                if not episode_id:
+                episodes = self._api.get_episodes(provider['id'])['items']
+                episode_item = [
+                    i
+                    for i in episodes
+                    if i['season_number'] == int(season)
+                    and i['episode_number'] == int(episode)
+                ]
+
+                if not episode_item:
+                    return None
+                episode_item = episode_item[0]
+
+                service_ep_id = self._get_service_ep_id(
+                    service_id, episode_item, season, episode
+                )
+                if not service_ep_id:
                     return None
 
-                service_ep_id = self._get_service_ep_id(service_id, season, episode, e)
                 source.update(
                     {
-                        "video_id": episode_id,
-                        "release_title": e['title'],
+                        "release_title": episode_item['title'],
                         "url": self._episode_url.format(
                             self._plugin,
                             id_format(service_ep_id)
@@ -139,6 +131,19 @@ class JustWatchCore(Core):
         )
         return source
 
+    @staticmethod
+    def _get_quality(offer):
+        types = {
+            "4K": ("4K",),
+            "HD": (
+                "1080p",
+                "720p",
+            ),
+            "SD": ("SD",),
+        }
+
+        return types[offer["presentation_type"].upper()]
+
     def _get_service_offers(self, item):
         offers = item["offers"]
         service_offers = [
@@ -156,24 +161,26 @@ class JustWatchCore(Core):
 
         resolutions = set()
         for offer in self._current_offers:
-            resolutions.update(get_quality(offer))
+            resolutions.update(self._get_quality(offer))
+        if drm.get_widevine_level() == "L3":
+            resolutions.discard("4K")
 
         order = {key: i for i, key in enumerate(["4K", "1080p", "720p", "SD"])}
 
         return '/'.join(sorted(list(resolutions), key=lambda x: order[x]))
 
-    def _get_service_id(self, item, season, episode):
+    def _get_service_id(self, item, season=0, episode=0):
         if not self._current_offers:
             return None
 
-        offer = self._current_offers[0]
-        url = offer['urls'][self._scheme]
+        offer = item.get("offers", [{}])[0]
+        url = offer.get('urls', {}).get(self._scheme, '')
         id = url.rstrip('/').split('/')[-1]
 
         return id
 
-    def _get_service_ep_id(self, show_id, season, episode, item):
-        return self._get_service_id(item=item)
+    def _get_service_ep_id(self, show_id, item, season, episode):
+        return self._get_service_id(item)
 
     def episode(self, simple_info, all_info, id_format=None):
         show_title = simple_info["show_title"]
@@ -220,7 +227,7 @@ class JustWatchCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data['scraper']
-        if not check_for_addon(ADDON_IDS[scraper]["plugin"]):
+        if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 "a4kOfficial: '{}' is not installed; disabling '{}'".format(
                     ADDON_IDS[scraper]["plugin"],
@@ -228,6 +235,6 @@ class JustWatchCore(Core):
                 ),
                 'info',
             )
-            change_provider_status(scraper, "disabled")
+            common.change_provider_status(scraper, "disabled")
         else:
             return super(JustWatchCore, JustWatchCore).get_listitem(return_data)
