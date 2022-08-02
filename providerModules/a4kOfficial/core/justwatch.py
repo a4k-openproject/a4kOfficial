@@ -79,6 +79,7 @@ class JustWatchCore(Core):
                     self._plugin,
                     id_format(service_id) if id_format is not None else service_id,
                 ),
+                "debrid_provider": self._plugin,
             }
 
             if type == "show":
