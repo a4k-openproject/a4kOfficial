@@ -103,10 +103,10 @@ def get_platform_machine():
 
 
 def check_for_addon(plugin):
-    if plugin is None:
-        return False
-
     status = True
+    if plugin is None:
+        return status
+
     try:
         xbmcaddon.Addon(plugin)
     except RuntimeError:
