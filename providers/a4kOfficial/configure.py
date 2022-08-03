@@ -5,12 +5,32 @@ from future.standard_library import install_aliases
 install_aliases()
 
 import importlib
+import re
+
+import requests
 
 import xbmcgui
 
 from providerModules.a4kOfficial import common, ADDON_IDS
 
 from resources.lib.modules.globals import g
+
+_ipify = "https://api.ipify.org?format=json"
+_ipinfo = "https://ipinfo.io/{}/json"
+
+
+def _get_current_ip():
+    data = requests.get(_ipify)
+    if data.ok:
+        return data.json().get("ip", "0.0.0.0")
+
+
+def _get_country_code():
+    ip = _get_current_ip()
+    data = requests.get(_ipinfo.format(ip))
+
+    if data.ok:
+        return data.json().get("country", "US")
 
 
 def _get_initial_provider_status(scraper=None):
@@ -19,6 +39,8 @@ def _get_initial_provider_status(scraper=None):
 
 
 if common.get_setting("general.firstrun") == "true":
+    common.set_setting("justwatch.country", _get_country_code() or "US")
+
     dialog = xbmcgui.Dialog()
     automatic = [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
 
