@@ -4,19 +4,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-from providerModules.a4kOfficial import common
-from providerModules.a4kOfficial.api.plex import Plex
 from providerModules.a4kOfficial.core.plex import PlexCore
-
-# _api = Plex()
-
-
-# def setup():
-#     success = _api.auth()
-#     for setting in ["plex.token", "plex.client_id", "plex.device_id"]:
-#         common.log(common.get_setting(setting))
-
-#     return success
 
 
 class sources(PlexCore):

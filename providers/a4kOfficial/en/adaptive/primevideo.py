@@ -16,10 +16,10 @@ class sources(JustWatchCore):
         self._episode_url = "plugin://{}/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
 
     def _get_service_id(self, item, season=0, episode=0):
-        if not self._current_offers:
+        if not self._service_offers:
             return None
 
-        offer = self._current_offers[0]
+        offer = self._service_offers[0]
         url = offer['urls'][self._scheme]
         id = url.rstrip('/').split('gti=')[1]
 

@@ -18,7 +18,7 @@ class JustWatchCore(Core):
         self._country = common.get_setting("justwatch.country")
         self._monetization_types = ["free", "flatrate"]
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
-        self._current_offers = None
+        self._service_offers = []
 
         self._providers = None
         self._scheme = None
@@ -33,10 +33,6 @@ class JustWatchCore(Core):
             monetization_types=self._monetization_types,
             **kwargs
         ).get("items", [])
-
-        self._current_offers = []
-        for item in items:
-            self._current_offers.extend(item.get("offers", {}))
 
         return items
 
@@ -55,25 +51,25 @@ class JustWatchCore(Core):
 
         return items
 
-    def __process_item(
-        self, provider, tmdb_id, type, season=0, episode=0, id_format=None
-    ):
+    def __process_item(self, item, tmdb_id, type, season=0, episode=0, id_format=None):
         source = None
+        if not self._get_service_offers(item):
+            return None
 
-        jw_title = self._api.get_title(title_id=provider['id'], content_type=type)
+        jw_title = self._api.get_title(title_id=item['id'], content_type=type)
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
 
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
-            service_id = self._get_service_id(provider, season, episode)
+            service_id = self._get_service_id(item, season, episode)
             if not service_id:
                 return None
 
             source = {
                 "scraper": self._scraper,
                 "plugin": self._plugin,
-                "release_title": provider['title'],
-                "quality": self._get_offered_resolutions(provider),
+                "release_title": item['title'],
+                "quality": self._get_offered_resolutions(item),
                 "url": self._movie_url.format(
                     self._plugin,
                     id_format(service_id) if id_format is not None else service_id,
@@ -82,7 +78,7 @@ class JustWatchCore(Core):
             }
 
             if type == "show":
-                episodes = self._api.get_episodes(provider['id'])['items']
+                episodes = self._api.get_episodes(item['id'])['items']
                 episode_item = [
                     i
                     for i in episodes
@@ -97,6 +93,7 @@ class JustWatchCore(Core):
                 service_ep_id = self._get_service_ep_id(
                     service_id, episode_item, season, episode
                 )
+
                 if not service_ep_id:
                     return None
 
@@ -114,15 +111,15 @@ class JustWatchCore(Core):
 
         return source
 
-    def _process_movie_item(self, provider, simple_info, all_info, id_format=None):
+    def _process_movie_item(self, item, simple_info, all_info, id_format=None):
         source = self.__process_item(
-            provider, all_info['info']['tmdb_id'], "movie", id_format=id_format
+            item, all_info['info']['tmdb_id'], "movie", id_format=id_format
         )
         return source
 
-    def _process_show_item(self, provider, simple_info, all_info, id_format=None):
+    def _process_show_item(self, item, simple_info, all_info, id_format=None):
         source = self.__process_item(
-            provider,
+            item,
             all_info['info']['tmdb_show_id'],
             "show",
             int(simple_info["season_number"]),
@@ -152,16 +149,16 @@ class JustWatchCore(Core):
             if o.get('package_short_name') in self._providers
             and o.get('monetization_type') in self._monetization_types
         ]
+        self._service_offers.extend(service_offers)
 
         return service_offers
 
     def _get_offered_resolutions(self, item):
-        offers = self._get_service_offers(None, self._current_offers)
-        if not offers:
+        if not self._service_offers:
             return None
 
         resolutions = set()
-        for offer in offers:
+        for offer in self._service_offers:
             resolutions.update(self._get_quality(offer))
         if drm.get_widevine_level() == "L3":
             resolutions.discard("4K")
@@ -171,10 +168,10 @@ class JustWatchCore(Core):
         return '/'.join(sorted(list(resolutions), key=lambda x: order[x]))
 
     def _get_service_id(self, item, season=0, episode=0):
-        if not self._current_offers:
+        if not self._service_offers:
             return None
 
-        offer = self._get_service_offers(item)[0]
+        offer = self._service_offers[0]
         url = offer.get('urls', {}).get(self._scheme, '')
         id = url.rstrip('/').split('/')[-1]
 
