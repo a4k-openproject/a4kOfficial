@@ -4,6 +4,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
+from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 
@@ -21,6 +22,9 @@ class sources(JustWatchCore):
 
         offer = self._service_offers[0]
         url = offer['urls'][self._scheme]
+        if not common.check_url(url):
+            return None
+
         id = url.rstrip('/').split('gti=')[1]
 
         return id

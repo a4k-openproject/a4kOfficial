@@ -10,6 +10,7 @@ from urllib.parse import quote_plus
 
 import requests
 
+from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 
@@ -32,17 +33,19 @@ class sources(JustWatchCore):
         return super(sources, self).movie(simple_info, all_info, id_format=quote_plus)
 
     def _get_service_id(self, item, season=0, episode=0):
-        if not self._current_offers:
+        if not self._service_offers:
             return None
 
-        offer = self._current_offers[0]
+        offer = self._service_offers[0]
         url = offer['urls'][self._scheme]
-        if '/episodes/' in url:
-            id = self._get_service_ep_id(url, item, season, episode)
-        else:
-            id = url
+        if not common.check_url(url):
+            return None
 
-        return id
+        return (
+            self._get_service_ep_id(url, item, season, episode)
+            if '/episodes/' in url
+            else url
+        )
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         seriesId = None
@@ -82,4 +85,5 @@ class sources(JustWatchCore):
         if ep:
             ep = ep[0]
         ep = 'https://www.bbc.co.uk' + ep if not ep.startswith('http') else ep
-        return ep
+
+        return None if not common.check_url(ep) else ep

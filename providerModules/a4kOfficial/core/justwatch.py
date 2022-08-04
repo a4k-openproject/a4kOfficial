@@ -4,6 +4,8 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
+import requests
+
 from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.justwatch import JustWatch
@@ -93,7 +95,6 @@ class JustWatchCore(Core):
                 service_ep_id = self._get_service_ep_id(
                     service_id, episode_item, season, episode
                 )
-
                 if not service_ep_id:
                     return None
 
@@ -173,6 +174,9 @@ class JustWatchCore(Core):
 
         offer = self._service_offers[0]
         url = offer.get('urls', {}).get(self._scheme, '')
+        if not common.check_url(url):
+            return None
+
         id = url.rstrip('/').split('/')[-1]
 
         return id

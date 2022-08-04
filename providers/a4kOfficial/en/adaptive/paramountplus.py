@@ -6,6 +6,7 @@ install_aliases()
 
 import re
 
+from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 
@@ -23,6 +24,9 @@ class sources(JustWatchCore):
 
         offer = self._service_offers[0]
         url = offer['urls'][self._scheme]
+        if not common.check_url(url):
+            return None
+
         id = (
             url.split('?')[0].split('/')[-1]
             if item['object_type'] == 'movie'

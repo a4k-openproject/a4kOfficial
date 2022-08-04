@@ -10,6 +10,8 @@ import xbmcaddon
 import math
 import os
 
+import requests
+
 from providerModules.a4kOfficial import PACKAGE_NAME
 
 from resources.lib.common import provider_tools
@@ -25,6 +27,10 @@ def debug(msg, format=None):
     if format:
         msg.format(format)
     g.log(msg, 'debug')
+
+
+def check_url(url):
+    return requests.get(url).ok
 
 
 def get_all_relative_py_files(file):
@@ -103,10 +109,10 @@ def get_platform_machine():
 
 
 def check_for_addon(plugin):
-    status = True
     if plugin is None:
-        return status
+        return False
 
+    status = True
     try:
         xbmcaddon.Addon(plugin)
     except RuntimeError:

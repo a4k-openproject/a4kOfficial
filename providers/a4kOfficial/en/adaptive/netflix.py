@@ -77,4 +77,10 @@ class sources(JustWatchCore):
         episodes = common.parseDOM(_season, 'a', ret='data-title-id')
         episode_id = episodes[int(episode)]
 
-        return episode_id
+        return (
+            None
+            if not common.check_url(
+                "https://www.netflix.com/watch/{}".format(episode_id)
+            )
+            else episode_id
+        )
