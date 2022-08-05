@@ -6,6 +6,7 @@ install_aliases()
 
 import requests
 
+from providers.a4kOfficial import configure
 from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.justwatch import JustWatch
@@ -17,7 +18,7 @@ from resources.lib.modules.exceptions import PreemptiveCancellation
 class JustWatchCore(Core):
     def __init__(self):
         super(JustWatchCore, self).__init__()
-        self._country = common.get_setting("justwatch.country")
+        self._country = configure.get_setting("justwatch.country")
         self._monetization_types = ["free", "flatrate"]
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._service_offers = []
@@ -231,7 +232,7 @@ class JustWatchCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data["scraper"]
-        if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
+        if not configure.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 "a4kOfficial: '{}' is not installed; disabling '{}'".format(
                     ADDON_IDS[scraper]["plugin"],
@@ -239,6 +240,6 @@ class JustWatchCore(Core):
                 ),
                 "info",
             )
-            common.change_provider_status(scraper, "disabled")
+            configure.change_provider_status(scraper, "disabled")
         else:
             return super(JustWatchCore, JustWatchCore).get_listitem(return_data)

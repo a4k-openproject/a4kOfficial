@@ -5,18 +5,13 @@ from future.standard_library import install_aliases
 install_aliases()
 
 import xbmc
-import xbmcaddon
 
 import math
 import os
 
 import requests
 
-from providerModules.a4kOfficial import PACKAGE_NAME
-
-from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
-from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 
 def log(msg, level="info"):
@@ -40,14 +35,6 @@ def get_all_relative_py_files(file):
         for filename in files
         if not filename.startswith("__") and filename.endswith(".py")
     ]
-
-
-def get_setting(id):
-    return provider_tools.get_setting(PACKAGE_NAME, id)
-
-
-def set_setting(id, value):
-    return provider_tools.set_setting(PACKAGE_NAME, id, value)
 
 
 def parseDOM(html, name="", attrs=None, ret=False):
@@ -80,6 +67,7 @@ def execute_jsonrpc(method, params):
 
 
 def convert_size(size_bytes):
+    size_bytes = int(size_bytes)
     if size_bytes == 0:
         return "0B"
     size_name = ("B", "KB", "MB", "GB")
@@ -94,23 +82,6 @@ def get_kodi_version(short=False):
     if short:
         version = int(version[:2])
     return version
-
-
-def check_for_addon(plugin):
-    if plugin is None:
-        return False
-
-    status = True
-    try:
-        xbmcaddon.Addon(plugin)
-    except RuntimeError:
-        status = False
-    finally:
-        return status
-
-
-def change_provider_status(scraper=None, status="enabled"):
-    ProviderInstallManager().flip_provider_status("a4kOfficial", scraper, status)
 
 
 def get_system_platform():

@@ -11,6 +11,7 @@ from urllib.parse import quote
 import xbmcaddon
 import xbmcvfs
 
+from providers.a4kOfficial import configure
 from providerModules.a4kOfficial import ADDON_IDS, common
 from providerModules.a4kOfficial.api.plex import Plex
 from providerModules.a4kOfficial.core import Core
@@ -93,7 +94,7 @@ class PlexCore(Core):
                 ]
             )
 
-            size = str(int(part.get("size", 0)) / 1024 / 1024) + "MiB"
+            size = common.convert_size(part.get("size", 0))
             file = part.get("file", "")
         except Exception as e:
             common.log(
@@ -240,7 +241,7 @@ class PlexCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data["scraper"]
-        if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
+        if not configure.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 "a4kOfficial: '{}' is not installed; disabling '{}'".format(
                     ADDON_IDS[scraper]["plugin"],
@@ -248,6 +249,6 @@ class PlexCore(Core):
                 ),
                 "info",
             )
-            common.change_provider_status(scraper, "disabled")
+            configure.change_provider_status(scraper, "disabled")
         else:
             return super(PlexCore, PlexCore).get_listitem(return_data)
