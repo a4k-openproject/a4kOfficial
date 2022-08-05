@@ -72,6 +72,7 @@ class JustWatchCore(Core):
                 "plugin": self._plugin,
                 "release_title": item['title'],
                 "quality": self._get_offered_resolutions(item),
+                "service_id": service_id,
                 "url": self._movie_url.format(
                     self._plugin,
                     id_format(service_id) if id_format is not None else service_id,
@@ -101,6 +102,7 @@ class JustWatchCore(Core):
                 source.update(
                     {
                         "release_title": episode_item['title'],
+                        "service_id": service_ep_id,
                         "url": self._episode_url.format(
                             self._plugin,
                             id_format(service_ep_id)

@@ -1,4 +1,5 @@
 from datetime import datetime
+from platform import machine, system
 import uuid
 from xml.etree import ElementTree
 
@@ -30,8 +31,8 @@ class Plex:
             "X-Plex-Version": "1.1.1",
             "X-Plex-Platform": "Kodi",
             "X-Plex-Platform-Version": common.get_kodi_version(),
-            "X-Plex-Device": common.get_platform_system(),
-            "X-Plex-Model": common.get_platform_machine(),
+            "X-Plex-Device": system(),
+            "X-Plex-Model": machine(),
             "X-Plex-Provides": "player",
             "X-Plex-Client-Identifier": self._client_id or str(hex(uuid.getnode())),
             "Accept": "application/json",

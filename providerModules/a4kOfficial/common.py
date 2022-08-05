@@ -96,18 +96,6 @@ def get_kodi_version(short=False):
     return version
 
 
-def get_platform_system():
-    from platform import system
-
-    return system()
-
-
-def get_platform_machine():
-    from platform import machine
-
-    return machine()
-
-
 def check_for_addon(plugin):
     if plugin is None:
         return False
@@ -123,3 +111,12 @@ def check_for_addon(plugin):
 
 def change_provider_status(scraper=None, status="enabled"):
     ProviderInstallManager().flip_provider_status('a4kOfficial', scraper, status)
+
+
+def get_system_platform():
+    platform = "unknown"
+    for p in ["android", "linux", "uwp", "windows", "osx", "ios", "tvos"]:
+        if xbmc.getCondVisibility('system.platform.{}'.format(p)):
+            platform = p
+
+    return platform

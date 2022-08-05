@@ -56,8 +56,8 @@ class sources(JustWatchCore):
         super(sources, self).__init__()
         self._providers = ["nfx", "nfk"]
         self._scheme = "standard_web"
-        self._movie_url = "plugin://{}/play_strm/{}/"
-        self._episode_url = "plugin://{}/play_strm/{}/"
+        self._movie_url = "plugin://{}/play/{}/"
+        self._episode_url = "plugin://{}/play/{}/"
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         code = INSTANT_WATCHER_COUNTRIES.get(self._country, '78')
