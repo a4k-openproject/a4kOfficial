@@ -90,9 +90,9 @@ class Plex:
                 * 100
             ),
             g.get_language_string(30018).format(g.color_string(self._auth_url))
-            + '\n'
+            + "\n"
             + g.get_language_string(30019).format(g.color_string(code))
-            + '\n'
+            + "\n"
             + g.get_language_string(30047),
         )
 

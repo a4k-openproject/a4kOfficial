@@ -24,7 +24,7 @@ from resources.lib.common.source_utils import (
 )
 from resources.lib.modules.exceptions import PreemptiveCancellation
 
-PLEX_AUDIO = {'dca': 'dts', 'dca-ma': 'hdma'}
+PLEX_AUDIO = {"dca": "dts", "dca-ma": "hdma"}
 
 
 class PlexCore(Core):
@@ -46,7 +46,7 @@ class PlexCore(Core):
         with open(cache_path, "rb") as f:
             cache = pickle.load(f)
 
-        token = cache.get("myplex_user_cache").split('|')[1]
+        token = cache.get("myplex_user_cache").split("|")[1]
 
         return client_id, token
 
@@ -80,15 +80,15 @@ class PlexCore(Core):
 
             quality = media.get("videoResolution", "Unknown")
             part = media.get("Part", [{}])[0]
-            info = ' '.join(
+            info = " ".join(
                 [
-                    media.get("container", ''),
-                    media.get("videoCodec", ''),
-                    media.get("videoProfile", ''),
+                    media.get("container", ""),
+                    media.get("videoCodec", ""),
+                    media.get("videoProfile", ""),
                     PLEX_AUDIO.get(
-                        media.get("audioCodec"), media.get("audioCodec", '')
+                        media.get("audioCodec"), media.get("audioCodec", "")
                     ),
-                    media.get("audioProfile", ''),
+                    media.get("audioProfile", ""),
                     str(media.get("audioChannels", "2")) + "ch",
                 ]
             )
@@ -102,16 +102,16 @@ class PlexCore(Core):
             return
 
         filename = file
-        if '/' in file:
-            filename = file.rsplit('/', 1)[-1]
-        elif '\\' in file:
-            filename = file.rsplit('\\', 1)[-1]
+        if "/" in file:
+            filename = file.rsplit("/", 1)[-1]
+        elif "\\" in file:
+            filename = file.rsplit("\\", 1)[-1]
 
         if type != "episode":
             return
         elif not (
-            season == simple_info['season_number']
-            and episode == simple_info['episode_number']
+            season == simple_info["season_number"]
+            and episode == simple_info["episode_number"]
         ):
             return
         elif not (
@@ -147,15 +147,15 @@ class PlexCore(Core):
             year = int(media.get("year", simple_info["year"]))
             quality = media.get("videoResolution", "Unknown")
             part = media.get("Part", [{}])[0]
-            info = ' '.join(
+            info = " ".join(
                 [
-                    media.get("container", ''),
-                    media.get("videoCodec", ''),
-                    media.get("videoProfile", ''),
+                    media.get("container", ""),
+                    media.get("videoCodec", ""),
+                    media.get("videoProfile", ""),
                     PLEX_AUDIO.get(
-                        media.get("audioCodec"), media.get("audioCodec", '')
+                        media.get("audioCodec"), media.get("audioCodec", "")
                     ),
-                    media.get("audioProfile", ''),
+                    media.get("audioProfile", ""),
                     str(media.get("audioChannels", "2")) + "ch",
                 ]
             )
@@ -169,10 +169,10 @@ class PlexCore(Core):
             return
 
         filename = file
-        if '/' in file:
-            filename = file.rsplit('/', 1)[-1]
-        elif '\\' in file:
-            filename = file.rsplit('\\', 1)[-1]
+        if "/" in file:
+            filename = file.rsplit("/", 1)[-1]
+        elif "\\" in file:
+            filename = file.rsplit("\\", 1)[-1]
 
         if type != "movie":
             return
@@ -213,15 +213,15 @@ class PlexCore(Core):
     def movie(self, simple_info, all_info):
         for resource in self._resources:
             queries = []
-            queries.append(simple_info['title'])
-            queries.extend(simple_info.get('aliases', []))
+            queries.append(simple_info["title"])
+            queries.extend(simple_info.get("aliases", []))
 
             try:
                 items = []
                 for query in queries:
                     items.extend(
                         self._make_movie_query(
-                            resource, query, int(simple_info['year'])
+                            resource, query, int(simple_info["year"])
                         )
                     )
 
@@ -239,14 +239,14 @@ class PlexCore(Core):
 
     @staticmethod
     def get_listitem(return_data):
-        scraper = return_data['scraper']
+        scraper = return_data["scraper"]
         if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 "a4kOfficial: '{}' is not installed; disabling '{}'".format(
                     ADDON_IDS[scraper]["plugin"],
                     scraper,
                 ),
-                'info',
+                "info",
             )
             common.change_provider_status(scraper, "disabled")
         else:

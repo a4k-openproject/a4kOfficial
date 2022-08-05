@@ -17,7 +17,7 @@ class Core:
     def __init__(self):
         self.start_time = time.time()
         self.sources = []
-        self._scraper = self.__module__.split('.')[-1]
+        self._scraper = self.__module__.split(".")[-1]
 
     def _return_results(self, source_type, sources, preemptive=False):
         if preemptive:
@@ -56,13 +56,13 @@ class Core:
 
     def movie(self, simple_info, all_info):
         queries = []
-        queries.append(simple_info['title'])
-        queries.extend(simple_info.get('aliases', []))
+        queries.append(simple_info["title"])
+        queries.extend(simple_info.get("aliases", []))
 
         try:
             items = []
             for query in queries:
-                items.extend(self._make_movie_query(query, int(simple_info['year'])))
+                items.extend(self._make_movie_query(query, int(simple_info["year"])))
 
             for item in items:
                 source = self._process_movie_item(item, simple_info, all_info)
@@ -78,7 +78,7 @@ class Core:
     def get_listitem(return_data):
         list_item = xbmcgui.ListItem(path=return_data["url"], offscreen=True)
         list_item.setContentLookup(False)
-        list_item.setProperty('isFolder', 'false')
-        list_item.setProperty('isPlayable', 'true')
+        list_item.setProperty("isFolder", "false")
+        list_item.setProperty("isPlayable", "true")
 
         return list_item

@@ -19,14 +19,14 @@ from resources.lib.modules.globals import g
 from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 
-def log(msg, level='info'):
-    g.log('{}'.format(msg), level)
+def log(msg, level="info"):
+    g.log("{}".format(msg), level)
 
 
 def debug(msg, format=None):
     if format:
         msg.format(format)
-    g.log(msg, 'debug')
+    g.log(msg, "debug")
 
 
 def check_url(url):
@@ -38,7 +38,7 @@ def get_all_relative_py_files(file):
     return [
         filename[:-3]
         for filename in files
-        if not filename.startswith('__') and filename.endswith('.py')
+        if not filename.startswith("__") and filename.endswith(".py")
     ]
 
 
@@ -50,12 +50,12 @@ def set_setting(id, value):
     return provider_tools.set_setting(PACKAGE_NAME, id, value)
 
 
-def parseDOM(html, name='', attrs=None, ret=False):
+def parseDOM(html, name="", attrs=None, ret=False):
     if attrs:
         import re
 
         attrs = dict(
-            (key, re.compile(value + ('$' if value else '')))
+            (key, re.compile(value + ("$" if value else "")))
             for key, value in attrs.items()
         )
     from providerModules.a4kOfficial import dom_parser
@@ -110,13 +110,13 @@ def check_for_addon(plugin):
 
 
 def change_provider_status(scraper=None, status="enabled"):
-    ProviderInstallManager().flip_provider_status('a4kOfficial', scraper, status)
+    ProviderInstallManager().flip_provider_status("a4kOfficial", scraper, status)
 
 
 def get_system_platform():
     platform = "unknown"
     for p in ["android", "linux", "uwp", "windows", "osx", "ios", "tvos"]:
-        if xbmc.getCondVisibility('system.platform.{}'.format(p)):
+        if xbmc.getCondVisibility("system.platform.{}".format(p)):
             platform = p
 
     return platform

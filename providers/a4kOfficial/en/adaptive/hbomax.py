@@ -10,7 +10,7 @@ from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__()
-        self._providers = ['hmf', 'hba', 'hbm']
+        self._providers = ["hmf", "hba", "hbm"]
         self._scheme = "standard_web"
         self._movie_url = "plugin://{}/?_=play&slug={}"
         self._episode_url = "plugin://{}/?_=play&slug={}"

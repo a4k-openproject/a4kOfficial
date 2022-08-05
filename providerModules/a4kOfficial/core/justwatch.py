@@ -58,9 +58,9 @@ class JustWatchCore(Core):
         if not self._get_service_offers(item):
             return None
 
-        jw_title = self._api.get_title(title_id=item['id'], content_type=type)
+        jw_title = self._api.get_title(title_id=item["id"], content_type=type)
         external_ids = jw_title.get("external_ids", {})
-        tmdb_ids = [i['external_id'] for i in external_ids if i['provider'] == 'tmdb']
+        tmdb_ids = [i["external_id"] for i in external_ids if i["provider"] == "tmdb"]
 
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
             service_id = self._get_service_id(item, season, episode)
@@ -70,7 +70,7 @@ class JustWatchCore(Core):
             source = {
                 "scraper": self._scraper,
                 "plugin": self._plugin,
-                "release_title": item['title'],
+                "release_title": item["title"],
                 "quality": self._get_offered_resolutions(item),
                 "service_id": service_id,
                 "url": self._movie_url.format(
@@ -81,12 +81,12 @@ class JustWatchCore(Core):
             }
 
             if type == "show":
-                episodes = self._api.get_episodes(item['id'])['items']
+                episodes = self._api.get_episodes(item["id"])["items"]
                 episode_item = [
                     i
                     for i in episodes
-                    if i['season_number'] == int(season)
-                    and i['episode_number'] == int(episode)
+                    if i["season_number"] == int(season)
+                    and i["episode_number"] == int(episode)
                 ]
 
                 if not episode_item:
@@ -101,7 +101,7 @@ class JustWatchCore(Core):
 
                 source.update(
                     {
-                        "release_title": episode_item['title'],
+                        "release_title": episode_item["title"],
                         "service_id": service_ep_id,
                         "url": self._episode_url.format(
                             self._plugin,
@@ -116,14 +116,14 @@ class JustWatchCore(Core):
 
     def _process_movie_item(self, item, simple_info, all_info, id_format=None):
         source = self.__process_item(
-            item, all_info['info']['tmdb_id'], "movie", id_format=id_format
+            item, all_info["info"]["tmdb_id"], "movie", id_format=id_format
         )
         return source
 
     def _process_show_item(self, item, simple_info, all_info, id_format=None):
         source = self.__process_item(
             item,
-            all_info['info']['tmdb_show_id'],
+            all_info["info"]["tmdb_show_id"],
             "show",
             int(simple_info["season_number"]),
             int(simple_info["episode_number"]),
@@ -149,8 +149,8 @@ class JustWatchCore(Core):
         service_offers = [
             o
             for o in offers
-            if o.get('package_short_name') in self._providers
-            and o.get('monetization_type') in self._monetization_types
+            if o.get("package_short_name") in self._providers
+            and o.get("monetization_type") in self._monetization_types
         ]
         self._service_offers.extend(service_offers)
 
@@ -168,18 +168,18 @@ class JustWatchCore(Core):
 
         order = {key: i for i, key in enumerate(["4K", "1080p", "720p", "SD"])}
 
-        return '/'.join(sorted(list(resolutions), key=lambda x: order[x]))
+        return "/".join(sorted(list(resolutions), key=lambda x: order[x]))
 
     def _get_service_id(self, item, season=0, episode=0):
         if not self._service_offers:
             return None
 
         offer = self._service_offers[0]
-        url = offer.get('urls', {}).get(self._scheme, '')
+        url = offer.get("urls", {}).get(self._scheme, "")
         if not common.check_url(url):
             return None
 
-        id = url.rstrip('/').split('/')[-1]
+        id = url.rstrip("/").split("/")[-1]
 
         return id
 
@@ -207,14 +207,14 @@ class JustWatchCore(Core):
 
     def movie(self, simple_info, all_info, id_format=None):
         queries = []
-        queries.append(simple_info['title'])
-        queries.extend(simple_info.get('aliases', []))
+        queries.append(simple_info["title"])
+        queries.extend(simple_info.get("aliases", []))
 
         try:
             self._api = JustWatch(country=self._country)
             items = []
             for query in queries:
-                items.extend(self._make_movie_query(query, simple_info['year']))
+                items.extend(self._make_movie_query(query, simple_info["year"]))
 
             for item in items:
                 source = self._process_movie_item(
@@ -230,14 +230,14 @@ class JustWatchCore(Core):
 
     @staticmethod
     def get_listitem(return_data):
-        scraper = return_data['scraper']
+        scraper = return_data["scraper"]
         if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 "a4kOfficial: '{}' is not installed; disabling '{}'".format(
                     ADDON_IDS[scraper]["plugin"],
                     scraper,
                 ),
-                'info',
+                "info",
             )
             common.change_provider_status(scraper, "disabled")
         else:

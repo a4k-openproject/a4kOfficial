@@ -11,7 +11,7 @@ from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__()
-        self._providers = ['amp', 'amz', 'prv']
+        self._providers = ["amp", "amz", "prv"]
         self._scheme = "standard_web"
         self._movie_url = "plugin://{}/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
         self._episode_url = "plugin://{}/?asin={}&mode=PlayVideo&name=None&adult=0&trailer=0&selbitrate=0"
@@ -21,10 +21,10 @@ class sources(JustWatchCore):
             return None
 
         offer = self._service_offers[0]
-        url = offer['urls'][self._scheme]
+        url = offer["urls"][self._scheme]
         if not common.check_url(url):
             return None
 
-        id = url.rstrip('/').split('gti=')[1]
+        id = url.rstrip("/").split("gti=")[1]
 
         return id

@@ -4,7 +4,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-PACKAGE_NAME = 'a4kOfficial'
+PACKAGE_NAME = "a4kOfficial"
 ADDON_IDS = {
     "iplayer": {
         "plugin": "plugin.video.iplayerwww",

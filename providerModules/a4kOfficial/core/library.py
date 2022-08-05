@@ -43,7 +43,7 @@ class LibraryCore(Core):
             .get("filedetails", {})
             .get("size", 0)
         )
-        file_info['size'] = de_string_size(common.convert_size(size))
+        file_info["size"] = de_string_size(common.convert_size(size))
 
         stream_details = db_details.get("streamdetails", {})
         audio_details = stream_details.get("audio", [])
@@ -51,17 +51,17 @@ class LibraryCore(Core):
         video_details = stream_details.get("video", [])
         video_details = video_details[0] if len(video_details) > 0 else {}
 
-        file_info['info'] = set()
+        file_info["info"] = set()
         if audio_channels := audio_details.get("channels"):
-            file_info['info'].add("{}ch".format(audio_channels))
+            file_info["info"].add("{}ch".format(audio_channels))
         if audio_codec := audio_details.get("codec"):
-            file_info['info'].add("dts" if audio_codec == "dca" else audio_codec)
+            file_info["info"].add("dts" if audio_codec == "dca" else audio_codec)
         if video_codec := video_details.get("codec"):
-            file_info['info'].add("h264" if video_codec == "avc1" else video_codec)
+            file_info["info"].add("h264" if video_codec == "avc1" else video_codec)
         if video_codec := video_details.get("stereomode"):
-            file_info['info'].add("3D")
+            file_info["info"].add("3D")
 
-        file_info['quality'] = LibraryCore.get_quality(video_details.get("width", 0))
+        file_info["quality"] = LibraryCore.get_quality(video_details.get("width", 0))
 
         return file_info
 
@@ -125,12 +125,12 @@ class LibraryCore(Core):
                         {
                             "field": "season",
                             "operator": "is",
-                            "value": str(all_info['info']["season"]),
+                            "value": str(all_info["info"]["season"]),
                         },
                         {
                             "field": "episode",
                             "operator": "is",
-                            "value": str(all_info['info']["episode"]),
+                            "value": str(all_info["info"]["episode"]),
                         },
                     ]
                 },
@@ -144,20 +144,20 @@ class LibraryCore(Core):
         db_details = db_details[0]
         external_ids = db_item.get("uniqueid", {})
         show_ids = {
-            "tmdb": all_info['info'].get("tmdb_show_id"),
-            "tvdb": all_info['info'].get("tvdb_show_id"),
-            "trakt": all_info['info'].get("trakt_show_id"),
+            "tmdb": all_info["info"].get("tmdb_show_id"),
+            "tvdb": all_info["info"].get("tvdb_show_id"),
+            "trakt": all_info["info"].get("trakt_show_id"),
         }
 
         if all([int(external_ids.get(i, -1)) in [-1, show_ids[i]] for i in show_ids]):
             source_info = self.get_file_info(db_details)
             source = {
                 "scraper": self._scraper,
-                "release_title": db_details['label'],
-                "info": source_info['info'],
-                "size": source_info['size'],
-                "quality": source_info['quality'],
-                "url": db_details.get('file', ''),
+                "release_title": db_details["label"],
+                "info": source_info["info"],
+                "size": source_info["size"],
+                "quality": source_info["quality"],
+                "url": db_details.get("file", ""),
             }
 
         return source
@@ -176,9 +176,9 @@ class LibraryCore(Core):
         ).get("moviedetails", {})
         external_ids = db_details.get("uniqueid", {})
         movie_ids = {
-            "tmdb": all_info['info'].get("tmdb_id"),
-            "imdb": all_info['info'].get("imdb_id"),
-            "trakt": all_info['info'].get("trakt_id"),
+            "tmdb": all_info["info"].get("tmdb_id"),
+            "imdb": all_info["info"].get("imdb_id"),
+            "trakt": all_info["info"].get("trakt_id"),
         }
 
         if all(
@@ -192,11 +192,11 @@ class LibraryCore(Core):
             source_info = self.get_file_info(db_details)
             source = {
                 "scraper": self._scraper,
-                "release_title": db_details['label'],
-                "info": source_info['info'],
-                "size": source_info['size'],
-                "quality": source_info['quality'],
-                "url": db_details.get('file', ''),
+                "release_title": db_details["label"],
+                "info": source_info["info"],
+                "size": source_info["size"],
+                "quality": source_info["quality"],
+                "url": db_details.get("file", ""),
             }
 
         return source

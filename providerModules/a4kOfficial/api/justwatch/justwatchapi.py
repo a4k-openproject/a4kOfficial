@@ -5,13 +5,13 @@ import requests
 import sys
 
 
-HEADER = {'User-Agent': 'JustWatch client (github.com/dawoudt/JustWatchAPI)'}
+HEADER = {"User-Agent": "JustWatch client (github.com/dawoudt/JustWatchAPI)"}
 
 
 class JustWatch:
     api_base_template = "https://apis.justwatch.com/content/{path}"
 
-    def __init__(self, country='AU', use_sessions=True, **kwargs):
+    def __init__(self, country="AU", use_sessions=True, **kwargs):
         self.kwargs = kwargs
         self.country = country
         self.kwargs_cinema = []
@@ -19,16 +19,16 @@ class JustWatch:
         self.locale = self.set_locale()
 
     def __del__(self):
-        '''Should really use context manager
+        """Should really use context manager
         but this should do without changing functionality.
-        '''
+        """
         if isinstance(self.requests, requests.Session):
             self.requests.close()
 
     def set_locale(self):
-        warn = '\nWARN: Unable to locale for {}! Defaulting to en_AU\n'
-        default_locale = 'en_AU'
-        path = 'locales/state'
+        warn = "\nWARN: Unable to locale for {}! Defaulting to en_AU\n"
+        default_locale = "en_AU"
+        path = "locales/state"
         api_url = self.api_base_template.format(path=path)
 
         r = self.requests.get(api_url, headers=HEADER)
@@ -42,24 +42,24 @@ class JustWatch:
 
         for result in results:
             if (
-                result['iso_3166_2'] == self.country
-                or result['country'] == self.country
+                result["iso_3166_2"] == self.country
+                or result["country"] == self.country
             ):
 
-                return result['full_locale']
+                return result["full_locale"]
 
         sys.stderr.write(warn.format(self.country))
         return default_locale
 
     def search_for_item(self, query=None, **kwargs):
 
-        path = 'titles/{}/popular'.format(self.locale)
+        path = "titles/{}/popular".format(self.locale)
         api_url = self.api_base_template.format(path=path)
 
         if kwargs:
             self.kwargs = kwargs
         if query:
-            self.kwargs.update({'query': query})
+            self.kwargs.update({"query": query})
         null = None
         payload = {
             "age_certifications": null,
@@ -86,7 +86,7 @@ class JustWatch:
             if key in payload.keys():
                 payload[key] = value
             else:
-                print('{} is not a valid keyword'.format(key))
+                print("{} is not a valid keyword".format(key))
         r = self.requests.post(api_url, json=payload, headers=HEADER)
 
         # Client should deal with rate-limiting. JustWatch may send a 429 Too Many Requests response.
@@ -95,7 +95,7 @@ class JustWatch:
         return r.json()
 
     def get_providers(self):
-        path = 'providers/locale/{}'.format(self.locale)
+        path = "providers/locale/{}".format(self.locale)
         api_url = self.api_base_template.format(path=path)
         r = self.requests.get(api_url, headers=HEADER)
         r.raise_for_status()  # Raises requests.exceptions.HTTPError if r.status_code != 200
@@ -103,15 +103,15 @@ class JustWatch:
         return r.json()
 
     def get_genres(self):
-        path = 'genres/locale/{}'.format(self.locale)
+        path = "genres/locale/{}".format(self.locale)
         api_url = self.api_base_template.format(path=path)
         r = self.requests.get(api_url, headers=HEADER)
         r.raise_for_status()  # Raises requests.exceptions.HTTPError if r.status_code != 200
 
         return r.json()
 
-    def get_title(self, title_id, content_type='movie'):
-        path = 'titles/{content_type}/{title_id}/locale/{locale}'.format(
+    def get_title(self, title_id, content_type="movie"):
+        path = "titles/{content_type}/{title_id}/locale/{locale}".format(
             content_type=content_type, title_id=title_id, locale=self.locale
         )
 
@@ -122,23 +122,23 @@ class JustWatch:
         return r.json()
 
     def search_title_id(self, query):
-        '''Returns a dictionary of titles returned
+        """Returns a dictionary of titles returned
         from search and their respective ID's
 
         >>> ...
         >>> just_watch.get_title_id('The Matrix')
         {'The Matrix': 10, ... }
 
-        '''
+        """
 
         results = self.search_for_item(query)
-        return {item['id']: item['title'] for item in results['items']}
+        return {item["id"]: item["title"] for item in results["items"]}
 
     def get_season(self, season_id):
 
         header = HEADER
         api_url = (
-            'https://apis.justwatch.com/content/titles/show_season/{}/locale/{}'.format(
+            "https://apis.justwatch.com/content/titles/show_season/{}/locale/{}".format(
                 season_id, self.locale
             )
         )
@@ -149,16 +149,16 @@ class JustWatch:
 
         return r.json()
 
-    def get_episodes(self, show_id, page=''):
-        '''Fetches episodes details from the API, based on show_id.
+    def get_episodes(self, show_id, page=""):
+        """Fetches episodes details from the API, based on show_id.
         API returns 200 episodes (from newest to oldest) but takes a 'page' param.
-        '''
+        """
         header = HEADER
-        api_url = 'https://apis.justwatch.com/content/titles/show/{}/locale/{}/newest_episodes'.format(
+        api_url = "https://apis.justwatch.com/content/titles/show/{}/locale/{}/newest_episodes".format(
             show_id, self.locale
         )
         if page:
-            api_url += '?page={}'.format(page)
+            api_url += "?page={}".format(page)
         r = self.requests.get(api_url, headers=header)
 
         # Client should deal with rate-limiting. JustWatch may send a 429 Too Many Requests response.
@@ -166,7 +166,7 @@ class JustWatch:
 
         return r.json()
 
-    def get_cinema_times(self, title_id, content_type='movie', **kwargs):
+    def get_cinema_times(self, title_id, content_type="movie", **kwargs):
 
         if kwargs:
             self.kwargs_cinema = kwargs
@@ -177,10 +177,10 @@ class JustWatch:
             if key in payload.keys():
                 payload[key] = value
             else:
-                print('{} is not a valid keyword'.format(key))
+                print("{} is not a valid keyword".format(key))
 
         header = HEADER
-        api_url = 'https://apis.justwatch.com/content/titles/{}/{}/showtimes'.format(
+        api_url = "https://apis.justwatch.com/content/titles/{}/{}/showtimes".format(
             content_type, title_id
         )
         r = self.requests.get(api_url, params=payload, headers=header)
@@ -199,14 +199,14 @@ class JustWatch:
         for key, value in self.kwargs_cinema.items():
             if key in payload.keys():
                 payload[key] = value
-            elif key == 'date':
+            elif key == "date":
                 # ignore the date value if passed
                 pass
             else:
-                print('{} is not a valid keyword'.format(key))
+                print("{} is not a valid keyword".format(key))
 
         header = HEADER
-        api_url = 'https://apis.justwatch.com/content/cinemas/{}'.format(self.locale)
+        api_url = "https://apis.justwatch.com/content/cinemas/{}".format(self.locale)
         r = self.requests.get(api_url, params=payload, headers=header)
 
         r.raise_for_status()  # Raises requests.exceptions.HTTPError if r.status_code != 200
@@ -217,14 +217,14 @@ class JustWatch:
 
         header = HEADER
         payload = {
-            'nationwide_cinema_releases_only': nationwide_cinema_releases_only,
-            'body': {},
+            "nationwide_cinema_releases_only": nationwide_cinema_releases_only,
+            "body": {},
         }
         now_date = datetime.now()
         td = timedelta(weeks=weeks_offset)
         year_month_day = (now_date + td).isocalendar()
         api_url = (
-            'https://apis.justwatch.com/content/titles/movie/upcoming/{}/{}/locale/{}'
+            "https://apis.justwatch.com/content/titles/movie/upcoming/{}/{}/locale/{}"
         )
         api_url = api_url.format(year_month_day[0], year_month_day[1], self.locale)
 
@@ -238,18 +238,18 @@ class JustWatch:
             return r.json()
         except:
             return {
-                'page': 0,
-                'page_size': 0,
-                'total_pages': 1,
-                'total_results': 0,
-                'items': [],
+                "page": 0,
+                "page_size": 0,
+                "total_pages": 1,
+                "total_results": 0,
+                "items": [],
             }
 
-    def get_certifications(self, content_type='movie'):
+    def get_certifications(self, content_type="movie"):
 
         header = HEADER
-        payload = {'country': self.country, 'object_type': content_type}
-        api_url = 'https://apis.justwatch.com/content/age_certifications'
+        payload = {"country": self.country, "object_type": content_type}
+        api_url = "https://apis.justwatch.com/content/age_certifications"
         r = self.requests.get(api_url, params=payload, headers=header)
 
         # Client should deal with rate-limiting. JustWatch may send a 429 Too Many Requests response.
@@ -258,7 +258,7 @@ class JustWatch:
         return r.json()
 
     def get_person_detail(self, person_id):
-        path = 'titles/person/{person_id}/locale/{locale}'.format(
+        path = "titles/person/{person_id}/locale/{locale}".format(
             person_id=person_id, locale=self.locale
         )
         api_url = self.api_base_template.format(path=path)
