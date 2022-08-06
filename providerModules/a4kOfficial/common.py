@@ -10,6 +10,7 @@ import math
 import os
 
 import requests
+from requests.exceptions import RequestException
 
 from resources.lib.modules.globals import g
 
@@ -19,7 +20,11 @@ def log(msg, level="info"):
 
 
 def check_url(url):
-    return requests.get(url).ok
+    try:
+        return requests.get(url).ok
+    except RequestException as re:
+        log(f"a4kOfficial: Could not access {url}. {re}", "error")
+        return False
 
 
 def get_all_relative_py_files(file):

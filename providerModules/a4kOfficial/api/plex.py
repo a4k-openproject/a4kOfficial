@@ -8,6 +8,7 @@ from platform import machine, system
 import uuid
 
 import requests
+from requests.exceptions import RequestException
 
 from providerModules.a4kOfficial import common
 
@@ -15,7 +16,6 @@ from providerModules.a4kOfficial import common
 class Plex:
     def __init__(self, client_id=None, token=None):
         self._base_url = "https://plex.tv"
-        self._auth_url = self._base_url + "/link/"
         self._token = token
         self._client_id = client_id
 
@@ -37,11 +37,17 @@ class Plex:
         if self._token:
             self._headers["X-Plex-Token"] = self._token
 
+    def _get(self, url, **kwargs):
+        try:
+            return requests.get(url, **kwargs)
+        except RequestException as re:
+            common.log(f"a4kOfficial: Could not access Plex. {re}", "error")
+
     def get_resources(self):
         url = self._base_url + "/api/v2/resources"
-        results = requests.get(url, params={"includeHttps": 1}, headers=self._headers)
+        results = self._get(url, params={"includeHttps": 1}, headers=self._headers)
 
-        if results.status_code != 200:
+        if results is not None and results.status_code != 200:
             common.log(
                 f"Failed to list Plex resources: {results.status_code} response from {url}"
             )
@@ -76,7 +82,7 @@ class Plex:
         params.update(**kwargs)
         self._headers["X-Plex-Token"] = resource[1]
 
-        results = requests.get(url, params=params, headers=self._headers)
+        results = self._get(url, params=params, headers=self._headers)
         self._headers["X-Plex-Token"] = self._token
         if results.ok:
             return results.json().get("MediaContainer", {}).get("Metadata", [])
