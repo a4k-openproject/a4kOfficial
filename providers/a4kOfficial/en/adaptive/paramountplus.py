@@ -12,11 +12,14 @@ from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 class sources(JustWatchCore):
     def __init__(self):
-        super(sources, self).__init__()
-        self._providers = ["pmp"]
-        self._scheme = "standard_web"
-        self._movie_url = "plugin://{}/?_=play&video_id={}"
-        self._episode_url = "plugin://{}/?_=play&video_id={}"
+        super(sources, self).__init__(providers=["pmp"])
+        
+        self._movie_url = (
+            f"{self._movie_url.format(movie_url='/?_=play&video_id={movie_id}')}"
+        )
+        self._episode_url = (
+            f"{self._episode_url.format(episode_url='/?_=play&video_id={episode_id}')}"
+        )
 
     def _get_service_id(self, item, season=0, episode=0):
         if not self._service_offers:

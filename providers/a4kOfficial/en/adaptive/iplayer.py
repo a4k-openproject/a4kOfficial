@@ -16,15 +16,10 @@ from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 class sources(JustWatchCore):
     def __init__(self):
-        super(sources, self).__init__()
-        self._providers = ["bbc"]
-        self._scheme = "standard_web"
-        self._movie_url = (
-            "plugin://{}/?mode=202&name=null&url={}&iconimage=null&description=null"
-        )
-        self._episode_url = (
-            "plugin://{}/?mode=202&name=null&url={}&iconimage=null&description=null"
-        )
+        super(sources, self).__init__(providers=["bbc"])
+        
+        self._movie_url = f"{self._movie_url.format(movie_url='/?mode=202&name=null&url={movie_id}&iconimage=null&description=null')}"
+        self._episode_url = f"{self._episode_url.format(episode_url='/?mode=202&name=null&url={episode_id}&iconimage=null&description=null')}"
 
     def episode(self, simple_info, all_info, id_format=None):
         return super(sources, self).episode(simple_info, all_info, id_format=quote_plus)

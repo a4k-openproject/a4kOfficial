@@ -16,17 +16,18 @@ from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
 class JustWatchCore(Core):
-    def __init__(self):
+    def __init__(self, providers, scheme="standard_web"):
         super(JustWatchCore, self).__init__()
         self._country = configure.get_setting("justwatch.country")
         self._monetization_types = ["free", "flatrate"]
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._service_offers = []
 
-        self._providers = None
-        self._scheme = None
-        self._movie_url = None
-        self._episode_url = None
+        self._providers = providers
+        self._scheme = scheme
+        self._base_url = f"plugin://{self._plugin}"
+        self._movie_url = self._base_url + "{movie_url}"
+        self._episode_url = self._base_url + "{episode_url}"
 
     def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
@@ -75,8 +76,9 @@ class JustWatchCore(Core):
                 "quality": self._get_offered_resolutions(item),
                 "service_id": service_id,
                 "url": self._movie_url.format(
-                    self._plugin,
-                    id_format(service_id) if id_format is not None else service_id,
+                    movie_id=id_format(service_id)
+                    if id_format is not None
+                    else service_id,
                 ),
                 "debrid_provider": self._plugin,
             }
@@ -105,8 +107,7 @@ class JustWatchCore(Core):
                         "release_title": episode_item["title"],
                         "service_id": service_ep_id,
                         "url": self._episode_url.format(
-                            self._plugin,
-                            id_format(service_ep_id)
+                            episode_id=id_format(service_ep_id)
                             if id_format is not None
                             else service_ep_id,
                         ),
@@ -232,9 +233,10 @@ class JustWatchCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data["scraper"]
-        if not configure.check_for_addon(ADDON_IDS[scraper]["plugin"]):
+        plugin = ADDON_IDS[scraper]["plugin"]
+        if not configure.check_for_addon(plugin):
             common.log(
-                f"a4kOfficial: '{ADDON_IDS[scraper]['plugin']}' is not installed; disabling '{scraper}'",
+                f"a4kOfficial: '{plugin}' is not installed; disabling '{scraper}'",
                 "info",
             )
             configure.change_provider_status(scraper, "disabled")

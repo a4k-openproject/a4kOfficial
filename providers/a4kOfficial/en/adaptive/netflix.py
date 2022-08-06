@@ -53,11 +53,28 @@ INSTANT_WATCHER_COUNTRIES = {
 
 class sources(JustWatchCore):
     def __init__(self):
-        super(sources, self).__init__()
-        self._providers = ["nfx", "nfk"]
-        self._scheme = "standard_web"
-        self._movie_url = "plugin://{}/play/{}/"
-        self._episode_url = "plugin://{}/play/{}/"
+        super(sources, self).__init__(providers=["nfx", "nfk"])
+        
+        self._movie_url = (
+            f"{self._movie_url.format(movie_url='/play/movie/{movie_id}/')}"
+        )
+        self._episode_url = f"{self._episode_url.format(episode_url='/play/show/{show_id}/season/0/episode/{episode_id}')}"
+
+    def _process_show_item(self, item, simple_info, all_info, id_format=None):
+        source = super(sources, self).__process_item(
+            item,
+            all_info["info"]["tmdb_show_id"],
+            "show",
+            int(simple_info["season_number"]),
+            int(simple_info["episode_number"]),
+            id_format=id_format,
+        )
+        if source is not None:
+            source["url"] = self._episode_url.format(
+                show_id=item["id"], episode_id=source["service_id"]
+            )
+
+        return source
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         code = INSTANT_WATCHER_COUNTRIES.get(self._country, "78")
