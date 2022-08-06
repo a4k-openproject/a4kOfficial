@@ -97,9 +97,7 @@ class PlexCore(Core):
             size = common.convert_size(part.get("size", 0))
             file = part.get("file", "")
         except Exception as e:
-            common.log(
-                "a4kOfficial: Failed to process Plex source: {}".format(e), "error"
-            )
+            common.log(f"a4kOfficial: Failed to process Plex source: {e}", "error")
             return
 
         filename = file
@@ -164,9 +162,7 @@ class PlexCore(Core):
             size = str(int(part.get("size", 0)) / 1024 / 1024) + "MiB"
             file = part.get("file", "")
         except Exception as e:
-            common.log(
-                "a4kOfficial: Failed to process Plex source: {}".format(e), "error"
-            )
+            common.log(f"a4kOfficial: Failed to process Plex source: {e}", "error")
             return
 
         filename = file
@@ -243,10 +239,7 @@ class PlexCore(Core):
         scraper = return_data["scraper"]
         if not configure.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
-                "a4kOfficial: '{}' is not installed; disabling '{}'".format(
-                    ADDON_IDS[scraper]["plugin"],
-                    scraper,
-                ),
+                f"a4kOfficial: '{ADDON_IDS[scraper]['plugin']}' is not installed; disabling '{scraper}'",
                 "info",
             )
             configure.change_provider_status(scraper, "disabled")

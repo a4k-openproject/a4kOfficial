@@ -34,7 +34,7 @@ class JustWatchCore(Core):
             content_types=[type],
             providers=self._providers,
             monetization_types=self._monetization_types,
-            **kwargs
+            **kwargs,
         ).get("items", [])
 
         return items
@@ -234,10 +234,7 @@ class JustWatchCore(Core):
         scraper = return_data["scraper"]
         if not configure.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
-                "a4kOfficial: '{}' is not installed; disabling '{}'".format(
-                    ADDON_IDS[scraper]["plugin"],
-                    scraper,
-                ),
+                f"a4kOfficial: '{ADDON_IDS[scraper]['plugin']}' is not installed; disabling '{scraper}'",
                 "info",
             )
             configure.change_provider_status(scraper, "disabled")

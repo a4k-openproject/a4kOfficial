@@ -15,13 +15,7 @@ from resources.lib.modules.globals import g
 
 
 def log(msg, level="info"):
-    g.log("{}".format(msg), level)
-
-
-def debug(msg, format=None):
-    if format:
-        msg.format(format)
-    g.log(msg, "debug")
+    g.log(f"{msg}", level)
 
 
 def check_url(url):
@@ -74,7 +68,7 @@ def convert_size(size_bytes):
     i = int(math.floor(math.log(size_bytes, 1024)))
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
-    return "{}{}".format(s, size_name[i])
+    return f"{s}{size_name[i]}"
 
 
 def get_kodi_version(short=False):
@@ -87,7 +81,7 @@ def get_kodi_version(short=False):
 def get_system_platform():
     platform = "unknown"
     for p in ["android", "linux", "uwp", "windows", "osx", "ios", "tvos"]:
-        if xbmc.getCondVisibility("system.platform.{}".format(p)):
+        if xbmc.getCondVisibility(f"system.platform.{p}"):
             platform = p
 
     return platform

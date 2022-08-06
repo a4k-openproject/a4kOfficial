@@ -53,7 +53,7 @@ class LibraryCore(Core):
 
         file_info["info"] = set()
         if audio_channels := audio_details.get("channels"):
-            file_info["info"].add("{}ch".format(audio_channels))
+            file_info["info"].add(f"{audio_channels}ch")
         if audio_codec := audio_details.get("codec"):
             file_info["info"].add("dts" if audio_codec == "dca" else audio_codec)
         if video_codec := video_details.get("codec"):

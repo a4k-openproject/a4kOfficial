@@ -40,9 +40,7 @@ def get_widevine_level():
                         pass
 
         except Exception as e:
-            common.log(
-                "a4kOfficial: Failed detecting Widevine security level. {}".format(e)
-            )
+            common.log(f"a4kOfficial: Failed detecting Widevine security level. {e}")
 
     if not wv_level:
         wv_level = WV_L3

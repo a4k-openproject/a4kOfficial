@@ -43,9 +43,7 @@ class Plex:
 
         if results.status_code != 200:
             common.log(
-                "Failed to list Plex resources: {} response from {}".format(
-                    results.status_code, url
-                )
+                f"Failed to list Plex resources: {results.status_code} response from {url}"
             )
             return
 
@@ -66,9 +64,7 @@ class Plex:
                         if ".plex.direct" in url and not local:
                             listings.append((url, access_token))
         except Exception as e:
-            common.log(
-                "a4kOfficial: Failed to list Plex resources: {}".format(e), "error"
-            )
+            common.log(f"a4kOfficial: Failed to list Plex resources: {e}")
             return
 
         return listings

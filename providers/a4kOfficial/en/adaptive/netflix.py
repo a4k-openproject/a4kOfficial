@@ -61,7 +61,7 @@ class sources(JustWatchCore):
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         code = INSTANT_WATCHER_COUNTRIES.get(self._country, "78")
-        url = "https://www.instantwatcher.com/netflix/{}/title/{}".format(code, show_id)
+        url = f"https://www.instantwatcher.com/netflix/{code}/title/{show_id}"
         r = requests.get(url, timeout=10).text
         r = common.parseDOM(r, "div", attrs={"class": "tdChildren-titles"})[0]
         seasons = re.findall(
@@ -79,8 +79,6 @@ class sources(JustWatchCore):
 
         return (
             None
-            if not common.check_url(
-                "https://www.netflix.com/watch/{}".format(episode_id)
-            )
+            if not common.check_url(f"https://www.netflix.com/watch/{episode_id}")
             else episode_id
         )

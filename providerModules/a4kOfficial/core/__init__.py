@@ -22,19 +22,15 @@ class Core:
     def _return_results(self, source_type, sources, preemptive=False):
         if preemptive:
             common.log(
-                "a4kOfficial.{}.{}: cancellation requested".format(
-                    source_type, self._scraper
-                ),
+                f"a4kOfficial.{source_type}.{self._scraper}: cancellation requested",
                 "info",
             )
         common.log(
-            "a4kOfficial.{}.{}: {}".format(source_type, self._scraper, len(sources)),
+            f"a4kOfficial.{source_type}.{self._scraper}: {len(sources)}",
             "info",
         )
         common.log(
-            "a4kOfficial.{}.{}: took {} ms".format(
-                source_type, self._scraper, int((time.time() - self.start_time) * 1000)
-            ),
+            f"a4kOfficial.{source_type}.{self._scraper}: took {int((time.time() - self.start_time) * 1000)} ms",
             "info",
         )
 
