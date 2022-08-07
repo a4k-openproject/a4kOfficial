@@ -17,7 +17,7 @@ from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__(providers=["bbc"])
-        
+
         self._movie_url = f"{self._movie_url.format(movie_url='/?mode=202&name=null&url={movie_id}&iconimage=null&description=null')}"
         self._episode_url = f"{self._episode_url.format(episode_url='/?mode=202&name=null&url={episode_id}&iconimage=null&description=null')}"
 
@@ -77,4 +77,4 @@ class sources(JustWatchCore):
             ep = ep[0]
         ep = "https://www.bbc.co.uk" + ep if not ep.startswith("http") else ep
 
-        return None if not common.check_url(ep) else ep
+        return None if not common.check_url(ep) else {"episode_id": ep}

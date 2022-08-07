@@ -54,32 +54,17 @@ INSTANT_WATCHER_COUNTRIES = {
 class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__(providers=["nfx", "nfk"])
-        
+
         self._movie_url = (
             f"{self._movie_url.format(movie_url='/play/movie/{movie_id}/')}"
         )
-        self._episode_url = f"{self._episode_url.format(episode_url='/play/show/{show_id}/season/0/episode/{episode_id}')}"
-
-    def _process_show_item(self, item, simple_info, all_info, id_format=None):
-        source = super(sources, self).__process_item(
-            item,
-            all_info["info"]["tmdb_show_id"],
-            "show",
-            int(simple_info["season_number"]),
-            int(simple_info["episode_number"]),
-            id_format=id_format,
-        )
-        if source is not None:
-            source["url"] = self._episode_url.format(
-                show_id=item["id"], episode_id=source["service_id"]
-            )
-
-        return source
+        self._episode_url = f"{self._episode_url.format(episode_url='/play/show/{show_id}/season/{season_id}/episode/{episode_id}')}"
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         code = INSTANT_WATCHER_COUNTRIES.get(self._country, "78")
         url = f"https://www.instantwatcher.com/netflix/{code}/title/{show_id}"
         r = requests.get(url, timeout=10).text
+
         r = common.parseDOM(r, "div", attrs={"class": "tdChildren-titles"})[0]
         seasons = re.findall(
             r'(<div class="iw-title netflix-title list-title".+?<div class="grandchildren-titles"></div></div>)',
@@ -97,5 +82,5 @@ class sources(JustWatchCore):
         return (
             None
             if not common.check_url(f"https://www.netflix.com/watch/{episode_id}")
-            else episode_id
+            else {"season_id": episodes[0], "episode_id": episode_id}
         )

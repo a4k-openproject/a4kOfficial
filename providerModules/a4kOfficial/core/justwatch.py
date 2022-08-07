@@ -29,6 +29,31 @@ class JustWatchCore(Core):
         self._movie_url = self._base_url + "{movie_url}"
         self._episode_url = self._base_url + "{episode_url}"
 
+    def _make_source(self, item, ids, base_url, id_format=None):
+        source = {
+            "scraper": self._scraper,
+            "plugin": self._plugin,
+            "release_title": item["title"],
+            "quality": self._get_offered_resolutions(item),
+            "debrid_provider": self._plugin,
+        }
+        source.update(ids)
+        source["url"] = base_url.format(
+            **(
+                {k: id_format(v) for k, v in ids.items()}
+                if id_format is not None
+                else ids
+            )
+        )
+
+        return source
+
+    def _make_episode_source(self, item, ids, id_format=None):
+        return self._make_source(item, ids, self._episode_url, id_format)
+
+    def _make_movie_source(self, item, ids, id_format=None):
+        return self._make_source(item, ids, self._movie_url, id_format)
+
     def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
             query=clean_title(query),
@@ -69,19 +94,7 @@ class JustWatchCore(Core):
             if not service_id:
                 return None
 
-            source = {
-                "scraper": self._scraper,
-                "plugin": self._plugin,
-                "release_title": item["title"],
-                "quality": self._get_offered_resolutions(item),
-                "service_id": service_id,
-                "url": self._movie_url.format(
-                    movie_id=id_format(service_id)
-                    if id_format is not None
-                    else service_id,
-                ),
-                "debrid_provider": self._plugin,
-            }
+            source = self._make_movie_source(item, {"movie_id": service_id}, id_format)
 
             if type == "show":
                 episodes = self._api.get_episodes(item["id"])["items"]
@@ -95,24 +108,15 @@ class JustWatchCore(Core):
                 if not episode_item:
                     return None
                 episode_item = episode_item[0]
-
-                service_ep_id = self._get_service_ep_id(
-                    service_id, episode_item, season, episode
+                ids = {"show_id": service_id}
+                ids.update(
+                    self._get_service_ep_id(service_id, episode_item, season, episode)
                 )
-                if not service_ep_id:
+
+                if not ids.get("episode_id"):
                     return None
 
-                source.update(
-                    {
-                        "release_title": episode_item["title"],
-                        "service_id": service_ep_id,
-                        "url": self._episode_url.format(
-                            episode_id=id_format(service_ep_id)
-                            if id_format is not None
-                            else service_ep_id,
-                        ),
-                    }
-                )
+                source = self._make_episode_source(episode_item, ids, id_format)
 
         return source
 
@@ -186,7 +190,7 @@ class JustWatchCore(Core):
         return id
 
     def _get_service_ep_id(self, show_id, item, season, episode):
-        return self._get_service_id(item)
+        return {"episode_id": self._get_service_id(item)}
 
     def episode(self, simple_info, all_info, id_format=None):
         show_title = simple_info["show_title"]
