@@ -188,7 +188,7 @@ class PlexCore(Core):
             "info": get_info(filename).union(get_info(info)),
             "size": de_string_size(size),
             "quality": get_quality(quality),
-            "url": self._movie_url.format(self._plugin, url),
+            "url": self._movie_url.format(url),
             "debrid_provider": source_title,
         }
 
