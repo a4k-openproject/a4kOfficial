@@ -38,11 +38,24 @@ When installed for the first time, a prompt is shown asking which providers you 
   - [x] `Enable Smart Play`
   - [x] `Pre-emptive Scraping`
   - [x] `Enable Playing Next Dialog`
+* Sort & Filter
+  - `Choose Items to Filter...`:
+    - Video Codecs
+      - [ ] `HEVC` (Recommended)
+    - HDR Codecs
+      - [ ] `DV` (Recommended)
+      - [ ] `HDR` (Recommended)
+      - [ ] `HYBRID` (Recommended)
+    - Audio Codecs
+      - [ ] `DD` (Recommended)
+      - [ ] `DD+` (Recommended)
+      - [ ] `ATMOS` (Recommended)
+
+  - `Max Resolution`: `4K`
 
 # Supported Add-ons
 For most of the add-ons supported, there are a few settings which may require attention in order to maintain the best compatibility with these players. In general, the recommended settings for each add-on are meant to preserve the most functionality of both the playing add-on and Seren, ideally including the following where available:
 
-* Consistent artwork and metadata
 * Progress tracking with the service
 * Progress tracking with Trakt
 * Auto-play next episode
@@ -50,7 +63,7 @@ For most of the add-ons supported, there are a few settings which may require at
 * Highest quality sources available
 * Fewest clicks to playback
 
-These features don't *always* work, notably with regards to artwork and metadata, as the playing add-on will usually use service-specific information where available. The general approach to the recommended settings below is to enable any "progress tracking" features (so that tracking works properly with the service), disable any "next episode" features (so that Seren's Playing Next feature will work properly), and optionally enable any "skip intro and/or credits" features (at user's discretion). Any settings which are not mentioned are recommended to be left at their default value.
+The general approach to the recommended settings below is to enable any "progress tracking" features (so that tracking works properly with the service), disable any "next episode" features (so that Seren's Playing Next feature will work properly), *optionally* enable any "skip intro and/or credits" features (at user's discretion). Any settings which are not mentioned are either recommended to be left at their default value, or the value won't affect these providers (as in the case of enabling/disabling menus, etc...).
 
 All of these add-ons require some kind of login process, which is usually initiated automatically whenever the add-on is opened for the first time, and will be the main requirement for any of them to playback sources (or, indeed, work at all).
 
