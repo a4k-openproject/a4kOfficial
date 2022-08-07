@@ -4,7 +4,7 @@ from future.standard_library import install_aliases
 
 install_aliases()
 
-import requests
+import xbmcaddon
 
 from providers.a4kOfficial import configure
 from providerModules.a4kOfficial import ADDON_IDS, common, drm
@@ -36,6 +36,7 @@ class JustWatchCore(Core):
             "release_title": item["title"],
             "quality": self._get_offered_resolutions(item),
             "debrid_provider": self._plugin,
+            "info": self._get_info_from_settings(),
         }
         source.update(ids)
         source["url"] = base_url.format(
@@ -47,6 +48,22 @@ class JustWatchCore(Core):
         )
 
         return source
+
+    def _get_info_from_settings(self):
+        addon = xbmcaddon.Addon(self._plugin)
+        info = set()
+        settings = ADDON_IDS[self._scraper].get("settings", {})
+
+        for setting in settings:
+            if addon.getSettingBool(settings[setting]):
+                info.add(setting)
+
+        if drm.get_widevine_level() == "L3" or (
+            "4K" in settings and not addon.getSettingBool(settings["4K"])
+        ):
+            info.difference_update({"HDR", "DV", "HYBRID"})
+
+        return info
 
     def _make_episode_source(self, item, ids, id_format=None):
         return self._make_source(item, ids, self._episode_url, id_format)
@@ -169,7 +186,13 @@ class JustWatchCore(Core):
         resolutions = set()
         for offer in self._service_offers:
             resolutions.update(self._get_quality(offer))
-        if drm.get_widevine_level() == "L3":
+
+        settings = ADDON_IDS[self._scraper].get("settings", {})
+
+        if drm.get_widevine_level() == "L3" or (
+            "4K" in settings
+            and not xbmcaddon.Addon(self._plugin).getSettingBool(settings["4K"])
+        ):
             resolutions.discard("4K")
 
         order = {key: i for i, key in enumerate(["4K", "1080p", "720p", "SD"])}
