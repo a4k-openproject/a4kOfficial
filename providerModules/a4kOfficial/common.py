@@ -5,26 +5,26 @@ from future.standard_library import install_aliases
 install_aliases()
 
 import xbmc
-import xbmcaddon
 
 import math
 import os
 
-from providerModules.a4kOfficial import PACKAGE_NAME
+import requests
+from requests.exceptions import RequestException
 
-from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
-from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 
-def log(msg, level='info'):
-    g.log('{}'.format(msg), level)
+def log(msg, level="info"):
+    g.log(f"{msg}", level)
 
 
-def debug(msg, format=None):
-    if format:
-        msg.format(format)
-    g.log(msg, 'debug')
+def check_url(url):
+    try:
+        return requests.get(url).ok
+    except RequestException as re:
+        log(f"a4kOfficial: Could not access {url}. {re}", "error")
+        return False
 
 
 def get_all_relative_py_files(file):
@@ -32,24 +32,16 @@ def get_all_relative_py_files(file):
     return [
         filename[:-3]
         for filename in files
-        if not filename.startswith('__') and filename.endswith('.py')
+        if not filename.startswith("__") and filename.endswith(".py")
     ]
 
 
-def get_setting(id):
-    return provider_tools.get_setting(PACKAGE_NAME, id)
-
-
-def set_setting(id, value):
-    return provider_tools.set_setting(PACKAGE_NAME, id, value)
-
-
-def parseDOM(html, name='', attrs=None, ret=False):
+def parseDOM(html, name="", attrs=None, ret=False):
     if attrs:
         import re
 
         attrs = dict(
-            (key, re.compile(value + ('$' if value else '')))
+            (key, re.compile(value + ("$" if value else "")))
             for key, value in attrs.items()
         )
     from providerModules.a4kOfficial import dom_parser
@@ -74,13 +66,14 @@ def execute_jsonrpc(method, params):
 
 
 def convert_size(size_bytes):
+    size_bytes = int(size_bytes)
     if size_bytes == 0:
         return "0B"
     size_name = ("B", "KB", "MB", "GB")
     i = int(math.floor(math.log(size_bytes, 1024)))
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
-    return "{}{}".format(s, size_name[i])
+    return f"{s}{size_name[i]}"
 
 
 def get_kodi_version(short=False):
@@ -90,30 +83,10 @@ def get_kodi_version(short=False):
     return version
 
 
-def get_platform_system():
-    from platform import system
+def get_system_platform():
+    platform = "unknown"
+    for p in ["android", "linux", "uwp", "windows", "osx", "ios", "tvos"]:
+        if xbmc.getCondVisibility(f"system.platform.{p}"):
+            platform = p
 
-    return system()
-
-
-def get_platform_machine():
-    from platform import machine
-
-    return machine()
-
-
-def check_for_addon(plugin):
-    if plugin is None:
-        return False
-
-    status = True
-    try:
-        xbmcaddon.Addon(plugin)
-    except RuntimeError:
-        status = False
-    finally:
-        return status
-
-
-def change_provider_status(scraper=None, status="enabled"):
-    ProviderInstallManager().flip_provider_status('a4kOfficial', scraper, status)
+    return platform

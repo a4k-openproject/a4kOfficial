@@ -6,19 +6,68 @@ install_aliases()
 
 import importlib
 
+import requests
+
+import xbmcaddon
 import xbmcgui
 
-from providerModules.a4kOfficial import common, ADDON_IDS
+from providerModules.a4kOfficial import common, ADDON_IDS, PACKAGE_NAME
 
+from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
+from resources.lib.modules.providers.install_manager import ProviderInstallManager
+
+_ipify = "https://api.ipify.org?format=json"
+_ipinfo = "https://ipinfo.io/{}/json"
+
+
+def get_setting(id):
+    return provider_tools.get_setting(PACKAGE_NAME, id)
+
+
+def set_setting(id, value):
+    return provider_tools.set_setting(PACKAGE_NAME, id, value)
+
+
+def _get_current_ip():
+    data = requests.get(_ipify)
+    if data.ok:
+        return data.json().get("ip", "0.0.0.0")
+
+
+def _get_country_code():
+    ip = _get_current_ip()
+    data = requests.get(_ipinfo.format(ip))
+
+    if data.ok:
+        return data.json().get("country", "US")
 
 
 def _get_initial_provider_status(scraper=None):
-    status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
+    status = check_for_addon(ADDON_IDS[scraper]["plugin"])
     return (scraper, status)
 
 
-if common.get_setting("general.firstrun") == "true":
+def change_provider_status(scraper=None, status="enabled"):
+    ProviderInstallManager().flip_provider_status("a4kOfficial", scraper, status)
+
+
+def check_for_addon(plugin):
+    if plugin is None:
+        return False
+
+    status = True
+    try:
+        xbmcaddon.Addon(plugin)
+    except RuntimeError:
+        status = False
+    finally:
+        return status
+
+
+if get_setting("general.firstrun") == "true":
+    set_setting("justwatch.country", _get_country_code() or "US")
+
     dialog = xbmcgui.Dialog()
     automatic = [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
 
@@ -31,31 +80,25 @@ if common.get_setting("general.firstrun") == "true":
     for i in range(len(automatic)):
         scraper, status = automatic[i][:2]
         if i in choices:
-            module = "providers.a4kOfficial.en.{}.{}".format(
-                ADDON_IDS[scraper]["type"], scraper
-            )
+            module = f"providers.a4kOfficial.en.{ADDON_IDS[scraper]['type']}.{scraper}"
             provider = importlib.import_module(module)
 
             if hasattr(provider, "setup"):
                 if dialog.yesno(
                     "a4kOfficial",
-                    "Do you want to enable and setup {}?".format(
-                        g.color_string(ADDON_IDS[scraper]["name"])
-                    ),
+                    f"Do you want to enable and setup {g.color_string(ADDON_IDS[scraper]['name'])}?",
                 ):
                     success = provider.setup()
                     if not success:
                         common.log(
-                            "a4kOfficial.{}: Setup not complete; disabling".format(
-                                scraper
-                            )
+                            f"a4kOfficial.{scraper}: Setup not complete; disabling"
                         )
-                    common.change_provider_status(
-                        scraper, "{}abled".format("en" if success else "dis")
+                    change_provider_status(
+                        scraper, f"{'en' if success else 'dis'}abled"
                     )
             else:
-                common.change_provider_status(scraper, "enabled")
+                change_provider_status(scraper, "enabled")
         else:
-            common.change_provider_status(scraper, "disabled")
+            change_provider_status(scraper, "disabled")
 
-    common.set_setting("general.firstrun", "false")
+    set_setting("general.firstrun", "false")

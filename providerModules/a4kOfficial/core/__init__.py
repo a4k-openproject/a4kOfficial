@@ -17,25 +17,25 @@ class Core:
     def __init__(self):
         self.start_time = time.time()
         self.sources = []
-        self._scraper = self.__module__.split('.')[-1]
+        self._scraper = self.__module__.split(".")[-1]
 
     def _return_results(self, source_type, sources, preemptive=False):
         if preemptive:
             common.log(
-                "a4kOfficial.{}.{}: cancellation requested".format(
-                    source_type, self._scraper
-                ),
+                f"a4kOfficial.{source_type}.{self._scraper}: cancellation requested",
                 "info",
             )
         common.log(
-            "a4kOfficial.{}.{}: {}".format(source_type, self._scraper, len(sources)),
+            f"a4kOfficial.{source_type}.{self._scraper}: {len(sources)}",
             "info",
         )
         common.log(
-            "a4kOfficial.{}.{}: took {} ms".format(
-                source_type, self._scraper, int((time.time() - self.start_time) * 1000)
-            ),
+            f"a4kOfficial.{source_type}.{self._scraper}: took {int((time.time() - self.start_time) * 1000)} ms",
             "info",
+        )
+        common.log(
+            f"a4kOfficial.{source_type}.{self._scraper}: {sources}",
+            "debug",
         )
 
         return sources
@@ -56,13 +56,13 @@ class Core:
 
     def movie(self, simple_info, all_info):
         queries = []
-        queries.append(simple_info['title'])
-        queries.extend(simple_info.get('aliases', []))
+        queries.append(simple_info["title"])
+        queries.extend(simple_info.get("aliases", []))
 
         try:
             items = []
             for query in queries:
-                items.extend(self._make_movie_query(query, int(simple_info['year'])))
+                items.extend(self._make_movie_query(query, int(simple_info["year"])))
 
             for item in items:
                 source = self._process_movie_item(item, simple_info, all_info)
@@ -78,7 +78,7 @@ class Core:
     def get_listitem(return_data):
         list_item = xbmcgui.ListItem(path=return_data["url"], offscreen=True)
         list_item.setContentLookup(False)
-        list_item.setProperty('isFolder', 'false')
-        list_item.setProperty('isPlayable', 'true')
+        list_item.setProperty("isFolder", "false")
+        list_item.setProperty("isPlayable", "true")
 
         return list_item
