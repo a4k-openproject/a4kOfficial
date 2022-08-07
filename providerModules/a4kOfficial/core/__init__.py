@@ -43,8 +43,6 @@ class Core:
     def _make_source(self, item, ids, **kwargs):
         source = {
             "scraper": self._scraper,
-            "plugin": self._plugin,
-            "debrid_provider": self._plugin,
         }
         source.update(ids)
 
@@ -78,6 +76,8 @@ class Core:
                 source = self._process_show_item(item, simple_info, all_info, **kwargs)
                 if source is not None:
                     self.sources.append(source)
+                if kwargs.get("single"):
+                    break
         except PreemptiveCancellation:
             return self._return_results("episode", self.sources, preemptive=True)
 
@@ -99,6 +99,8 @@ class Core:
                 source = self._process_movie_item(item, simple_info, all_info, **kwargs)
                 if source is not None:
                     self.sources.append(source)
+                if kwargs.get("single"):
+                    break
         except PreemptiveCancellation:
             return self._return_results("movie", self.sources, preemptive=True)
 

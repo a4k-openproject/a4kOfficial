@@ -31,12 +31,15 @@ class JustWatchCore(Core):
         self._episode_url = self._base_url + "{episode_url}"
 
     def _make_source(self, item, ids, **kwargs):
-        source = self._make_source(item, ids, **kwargs)
+        source = super(JustWatchCore, self)._make_source(item, ids, **kwargs)
         source.update(
             {
                 "release_title": item["title"],
                 "quality": self._get_offered_resolutions(item),
                 "info": self._get_info_from_settings(),
+                "plugin": self._plugin,
+                "debrid_provider": self._plugin,
+                "provider_name_override": ADDON_IDS[self._scraper]["name"],
             }
         )
 
@@ -98,9 +101,11 @@ class JustWatchCore(Core):
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i["external_id"] for i in external_ids if i["provider"] == "tmdb"]
 
-        tmdb_id = all_info["info"]["tmdb_show_id"]
-        season = int(simple_info["season_number"])
-        episode = int(simple_info["episode_number"])
+        tmdb_id = all_info["info"].get(
+            "tmdb_show_id" if type == "episode" else "tmdb_id"
+        )
+        season = int(simple_info.get("season_number", 0))
+        episode = int(simple_info.get("episode_number", 0))
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
             service_id = self._get_service_id(item, season, episode)
             if not service_id:
@@ -192,6 +197,16 @@ class JustWatchCore(Core):
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         return {"episode_id": self._get_service_id(item)}
+
+    def episode(self, simple_info, all_info, **kwargs):
+        return super(JustWatchCore, self).episode(
+            simple_info, all_info, single=True, **kwargs
+        )
+
+    def movie(self, simple_info, all_info, **kwargs):
+        return super(JustWatchCore, self).movie(
+            simple_info, all_info, single=True, **kwargs
+        )
 
     @staticmethod
     def get_listitem(return_data):
