@@ -33,6 +33,10 @@ class Core:
             f"a4kOfficial.{source_type}.{self._scraper}: took {int((time.time() - self.start_time) * 1000)} ms",
             "info",
         )
+        common.log(
+            f"a4kOfficial.{source_type}.{self._scraper}: {sources}",
+            "debug",
+        )
 
         return sources
 
