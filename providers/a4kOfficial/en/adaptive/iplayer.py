@@ -21,11 +21,11 @@ class sources(JustWatchCore):
         self._movie_url = f"{self._movie_url.format(movie_url='/?mode=202&name=null&url={movie_id}&iconimage=null&description=null')}"
         self._episode_url = f"{self._episode_url.format(episode_url='/?mode=202&name=null&url={episode_id}&iconimage=null&description=null')}"
 
-    def episode(self, simple_info, all_info, id_format=None):
-        return super(sources, self).episode(simple_info, all_info, id_format=quote_plus)
+    def _make_source(self, item, ids, **kwargs):
+        source = self._make_source(item, ids, **kwargs)
 
-    def movie(self, simple_info, all_info, id_format=None):
-        return super(sources, self).movie(simple_info, all_info, id_format=quote_plus)
+        base_url = kwargs["base_url"]
+        source["url"] = base_url.format(**({k: quote_plus(v) for k, v in ids.items()}))
 
     def _get_service_id(self, item, season=0, episode=0):
         if not self._service_offers:
