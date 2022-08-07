@@ -36,6 +36,10 @@ class PlexCore(Core):
         self._api = Plex(client_id, token)
         self._resources = self._api.get_resources()
 
+        self._base_url = f"plugin://{self._plugin}"
+        self._movie_url = self._base_url + "{movie_url}"
+        self._episode_url = self._base_url + "{episode_url}"
+
     def _get_auth(self):
         addon = xbmcaddon.Addon(self._plugin)
         client_id = addon.getSetting("client_id")
