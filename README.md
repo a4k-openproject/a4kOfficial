@@ -109,7 +109,6 @@ SlyGuy Repository Install:
   - [x] `Skip Intros` (Optional)
   - [x] `Skip Credits` (Optional)
   - [x] `Disney+ Sync Playback`
-  - [x] `Bookmarks`
 * Playback
   - `Playback Quality`: `Best`
 
@@ -125,12 +124,14 @@ SlyGuy Repository Install:
   - [ ] `Play Next Episode`
   - [ ] `Play Next Recommended Movie`
   - [x] `HBO Max Sync Playback`
-  - [x] `Bookmarks`
 * Playback
   - `Playback Quality`: `Best`
   - [x] `Dolby Digital (AC-3)`
   - [x] `Dolby Digital Plus (EC-3)`
+  - [x] `Dolby Atmos`
   - [x] `H.265`
+  - [x] `4K`
+  - [x] `Dolby Vision`
 
 ## Hulu
 ### Installation
@@ -139,8 +140,6 @@ SlyGuy Repository Install:
 ### Recommended Settings
 * General
   - [x] `Hulu Sync Playback`
-* Look & Feel
-  - [x] Bookmarks
 * Playback
   - `Playback Quality`: `Best`
   - [x] `EC3`
@@ -169,8 +168,6 @@ After successfully authenticating, the Profiles menu is shown. Highlight the pro
 
 ### Installation
 ### Recommended Settings
-* Look & Feel
-  - [x] `Bookmarks`
 * Playback
   - `Playback Quality`: `Best`
   - [x] `Dolby Digital (AC-3)`
