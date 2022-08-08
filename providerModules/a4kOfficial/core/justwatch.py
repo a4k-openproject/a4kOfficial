@@ -12,13 +12,12 @@ from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.justwatch import JustWatch
 
 from resources.lib.common.source_utils import clean_title
-from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
 class JustWatchCore(Core):
     def __init__(self, providers, scheme="standard_web"):
         super(JustWatchCore, self).__init__()
-        self._country = configure.get_setting("justwatch.country")
+        self._country = common.get_setting("justwatch.country")
         self._api = JustWatch(country=self._country)
         self._monetization_types = ["free", "flatrate"]
         self._plugin = ADDON_IDS[self._scraper]["plugin"]

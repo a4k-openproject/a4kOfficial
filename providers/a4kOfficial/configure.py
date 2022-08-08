@@ -11,22 +11,13 @@ import requests
 import xbmcaddon
 import xbmcgui
 
-from providerModules.a4kOfficial import common, ADDON_IDS, PACKAGE_NAME
+from providerModules.a4kOfficial import common, ADDON_IDS
 
-from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"
-
-
-def get_setting(id):
-    return provider_tools.get_setting(PACKAGE_NAME, id)
-
-
-def set_setting(id, value):
-    return provider_tools.set_setting(PACKAGE_NAME, id, value)
 
 
 def _get_current_ip():
@@ -65,8 +56,8 @@ def check_for_addon(plugin):
         return status
 
 
-if get_setting("general.firstrun") == "true":
-    set_setting("justwatch.country", _get_country_code() or "US")
+if common.get_setting("general.firstrun") == "true":
+    common.set_setting("justwatch.country", _get_country_code() or "US")
 
     dialog = xbmcgui.Dialog()
     automatic = [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
@@ -101,4 +92,4 @@ if get_setting("general.firstrun") == "true":
         else:
             change_provider_status(scraper, "disabled")
 
-    set_setting("general.firstrun", "false")
+    common.set_setting("general.firstrun", "false")

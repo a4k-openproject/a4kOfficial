@@ -12,11 +12,22 @@ import os
 import requests
 from requests.exceptions import RequestException
 
+from providerModules.a4kOfficial import PACKAGE_NAME
+
 from resources.lib.modules.globals import g
+from resources.lib.common import provider_tools
 
 
 def log(msg, level="info"):
     g.log(f"{msg}", level)
+
+
+def get_setting(id):
+    return provider_tools.get_setting(PACKAGE_NAME, id)
+
+
+def set_setting(id, value):
+    return provider_tools.set_setting(PACKAGE_NAME, id, value)
 
 
 def check_url(url):
