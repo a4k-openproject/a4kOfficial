@@ -12,13 +12,13 @@ from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.justwatch import JustWatch
 
 from resources.lib.common.source_utils import clean_title
-from resources.lib.modules.exceptions import PreemptiveCancellation
 
 
 class JustWatchCore(Core):
     def __init__(self, providers, scheme="standard_web"):
         super(JustWatchCore, self).__init__()
-        self._country = configure.get_setting("justwatch.country")
+        self._country = common.get_setting("justwatch.country")
+        self._api = JustWatch(country=self._country)
         self._monetization_types = ["free", "flatrate"]
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._service_offers = []
@@ -29,23 +29,21 @@ class JustWatchCore(Core):
         self._movie_url = self._base_url + "{movie_url}"
         self._episode_url = self._base_url + "{episode_url}"
 
-    def _make_source(self, item, ids, base_url, id_format=None):
-        source = {
-            "scraper": self._scraper,
-            "plugin": self._plugin,
-            "release_title": item["title"],
-            "quality": self._get_offered_resolutions(item),
-            "debrid_provider": self._plugin,
-            "info": self._get_info_from_settings(),
-        }
-        source.update(ids)
-        source["url"] = base_url.format(
-            **(
-                {k: id_format(v) for k, v in ids.items()}
-                if id_format is not None
-                else ids
-            )
+    def _make_source(self, item, ids, **kwargs):
+        source = super(JustWatchCore, self)._make_source(item, ids, **kwargs)
+        source.update(
+            {
+                "release_title": item["title"],
+                "quality": self._get_offered_resolutions(item),
+                "info": self._get_info_from_settings(),
+                "plugin": self._plugin,
+                "debrid_provider": self._plugin,
+                "provider_name_override": ADDON_IDS[self._scraper]["name"],
+            }
         )
+
+        base_url = kwargs["base_url"]
+        source["url"] = base_url.format(**ids)
 
         return source
 
@@ -65,12 +63,6 @@ class JustWatchCore(Core):
 
         return info
 
-    def _make_episode_source(self, item, ids, id_format=None):
-        return self._make_source(item, ids, self._episode_url, id_format)
-
-    def _make_movie_source(self, item, ids, id_format=None):
-        return self._make_source(item, ids, self._movie_url, id_format)
-
     def __make_query(self, query, type, **kwargs):
         items = self._api.search_for_item(
             query=clean_title(query),
@@ -82,22 +74,24 @@ class JustWatchCore(Core):
 
         return items
 
-    def _make_movie_query(self, title, year):
+    def _make_movie_query(self, **kwargs):
         items = self.__make_query(
-            query=title,
+            query=kwargs["title"],
             type="movie",
-            release_year_from=int(year) - 1,
-            release_year_until=int(year) + 1,
+            release_year_from=int(kwargs["year"]) - 1,
+            release_year_until=int(kwargs["year"]) + 1,
         )
 
         return items
 
-    def _make_show_query(self, show_title):
-        items = self.__make_query(query=show_title, type="show")
+    def _make_show_query(self, **kwargs):
+        items = self.__make_query(
+            query=kwargs["simple_info"]["show_title"], type="show"
+        )
 
         return items
 
-    def __process_item(self, item, tmdb_id, type, season=0, episode=0, id_format=None):
+    def _process_item(self, item, simple_info, all_info, type, **kwargs):
         source = None
         if not self._get_service_offers(item):
             return None
@@ -106,14 +100,19 @@ class JustWatchCore(Core):
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i["external_id"] for i in external_ids if i["provider"] == "tmdb"]
 
+        tmdb_id = all_info["info"].get(
+            "tmdb_show_id" if type == "episode" else "tmdb_id"
+        )
+        season = int(simple_info.get("season_number", 0))
+        episode = int(simple_info.get("episode_number", 0))
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
             service_id = self._get_service_id(item, season, episode)
             if not service_id:
                 return None
 
-            source = self._make_movie_source(item, {"movie_id": service_id}, id_format)
+            source = self._make_movie_source(item, {"movie_id": service_id}, **kwargs)
 
-            if type == "show":
+            if type == "episode":
                 episodes = self._api.get_episodes(item["id"])["items"]
                 episode_item = [
                     i
@@ -133,25 +132,8 @@ class JustWatchCore(Core):
                 if not ids.get("episode_id"):
                     return None
 
-                source = self._make_episode_source(episode_item, ids, id_format)
+                source = self._make_episode_source(episode_item, ids, **kwargs)
 
-        return source
-
-    def _process_movie_item(self, item, simple_info, all_info, id_format=None):
-        source = self.__process_item(
-            item, all_info["info"]["tmdb_id"], "movie", id_format=id_format
-        )
-        return source
-
-    def _process_show_item(self, item, simple_info, all_info, id_format=None):
-        source = self.__process_item(
-            item,
-            all_info["info"]["tmdb_show_id"],
-            "show",
-            int(simple_info["season_number"]),
-            int(simple_info["episode_number"]),
-            id_format=id_format,
-        )
         return source
 
     @staticmethod
@@ -215,47 +197,15 @@ class JustWatchCore(Core):
     def _get_service_ep_id(self, show_id, item, season, episode):
         return {"episode_id": self._get_service_id(item)}
 
-    def episode(self, simple_info, all_info, id_format=None):
-        show_title = simple_info["show_title"]
+    def episode(self, simple_info, all_info, **kwargs):
+        return super(JustWatchCore, self).episode(
+            simple_info, all_info, single=True, **kwargs
+        )
 
-        try:
-            self._api = JustWatch(country=self._country)
-            items = self._make_show_query(show_title)
-
-            for item in items:
-                source = self._process_show_item(
-                    item, simple_info, all_info, id_format=None
-                )
-                if source is not None:
-                    self.sources.append(source)
-                    break
-        except PreemptiveCancellation:
-            return self._return_results("episode", self.sources, preemptive=True)
-
-        return self._return_results("episode", self.sources)
-
-    def movie(self, simple_info, all_info, id_format=None):
-        queries = []
-        queries.append(simple_info["title"])
-        queries.extend(simple_info.get("aliases", []))
-
-        try:
-            self._api = JustWatch(country=self._country)
-            items = []
-            for query in queries:
-                items.extend(self._make_movie_query(query, simple_info["year"]))
-
-            for item in items:
-                source = self._process_movie_item(
-                    item, simple_info, all_info, id_format
-                )
-                if source is not None:
-                    self.sources.append(source)
-                    break
-        except PreemptiveCancellation:
-            return self._return_results("movie", self.sources, preemptive=True)
-
-        return self._return_results("movie", self.sources)
+    def movie(self, simple_info, all_info, **kwargs):
+        return super(JustWatchCore, self).movie(
+            simple_info, all_info, single=True, **kwargs
+        )
 
     @staticmethod
     def get_listitem(return_data):

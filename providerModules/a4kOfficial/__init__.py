@@ -63,11 +63,12 @@ ADDON_IDS = {
             "DV": "dolby_vision",
         },
     },
-    "plex": {
+    "plex_composite": {
         "plugin": "plugin.video.composite_for_plex",
         "name": "Plex (Composite)",
         "type": "adaptive",
     },
+    "plex_direct": {"plugin": None, "name": "Plex (Direct)", "type": "direct"},
     "primevideo": {
         "plugin": "plugin.video.amazon-test",
         "name": "Prime Video",

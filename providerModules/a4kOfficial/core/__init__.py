@@ -40,21 +40,50 @@ class Core:
 
         return sources
 
-    def episode(self, simple_info, all_info):
+    def _make_source(self, item, ids, **kwargs):
+        source = {
+            "scraper": self._scraper,
+        }
+        source.update(ids)
+
+        return source
+
+    def _make_episode_source(self, item, ids, **kwargs):
+        return self._make_source(item, ids, base_url=self._episode_url, **kwargs)
+
+    def _make_movie_source(self, item, ids, **kwargs):
+        return self._make_source(item, ids, base_url=self._movie_url, **kwargs)
+
+    def _process_movie_item(self, item, simple_info, all_info, **kwargs):
+        source = self._process_item(item, simple_info, all_info, type="movie", **kwargs)
+        return source
+
+    def _process_show_item(self, item, simple_info, all_info, **kwargs):
+        source = self._process_item(
+            item,
+            simple_info,
+            all_info,
+            type="episode",
+            **kwargs,
+        )
+        return source
+
+    def episode(self, simple_info, all_info, **kwargs):
         try:
-            items = self._make_show_query(simple_info["episode_title"])
+            items = self._make_show_query(simple_info=simple_info)
 
             for item in items:
-                source = self._process_show_item(item, simple_info, all_info)
+                source = self._process_show_item(item, simple_info, all_info, **kwargs)
                 if source is not None:
                     self.sources.append(source)
+                if kwargs.get("single"):
                     break
         except PreemptiveCancellation:
             return self._return_results("episode", self.sources, preemptive=True)
 
         return self._return_results("episode", self.sources)
 
-    def movie(self, simple_info, all_info):
+    def movie(self, simple_info, all_info, **kwargs):
         queries = []
         queries.append(simple_info["title"])
         queries.extend(simple_info.get("aliases", []))
@@ -62,12 +91,15 @@ class Core:
         try:
             items = []
             for query in queries:
-                items.extend(self._make_movie_query(query, int(simple_info["year"])))
+                items.extend(
+                    self._make_movie_query(title=query, year=int(simple_info["year"]))
+                )
 
             for item in items:
-                source = self._process_movie_item(item, simple_info, all_info)
+                source = self._process_movie_item(item, simple_info, all_info, **kwargs)
                 if source is not None:
                     self.sources.append(source)
+                if kwargs.get("single"):
                     break
         except PreemptiveCancellation:
             return self._return_results("movie", self.sources, preemptive=True)
