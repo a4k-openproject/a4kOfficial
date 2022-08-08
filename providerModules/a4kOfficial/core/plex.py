@@ -68,7 +68,7 @@ class PlexCore(Core):
                 "size": de_string_size(item["size"]),
                 "quality": get_quality(f"{item['filename']} ({item['quality']})"),
                 "url": kwargs["base_url"].format(**url),
-                "debrid_provider": item["source_title"],
+                "debrid_provider": f"{item['source_title']} - {item['library_title']}",
                 "provider_name_override": ADDON_IDS[self._scraper]["name"],
                 "plugin": self._plugin,
             }
@@ -118,6 +118,7 @@ class PlexCore(Core):
             resource = item.get("resource", ())
             media = item.get("Media", [{}])[0]
             source_title = item.get("sourceTitle", "")
+            library_title = item.get("librarySectionTitle", "")
 
             year = int(media.get("year", simple_info["year"]))
             quality = media.get("videoResolution", "Unknown")
@@ -157,6 +158,7 @@ class PlexCore(Core):
             "size": size,
             "quality": quality,
             "source_title": source_title,
+            "library_title": library_title,
         }
         url = {"base_url": resource[0], "token": resource[1]}
         if type == "movie":
