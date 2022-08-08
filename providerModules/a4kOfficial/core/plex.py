@@ -6,7 +6,6 @@ install_aliases()
 
 import pickle
 import os
-from urllib.parse import quote
 
 import xbmcaddon
 import xbmcvfs
@@ -36,9 +35,9 @@ class PlexCore(Core):
         self._api = Plex(self._client_id, self._token)
         self._resources = self._api.get_resources()
 
-        self._base_url = f"plugin://{self._plugin}"
-        self._movie_url = self._base_url + "{movie_url}"
-        self._episode_url = self._base_url + "{episode_url}"
+        self._base_url = None
+        self._movie_url = None
+        self._episode_url = None
 
     def _get_auth(self):
         if self._plugin:
@@ -159,7 +158,7 @@ class PlexCore(Core):
             "quality": quality,
             "source_title": source_title,
         }
-        url = {"base_url": quote(resource[0]), "token": resource[1]}
+        url = {"base_url": resource[0], "token": resource[1]}
         if type == "movie":
             if (
                 year < int(simple_info["year"]) - 1
@@ -167,7 +166,7 @@ class PlexCore(Core):
             ):
                 return
 
-            url.update({"movie_id": quote(key)})
+            url.update({"movie_id": key})
             return self._make_movie_source(
                 item,
                 url,
@@ -191,7 +190,7 @@ class PlexCore(Core):
             ):
                 return
 
-            url.update({"episode_id": quote(key)})
+            url.update({"episode_id": key})
             return self._make_episode_source(item, url, **kwargs)
 
     @staticmethod

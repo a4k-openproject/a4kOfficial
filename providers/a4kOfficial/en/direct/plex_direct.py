@@ -23,5 +23,15 @@ class sources(PlexCore):
     def __init__(self):
         super(sources, self).__init__()
 
-        self._movie_url = "{movie_url}" + f"&X-Plex-Token={self._token}"
-        self._episode_url = "{episode_url}" + f"&X-Plex-Token={self._token}"
+        self._movie_url = "{base_url}{movie_id}" + f"&X-Plex-Token={self._token}"
+        self._episode_url = "{base_url}{episode_id}" + f"&X-Plex-Token={self._token}"
+
+    def episode(self, simple_info, all_info, **kwargs):
+        return super(PlexCore, self).episode(
+            simple_info, all_info, single=False, **kwargs
+        )
+
+    def movie(self, simple_info, all_info, **kwargs):
+        return super(PlexCore, self).movie(
+            simple_info, all_info, single=False, **kwargs
+        )
