@@ -27,8 +27,8 @@ class Plex:
     def __init__(self, client_id=None, token=None):
         self._base_url = "https://plex.tv"
         self._auth_url = self._base_url + "/link/"
-        self._token = token or common.get_setting("plex.token")
-        self._client_id = client_id or common.get_setting("plex.client_id")
+        self._client_id = client_id
+        self._token = token
         self._device_id = common.get_setting("plex.device_id")
 
         self.dialog = None
@@ -59,6 +59,7 @@ class Plex:
                 common.log(f"a4kOfficial: Could not access Plex. {re}", "error")
 
     def auth(self):
+        self.dialog = xbmcgui.Dialog()
         self.progress = xbmcgui.DialogProgress()
         self._start_auth_time = datetime.utcnow().timestamp()
 
@@ -78,7 +79,7 @@ class Plex:
             code = pin.get("code", "")
             self._device_id = pin.get("id", "")
             self._expire_auth_time = datetime.strptime(
-                pin.get("expires-at", ""), "%Y-%m-%dT%H:%M:%SZ"
+                pin.get("expires_at", ""), "%Y-%m-%dT%H:%M:%SZ"
             ).timestamp()
         except Exception as e:
             common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")

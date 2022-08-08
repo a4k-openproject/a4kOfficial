@@ -41,17 +41,21 @@ class PlexCore(Core):
         self._episode_url = self._base_url + "{episode_url}"
 
     def _get_auth(self):
-        addon = xbmcaddon.Addon(self._plugin)
-        client_id = addon.getSetting("client_id")
+        if self._plugin:
+            addon = xbmcaddon.Addon(self._plugin)
+            client_id = addon.getSetting("client_id")
 
-        addon_path = xbmcvfs.translatePath(addon.getAddonInfo("profile"))
-        cache_path = os.path.join(
-            addon_path, "cache", "servers", "plexhome_user.pcache"
-        )
-        with open(cache_path, "rb") as f:
-            cache = pickle.load(f)
+            addon_path = xbmcvfs.translatePath(addon.getAddonInfo("profile"))
+            cache_path = os.path.join(
+                addon_path, "cache", "servers", "plexhome_user.pcache"
+            )
+            with open(cache_path, "rb") as f:
+                cache = pickle.load(f)
 
-        token = cache.get("myplex_user_cache").split("|")[1]
+            token = cache.get("myplex_user_cache").split("|")[1]
+        else:
+            client_id = common.get_setting("plex.client_id")
+            token = common.get_setting("plex.token")
 
         return client_id, token
 
