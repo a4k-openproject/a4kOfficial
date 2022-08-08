@@ -32,8 +32,8 @@ class PlexCore(Core):
     def __init__(self):
         super(PlexCore, self).__init__()
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
-        client_id, token = self._get_auth()
-        self._api = Plex(client_id, token)
+        self._client_id, self._token = self._get_auth()
+        self._api = Plex(self._client_id, self._token)
         self._resources = self._api.get_resources()
 
         self._base_url = f"plugin://{self._plugin}"
