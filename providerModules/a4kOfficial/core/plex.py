@@ -63,7 +63,7 @@ class PlexCore(Core):
                 "release_title": item["filename"],
                 "info": get_info(item["filename"]).union(get_info(item["info"])),
                 "size": de_string_size(item["size"]),
-                "quality": get_quality(item["quality"]),
+                "quality": get_quality(f"{item['filename']} ({item['quality']})"),
                 "url": kwargs["base_url"].format(**url),
                 "debrid_provider": item["source_title"],
                 "provider_name_override": ADDON_IDS[self._scraper]["name"],
@@ -74,7 +74,7 @@ class PlexCore(Core):
         return source
 
     def __make_query(self, resource, query, **kwargs):
-        result = self._api.search(resource, query, **kwargs)
+        result = self._api.search(resource, query, **kwargs) or []
 
         return result
 
@@ -83,7 +83,7 @@ class PlexCore(Core):
         for resource in self._resources:
             result.extend(
                 [
-                    i.update({"resource": resource})
+                    dict(resource=resource, **i)
                     for i in self.__make_query(
                         resource, kwargs["simple_info"]["episode_title"], type="episode"
                     )
@@ -97,7 +97,7 @@ class PlexCore(Core):
         for resource in self._resources:
             result.extend(
                 [
-                    i.update({"resource": resource})
+                    dict(resource=resource, **i)
                     for i in self.__make_query(
                         resource,
                         kwargs["title"],
@@ -112,7 +112,7 @@ class PlexCore(Core):
     def _process_item(self, item, simple_info, all_info, type, **kwargs):
         try:
             item_type = item.get("type", "")
-            resource = item.get("resource", "")
+            resource = item.get("resource", ())
             media = item.get("Media", [{}])[0]
             source_title = item.get("sourceTitle", "")
 
@@ -132,9 +132,9 @@ class PlexCore(Core):
                 ]
             )
 
-            size = str(int(part.get("size", 0)) / 1024 / 1024) + "MiB"
+            size = common.convert_size(part.get("size", 0))
             file = part.get("file", "")
-            key = part.get("key", "")
+            key = part.get("key", "") if not self._plugin else item.get("key", "")
         except Exception as e:
             common.log(f"a4kOfficial: Failed to process Plex source: {e}", "error")
             return
@@ -148,7 +148,6 @@ class PlexCore(Core):
         if item_type != type:
             return
 
-        url = quote(resource[0] + key)
         item = {
             "filename": filename,
             "info": info,
@@ -156,7 +155,7 @@ class PlexCore(Core):
             "quality": quality,
             "source_title": source_title,
         }
-
+        url = {"base_url": quote(resource[0]), "token": resource[1]}
         if type == "movie":
             if (
                 year < int(simple_info["year"]) - 1
@@ -164,7 +163,12 @@ class PlexCore(Core):
             ):
                 return
 
-            return self._make_movie_source(item, url, **kwargs)
+            url.update({"movie_id": quote(key)})
+            return self._make_movie_source(
+                item,
+                url,
+                **kwargs,
+            )
         elif type == "episode":
             show_title = item.get("grandparentTitle", "")
             episode_title = item.get("title", "")
@@ -183,6 +187,7 @@ class PlexCore(Core):
             ):
                 return
 
+            url.update({"episode_id": quote(key)})
             return self._make_episode_source(item, url, **kwargs)
 
     @staticmethod

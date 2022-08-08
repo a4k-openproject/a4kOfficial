@@ -12,16 +12,16 @@ class sources(PlexCore):
         super(sources, self).__init__()
 
         self._movie_url = (
-            f"{self._movie_url.format(movie_url='/?mode=5&url={movie_id}')}"
+            f"{self._movie_url.format(movie_url='/?mode=5&url={base_url}{movie_id}')}"
         )
-        self._episode_url = (
-            f"{self._episode_url.format(episode_url='/?mode=6&url={episode_id}')}"
-        )
+        self._episode_url = f"{self._episode_url.format(episode_url='/?mode=6&url={base_url}{episode_id}')}"
 
     def episode(self, simple_info, all_info, **kwargs):
         return super(PlexCore, self).episode(
-            simple_info, all_info, single=True, **kwargs
+            simple_info, all_info, single=False, **kwargs
         )
 
     def movie(self, simple_info, all_info, **kwargs):
-        return super(PlexCore, self).movie(simple_info, all_info, single=True, **kwargs)
+        return super(PlexCore, self).movie(
+            simple_info, all_info, single=False, **kwargs
+        )

@@ -54,7 +54,10 @@ class Plex:
         try:
             return requests.get(url, **kwargs)
         except RequestException as re:
-            common.log(f"a4kOfficial: Could not access Plex. {re}", "error")
+            try:
+                return requests.get(url, verify=True, **kwargs)
+            except RequestException as re:
+                common.log(f"a4kOfficial: Could not access Plex. {re}", "error")
 
     def auth(self):
         self.progress = xbmcgui.DialogProgress()
@@ -213,5 +216,5 @@ class Plex:
 
         results = self._get(url, params=params, headers=self._headers)
         self._headers["X-Plex-Token"] = self._token
-        if results.ok:
+        if results and results.ok:
             return results.json().get("MediaContainer", {}).get("Metadata", [])
