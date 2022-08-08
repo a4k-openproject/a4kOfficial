@@ -17,6 +17,7 @@ import xbmcgui
 import requests
 from requests.exceptions import RequestException
 
+from providers.a4kOfficial import configure
 from providerModules.a4kOfficial import common
 
 from resources.lib.common import tools
@@ -27,9 +28,9 @@ class Plex:
     def __init__(self, client_id=None, token=None):
         self._base_url = "https://plex.tv"
         self._auth_url = self._base_url + "/link/"
-        self._token = token or common.get_setting("plex.token")
-        self._client_id = client_id or common.get_setting("plex.client_id")
-        self._device_id = common.get_setting("plex.device_id")
+        self._token = token or configure.get_setting("plex.token")
+        self._client_id = client_id or configure.get_setting("plex.client_id")
+        self._device_id = configure.get_setting("plex.device_id")
 
         self.dialog = None
         self.progress = None
