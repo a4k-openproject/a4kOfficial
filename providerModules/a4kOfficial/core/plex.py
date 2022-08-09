@@ -117,6 +117,7 @@ class PlexCore(Core):
             item_type = item.get("type", "")
             resource = item.get("resource", ())
             media = item.get("Media", [{}])[0]
+            meta_title = item.get("title", "")
             source_title = item.get("sourceTitle", "")
             library_title = item.get("librarySectionTitle", "")
 
@@ -166,6 +167,8 @@ class PlexCore(Core):
                 year < int(simple_info["year"]) - 1
                 or year > int(simple_info["year"]) + 1
             ):
+                return
+            elif clean_title(meta_title) != clean_title(simple_info["title"]):
                 return
 
             url.update({"movie_id": key})
