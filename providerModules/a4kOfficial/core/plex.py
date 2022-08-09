@@ -120,8 +120,8 @@ class PlexCore(Core):
             meta_title = item.get("title", "")
             source_title = item.get("sourceTitle", "")
             library_title = item.get("librarySectionTitle", "")
+            year = int(item.get("year", 0))
 
-            year = int(media.get("year", simple_info["year"]))
             quality = media.get("videoResolution", "Unknown")
             part = media.get("Part", [{}])[0]
             info = " ".join(
