@@ -197,7 +197,7 @@ class Plex:
                     connections = resource.get("connections", [])
                     for connection in connections:
                         url = connection.get("uri", "")
-                        local = int(connection.get("local", True))
+                        local = connection.get("local", True)
 
                         if ".plex.direct" in url and not local:
                             listings.append((url, access_token))
