@@ -6,6 +6,7 @@ install_aliases()
 
 import pickle
 import os
+import re
 
 import xbmcaddon
 import xbmcvfs
@@ -150,6 +151,9 @@ class PlexCore(Core):
         elif "\\" in file:
             filename = file.rsplit("\\", 1)[-1]
 
+        if source_year := re.search(r"((?:1|2)(?:9|0)(?:[0-9]{2}))", filename):
+            year = int(source_year.group(0))
+
         if item_type != type:
             return
 
@@ -165,6 +169,7 @@ class PlexCore(Core):
 
         if type == "movie":
             titles = [simple_info["title"], *simple_info.get("aliases", [])]
+
             if (
                 year < int(simple_info["year"]) - 1
                 or year > int(simple_info["year"]) + 1
