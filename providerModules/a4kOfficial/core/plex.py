@@ -162,13 +162,17 @@ class PlexCore(Core):
             "library_title": library_title,
         }
         url = {"base_url": resource[0], "token": resource[1]}
+
         if type == "movie":
+            titles = [simple_info["title"], *simple_info.get("aliases", [])]
             if (
                 year < int(simple_info["year"]) - 1
                 or year > int(simple_info["year"]) + 1
             ):
                 return
-            elif clean_title(meta_title) != clean_title(simple_info["title"]):
+            elif not any(
+                [clean_title(meta_title) != clean_title(title) for title in titles]
+            ):
                 return
 
             url.update({"movie_id": key})
@@ -182,6 +186,7 @@ class PlexCore(Core):
             episode_title = item.get("title", "")
             season = item.get("parentIndex", 0)
             episode = item.get("index", 0)
+            titles = [simple_info["show_title"], *simple_info.get("show_aliases", [])]
 
             if not (
                 season == simple_info["season_number"]
@@ -189,7 +194,7 @@ class PlexCore(Core):
             ):
                 return
             elif not (
-                clean_title(simple_info["show_title"]) == clean_title(show_title)
+                any([clean_title(show_title) == clean_title(title) for title in titles])
                 and clean_title(simple_info["episode_title"])
                 == clean_title(episode_title)
             ):
