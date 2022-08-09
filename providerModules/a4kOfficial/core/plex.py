@@ -171,7 +171,7 @@ class PlexCore(Core):
             ):
                 return
             elif not any(
-                [clean_title(meta_title) != clean_title(title) for title in titles]
+                [clean_title(meta_title) == clean_title(title) for title in titles]
             ):
                 return
 
