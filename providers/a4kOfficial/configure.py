@@ -8,13 +8,11 @@ import importlib
 
 import requests
 
-import xbmcaddon
 import xbmcgui
 
 from providerModules.a4kOfficial import common, ADDON_IDS
 
 from resources.lib.modules.globals import g
-from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"
@@ -35,25 +33,8 @@ def _get_country_code():
 
 
 def _get_initial_provider_status(scraper=None):
-    status = check_for_addon(ADDON_IDS[scraper]["plugin"])
+    status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
     return (scraper, status)
-
-
-def change_provider_status(scraper=None, status="enabled"):
-    ProviderInstallManager().flip_provider_status("a4kOfficial", scraper, status)
-
-
-def check_for_addon(plugin):
-    if plugin is None:
-        return False
-
-    status = True
-    try:
-        xbmcaddon.Addon(plugin)
-    except RuntimeError:
-        status = False
-    finally:
-        return status
 
 
 if common.get_setting("general.firstrun") == "true":
@@ -84,12 +65,12 @@ if common.get_setting("general.firstrun") == "true":
                         common.log(
                             f"a4kOfficial.{scraper}: Setup not complete; disabling"
                         )
-                    change_provider_status(
+                    common.change_provider_status(
                         scraper, f"{'en' if success else 'dis'}abled"
                     )
             else:
-                change_provider_status(scraper, "enabled")
+                common.change_provider_status(scraper, "enabled")
         else:
-            change_provider_status(scraper, "disabled")
+            common.change_provider_status(scraper, "disabled")
 
     common.set_setting("general.firstrun", "false")

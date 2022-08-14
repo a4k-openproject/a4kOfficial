@@ -6,7 +6,6 @@ install_aliases()
 
 import xbmcaddon
 
-from providers.a4kOfficial import configure
 from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.justwatch import JustWatch
@@ -211,11 +210,11 @@ class JustWatchCore(Core):
     def get_listitem(return_data):
         scraper = return_data["scraper"]
         plugin = ADDON_IDS[scraper]["plugin"]
-        if not configure.check_for_addon(plugin):
+        if not common.check_for_addon(plugin):
             common.log(
                 f"a4kOfficial: '{plugin}' is not installed; disabling '{scraper}'",
                 "info",
             )
-            configure.change_provider_status(scraper, "disabled")
+            common.change_provider_status(scraper, "disabled")
         else:
             return super(JustWatchCore, JustWatchCore).get_listitem(return_data)

@@ -5,6 +5,7 @@ from future.standard_library import install_aliases
 install_aliases()
 
 import xbmc
+import xbmcaddon
 
 import math
 import os
@@ -14,8 +15,9 @@ from requests.exceptions import RequestException
 
 from providerModules.a4kOfficial import PACKAGE_NAME
 
-from resources.lib.modules.globals import g
 from resources.lib.common import provider_tools
+from resources.lib.modules.globals import g
+from resources.lib.modules.providers.install_manager import ProviderInstallManager
 
 
 def log(msg, level="info"):
@@ -28,6 +30,23 @@ def get_setting(id):
 
 def set_setting(id, value):
     return provider_tools.set_setting(PACKAGE_NAME, id, value)
+
+
+def change_provider_status(scraper=None, status="enabled"):
+    ProviderInstallManager().flip_provider_status("a4kOfficial", scraper, status)
+
+
+def check_for_addon(plugin):
+    if plugin is None:
+        return False
+
+    status = True
+    try:
+        xbmcaddon.Addon(plugin)
+    except RuntimeError:
+        status = False
+    finally:
+        return status
 
 
 def check_url(url):
