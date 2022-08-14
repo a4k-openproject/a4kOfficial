@@ -47,7 +47,7 @@ if common.get_setting("general.firstrun") == "true":
         "a4kOfficial: Choose providers to enable",
         [ADDON_IDS[i[0]]["name"] for i in automatic],
         preselect=[i for i in range(len(automatic)) if automatic[i][1]],
-    )
+    ) or []
 
     for i in range(len(automatic)):
         scraper, status = automatic[i][:2]
