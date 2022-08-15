@@ -95,7 +95,9 @@ class JustWatchCore(Core):
         if not self._get_service_offers(item):
             return None
 
-        jw_title = self._api.get_title(title_id=item["id"], content_type=type)
+        jw_title = self._api.get_title(
+            title_id=item["id"], content_type="show" if type == "episode" else type
+        )
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i["external_id"] for i in external_ids if i["provider"] == "tmdb"]
 
