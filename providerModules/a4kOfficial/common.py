@@ -120,3 +120,10 @@ def get_system_platform():
             platform = p
 
     return platform
+
+
+def get_package_providers():
+    manager = ProviderInstallManager()
+    providers = manager.known_providers
+
+    return [p for p in providers if p["package"] == PACKAGE_NAME]

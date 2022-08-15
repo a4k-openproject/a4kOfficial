@@ -18,36 +18,27 @@ _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"
 
 
-def _get_current_ip():
-    data = requests.get(_ipify)
-    if data.ok:
-        return data.json().get("ip", "0.0.0.0")
-
-
-def _get_country_code():
-    ip = _get_current_ip()
-    data = requests.get(_ipinfo.format(ip))
-
-    if data.ok:
-        return data.json().get("country", "US")
-
-
-def _get_initial_provider_status(scraper=None):
-    status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
-    return (scraper, status)
-
-
-if common.get_setting("general.firstrun") == "true":
+def setup(*args, **kwargs):
     common.set_setting("justwatch.country", _get_country_code() or "US")
 
     dialog = xbmcgui.Dialog()
-    automatic = [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
+    automatic = (
+        [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
+        if kwargs.get("first_run")
+        else [
+            True if p["status"] == "enabled" else False
+            for p in common.get_package_providers()
+        ]
+    )
 
-    choices = dialog.multiselect(
-        "a4kOfficial: Choose providers to enable",
-        [ADDON_IDS[i[0]]["name"] for i in automatic],
-        preselect=[i for i in range(len(automatic)) if automatic[i][1]],
-    ) or []
+    choices = (
+        dialog.multiselect(
+            "a4kOfficial: Choose providers to enable",
+            [ADDON_IDS[i[0]]["name"] for i in automatic],
+            preselect=[i for i in range(len(automatic)) if automatic[i][1]],
+        )
+        or []
+    )
 
     for i in range(len(automatic)):
         scraper, status = automatic[i][:2]
@@ -73,4 +64,28 @@ if common.get_setting("general.firstrun") == "true":
         else:
             common.change_provider_status(scraper, "disabled")
 
-    common.set_setting("general.firstrun", "false")
+    return False
+
+
+def _get_current_ip():
+    data = requests.get(_ipify)
+    if data.ok:
+        return data.json().get("ip", "0.0.0.0")
+
+
+def _get_country_code():
+    ip = _get_current_ip()
+    data = requests.get(_ipinfo.format(ip))
+
+    if data.ok:
+        return data.json().get("country", "US")
+
+
+def _get_initial_provider_status(scraper=None):
+    status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
+    return (scraper, status)
+
+
+if common.get_setting("general.firstrun"):
+    first_run = setup(first_run=True)
+    common.set_setting("general.firstrun", first_run)
