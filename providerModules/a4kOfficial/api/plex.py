@@ -1,26 +1,18 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 from datetime import datetime
 from platform import machine, system
+import requests
+from requests.exceptions import RequestException
 import uuid
 from xml.etree import ElementTree
-
-import requests
 
 import xbmc
 import xbmcgui
 
-import requests
-from requests.exceptions import RequestException
-
-from providerModules.a4kOfficial import common
-
 from resources.lib.common import tools
 from resources.lib.modules.globals import g
+
+from providerModules.a4kOfficial import common
 
 
 class Plex:
@@ -197,7 +189,7 @@ class Plex:
                     connections = resource.get("connections", [])
                     for connection in connections:
                         url = connection.get("uri", "")
-                        local = int(connection.get("local", True))
+                        local = connection.get("local", True)
 
                         if ".plex.direct" in url and not local:
                             listings.append((url, access_token))

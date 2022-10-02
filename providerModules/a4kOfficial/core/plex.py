@@ -1,28 +1,22 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import pickle
 import os
+import re
 
 import xbmcaddon
 import xbmcvfs
 
-from providers.a4kOfficial import configure
-from providerModules.a4kOfficial import ADDON_IDS, common
-from providerModules.a4kOfficial.api.plex import Plex
-from providerModules.a4kOfficial.core import Core
-
 from resources.lib.common.source_utils import (
-    check_title_match,
     clean_title,
     get_info,
     get_quality,
     de_string_size,
 )
-from resources.lib.modules.exceptions import PreemptiveCancellation
+
+from providerModules.a4kOfficial import ADDON_IDS, common
+from providerModules.a4kOfficial.api.plex import Plex
+from providerModules.a4kOfficial.core import Core
+
 
 PLEX_AUDIO = {"dca": "dts", "dca-ma": "hdma"}
 
@@ -117,10 +111,11 @@ class PlexCore(Core):
             item_type = item.get("type", "")
             resource = item.get("resource", ())
             media = item.get("Media", [{}])[0]
+            meta_title = item.get("title", "")
             source_title = item.get("sourceTitle", "")
             library_title = item.get("librarySectionTitle", "")
+            year = int(item.get("year", 0))
 
-            year = int(media.get("year", simple_info["year"]))
             quality = media.get("videoResolution", "Unknown")
             part = media.get("Part", [{}])[0]
             info = " ".join(
@@ -149,6 +144,9 @@ class PlexCore(Core):
         elif "\\" in file:
             filename = file.rsplit("\\", 1)[-1]
 
+        if source_year := re.search(r"((?:1|2)(?:9|0)(?:[0-9]{2}))", filename):
+            year = int(source_year.group(0))
+
         if item_type != type:
             return
 
@@ -161,10 +159,17 @@ class PlexCore(Core):
             "library_title": library_title,
         }
         url = {"base_url": resource[0], "token": resource[1]}
+
         if type == "movie":
+            titles = [simple_info["title"], *simple_info.get("aliases", [])]
+
             if (
                 year < int(simple_info["year"]) - 1
                 or year > int(simple_info["year"]) + 1
+            ):
+                return
+            elif not any(
+                [clean_title(meta_title) == clean_title(title) for title in titles]
             ):
                 return
 
@@ -179,6 +184,7 @@ class PlexCore(Core):
             episode_title = item.get("title", "")
             season = item.get("parentIndex", 0)
             episode = item.get("index", 0)
+            titles = [simple_info["show_title"], *simple_info.get("show_aliases", [])]
 
             if not (
                 season == simple_info["season_number"]
@@ -186,7 +192,7 @@ class PlexCore(Core):
             ):
                 return
             elif not (
-                clean_title(simple_info["show_title"]) == clean_title(show_title)
+                any([clean_title(show_title) == clean_title(title) for title in titles])
                 and clean_title(simple_info["episode_title"])
                 == clean_title(episode_title)
             ):
@@ -198,11 +204,11 @@ class PlexCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data["scraper"]
-        if not configure.check_for_addon(ADDON_IDS[scraper]["plugin"]):
+        if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
             common.log(
                 f"a4kOfficial: '{ADDON_IDS[scraper]['plugin']}' is not installed; disabling '{scraper}'",
                 "info",
             )
-            configure.change_provider_status(scraper, "disabled")
+            common.change_provider_status(scraper, "disabled")
         else:
             return super(PlexCore, PlexCore).get_listitem(return_data)

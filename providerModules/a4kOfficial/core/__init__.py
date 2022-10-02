@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import time
 
 import xbmcgui
 
-from providerModules.a4kOfficial import common
-
 from resources.lib.modules.exceptions import PreemptiveCancellation
+
+from providerModules.a4kOfficial import common
 
 
 class Core:
@@ -84,16 +79,10 @@ class Core:
         return self._return_results("episode", self.sources)
 
     def movie(self, simple_info, all_info, **kwargs):
-        queries = []
-        queries.append(simple_info["title"])
-        queries.extend(simple_info.get("aliases", []))
-
         try:
-            items = []
-            for query in queries:
-                items.extend(
-                    self._make_movie_query(title=query, year=int(simple_info["year"]))
-                )
+            items = self._make_movie_query(
+                title=simple_info["title"], year=int(simple_info["year"])
+            )
 
             for item in items:
                 source = self._process_movie_item(item, simple_info, all_info, **kwargs)

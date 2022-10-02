@@ -1,21 +1,17 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
-import xbmc
-
 import math
 import os
-
 import requests
 from requests.exceptions import RequestException
 
-from providerModules.a4kOfficial import PACKAGE_NAME
+import xbmc
+import xbmcaddon
 
-from resources.lib.modules.globals import g
 from resources.lib.common import provider_tools
+from resources.lib.modules.globals import g
+from resources.lib.modules.providers.install_manager import ProviderInstallManager
+
+from providerModules.a4kOfficial import PACKAGE_NAME
 
 
 def log(msg, level="info"):
@@ -28,6 +24,23 @@ def get_setting(id):
 
 def set_setting(id, value):
     return provider_tools.set_setting(PACKAGE_NAME, id, value)
+
+
+def change_provider_status(scraper=None, status="enabled"):
+    ProviderInstallManager().flip_provider_status("a4kOfficial", scraper, status)
+
+
+def check_for_addon(plugin):
+    if plugin is None:
+        return False
+
+    status = True
+    try:
+        xbmcaddon.Addon(plugin)
+    except RuntimeError:
+        status = False
+    finally:
+        return status
 
 
 def check_url(url):
@@ -101,3 +114,10 @@ def get_system_platform():
             platform = p
 
     return platform
+
+
+def get_package_providers():
+    manager = ProviderInstallManager()
+    providers = manager.known_providers
+
+    return [p for p in providers if p["package"] == PACKAGE_NAME]

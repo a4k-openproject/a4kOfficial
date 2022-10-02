@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import json
 import re
-from urllib.parse import quote_plus
-
 import requests
+from urllib.parse import quote_plus
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core.justwatch import JustWatchCore

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-
-from . import adaptive, direct
+from . import adaptive
+from . import direct
 
 
 def get_torrent():

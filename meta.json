@@ -10,38 +10,50 @@
   "settings": [
     {
       "id": "justwatch.country",
-      "type": "string",
+      "type": "str",
       "default": "US",
       "visible": true,
       "label": "JustWatch Country"
     },
     {
       "id": "general.firstrun",
-      "type": "string",
-      "default": "true",
+      "type": "bool",
+      "default": true,
       "visible": false,
       "label": "First Run"
     },
     {
       "id": "plex.token",
-      "type": "string",
+      "type": "str",
       "default": "",
       "visible": false,
       "label": "Plex Token"
     },
     {
       "id": "plex.client_id",
-      "type": "string",
+      "type": "str",
       "default": "",
       "visible": false,
       "label": "Plex Client ID"
     },
     {
       "id": "plex.device_id",
-      "type": "string",
+      "type": "str",
       "default": "",
       "visible": false,
       "label": "Plex Device ID"
+    },
+    {
+      "id": "general.configure",
+      "type": "bool",
+      "default": false,
+      "visible": true,
+      "label": "Re-run Package Configuration",
+      "hide_value": true,
+      "action": {
+        "module": "providers.a4kOfficial.configure",
+        "function": "setup"
+      }
     }
   ]
 }

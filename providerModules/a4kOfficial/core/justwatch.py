@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import xbmcaddon
 
-from providers.a4kOfficial import configure
+from resources.lib.common.source_utils import clean_title
+
 from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.justwatch import JustWatch
-
-from resources.lib.common.source_utils import clean_title
 
 
 class JustWatchCore(Core):
@@ -96,7 +90,9 @@ class JustWatchCore(Core):
         if not self._get_service_offers(item):
             return None
 
-        jw_title = self._api.get_title(title_id=item["id"], content_type=type)
+        jw_title = self._api.get_title(
+            title_id=item["id"], content_type="show" if type == "episode" else type
+        )
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i["external_id"] for i in external_ids if i["provider"] == "tmdb"]
 
@@ -211,11 +207,11 @@ class JustWatchCore(Core):
     def get_listitem(return_data):
         scraper = return_data["scraper"]
         plugin = ADDON_IDS[scraper]["plugin"]
-        if not configure.check_for_addon(plugin):
+        if not common.check_for_addon(plugin):
             common.log(
                 f"a4kOfficial: '{plugin}' is not installed; disabling '{scraper}'",
                 "info",
             )
-            configure.change_provider_status(scraper, "disabled")
+            common.change_provider_status(scraper, "disabled")
         else:
             return super(JustWatchCore, JustWatchCore).get_listitem(return_data)
