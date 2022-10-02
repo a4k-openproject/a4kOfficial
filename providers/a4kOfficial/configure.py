@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import importlib
-
 import requests
 
 import xbmcgui
 
+from resources.lib.modules.globals import g
+
 from providerModules.a4kOfficial import common, ADDON_IDS
 
-from resources.lib.modules.globals import g
 
 _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"

@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
+from resources.lib.common.source_utils import de_string_size
 
 from providerModules.a4kOfficial import common
 from providerModules.a4kOfficial.core import Core
-
-from resources.lib.common.source_utils import de_string_size
 
 
 class LibraryCore(Core):

@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import xbmcaddon
+
+from resources.lib.common.source_utils import clean_title
 
 from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
 from providerModules.a4kOfficial.api.justwatch import JustWatch
-
-from resources.lib.common.source_utils import clean_title
 
 
 class JustWatchCore(Core):

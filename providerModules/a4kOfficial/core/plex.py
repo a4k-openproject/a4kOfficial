@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
-
 import pickle
 import os
 import re
@@ -11,18 +6,17 @@ import re
 import xbmcaddon
 import xbmcvfs
 
-from providerModules.a4kOfficial import ADDON_IDS, common
-from providerModules.a4kOfficial.api.plex import Plex
-from providerModules.a4kOfficial.core import Core
-
 from resources.lib.common.source_utils import (
-    check_title_match,
     clean_title,
     get_info,
     get_quality,
     de_string_size,
 )
-from resources.lib.modules.exceptions import PreemptiveCancellation
+
+from providerModules.a4kOfficial import ADDON_IDS, common
+from providerModules.a4kOfficial.api.plex import Plex
+from providerModules.a4kOfficial.core import Core
+
 
 PLEX_AUDIO = {"dca": "dts", "dca-ma": "hdma"}
 

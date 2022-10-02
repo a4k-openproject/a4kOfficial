@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, unicode_literals
-from future.standard_library import install_aliases
-
-install_aliases()
+import math
+import os
+import requests
+from requests.exceptions import RequestException
 
 import xbmc
 import xbmcaddon
 
-import math
-import os
-
-import requests
-from requests.exceptions import RequestException
-
-from providerModules.a4kOfficial import PACKAGE_NAME
-
 from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
 from resources.lib.modules.providers.install_manager import ProviderInstallManager
+
+from providerModules.a4kOfficial import PACKAGE_NAME
 
 
 def log(msg, level="info"):
