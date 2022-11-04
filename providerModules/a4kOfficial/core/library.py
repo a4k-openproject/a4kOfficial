@@ -65,7 +65,7 @@ class LibraryCore(Core):
 
         return result
 
-    def _make_show_query(self, query):
+    def _make_show_query(self, **kwargs):
         result = self.__make_query(
             method="VideoLibrary.GetTVShows",
             params={
@@ -75,26 +75,26 @@ class LibraryCore(Core):
 
         return result.get("tvshows", {})
 
-    def _make_movie_query(self, title, year):
+    def _make_movie_query(self, **kwargs):
         result = self.__make_query(
             method="VideoLibrary.GetMovies",
             params={
                 "properties": ["uniqueid", "title", "originaltitle", "file"],
                 "filter": {
                     "and": [
-                        {"field": "title", "operator": "startswith", "value": title},
+                        {"field": "title", "operator": "startswith", "value": kwargs['title']},
                         {
                             "or": [
                                 {
                                     "field": "year",
                                     "operator": "is",
-                                    "value": str(year - 1),
+                                    "value": str(kwargs['year'] - 1),
                                 },
-                                {"field": "year", "operator": "is", "value": str(year)},
+                                {"field": "year", "operator": "is", "value": str(kwargs['year'])},
                                 {
                                     "field": "year",
                                     "operator": "is",
-                                    "value": str(year + 1),
+                                    "value": str(kwargs['year'] + 1),
                                 },
                             ]
                         },
