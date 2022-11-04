@@ -39,9 +39,7 @@ class PlexCore(Core):
             client_id = addon.getSetting("client_id")
 
             addon_path = xbmcvfs.translatePath(addon.getAddonInfo("profile"))
-            cache_path = os.path.join(
-                addon_path, "cache", "servers", "plexhome_user.pcache"
-            )
+            cache_path = os.path.join(addon_path, "cache", "servers", "plexhome_user.pcache")
             with open(cache_path, "rb") as f:
                 cache = pickle.load(f)
 
@@ -81,9 +79,7 @@ class PlexCore(Core):
             result.extend(
                 [
                     dict(resource=resource, **i)
-                    for i in self.__make_query(
-                        resource, kwargs["simple_info"]["episode_title"], type="episode"
-                    )
+                    for i in self.__make_query(resource, kwargs["simple_info"]["episode_title"], type="episode")
                 ]
             )
 
@@ -123,9 +119,7 @@ class PlexCore(Core):
                     media.get("container", ""),
                     media.get("videoCodec", ""),
                     media.get("videoProfile", ""),
-                    PLEX_AUDIO.get(
-                        media.get("audioCodec"), media.get("audioCodec", "")
-                    ),
+                    PLEX_AUDIO.get(media.get("audioCodec"), media.get("audioCodec", "")),
                     media.get("audioProfile", ""),
                     str(media.get("audioChannels", "2")) + "ch",
                 ]
@@ -163,14 +157,9 @@ class PlexCore(Core):
         if type == "movie":
             titles = [simple_info["title"], *simple_info.get("aliases", [])]
 
-            if (
-                year < int(simple_info["year"]) - 1
-                or year > int(simple_info["year"]) + 1
-            ):
+            if year < int(simple_info["year"]) - 1 or year > int(simple_info["year"]) + 1:
                 return
-            elif not any(
-                [clean_title(meta_title) == clean_title(title) for title in titles]
-            ):
+            elif not any([clean_title(meta_title) == clean_title(title) for title in titles]):
                 return
 
             url.update({"movie_id": key})
@@ -187,14 +176,10 @@ class PlexCore(Core):
             titles = [simple_info["show_title"], *simple_info.get("show_aliases", [])]
 
             if not (
-                season == simple_info["season_number"]
-                and episode == simple_info["episode_number"]
-            ):
                 return
             elif not (
                 any([clean_title(show_title) == clean_title(title) for title in titles])
-                and clean_title(simple_info["episode_title"])
-                == clean_title(episode_title)
+                and clean_title(simple_info["episode_title"]) == clean_title(episode_title)
             ):
                 return
 

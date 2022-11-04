@@ -12,7 +12,9 @@ class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__(providers=["bbc"])
 
-        self._movie_url = f"{self._movie_url.format(movie_url='/?mode=202&name=null&url={movie_id}&iconimage=null&description=null')}"
+        self._movie_url = (
+            f"{self._movie_url.format(movie_url='/?mode=202&name=null&url={movie_id}&iconimage=null&description=null')}"
+        )
         self._episode_url = f"{self._episode_url.format(episode_url='/?mode=202&name=null&url={episode_id}&iconimage=null&description=null')}"
 
     def _make_source(self, item, ids, **kwargs):
@@ -30,11 +32,7 @@ class sources(JustWatchCore):
         if not common.check_url(url):
             return None
 
-        return (
-            self._get_service_ep_id(url, item, season, episode)
-            if "/episodes/" in url
-            else url
-        )
+        return self._get_service_ep_id(url, item, season, episode) if "/episodes/" in url else url
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         seriesId = None
@@ -49,11 +47,7 @@ class sources(JustWatchCore):
 
         if seriesId:
             seasons = eps.get("header", {}).get("availableSlices", {})
-            series_id = [
-                s.get("id", "")
-                for s in seasons
-                if int(re.sub("[^0-9]", "", s["title"])) == season
-            ]
+            series_id = [s.get("id", "") for s in seasons if int(re.sub("[^0-9]", "", s["title"])) == season]
             if series_id:
                 series_id = series_id[0]
 

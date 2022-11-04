@@ -49,10 +49,10 @@ class sources(JustWatchCore):
     def __init__(self):
         super(sources, self).__init__(providers=["nfx", "nfk"])
 
-        self._movie_url = (
-            f"{self._movie_url.format(movie_url='/play/movie/{movie_id}/')}"
+        self._movie_url = f"{self._movie_url.format(movie_url='/play/movie/{movie_id}/')}"
+        self._episode_url = (
+            f"{self._episode_url.format(episode_url='/play/show/{show_id}/season/{season_id}/episode/{episode_id}')}"
         )
-        self._episode_url = f"{self._episode_url.format(episode_url='/play/show/{show_id}/season/{season_id}/episode/{episode_id}')}"
 
     def _get_service_ep_id(self, show_id, item, season, episode):
         code = INSTANT_WATCHER_COUNTRIES.get(self._country, "78")
@@ -65,11 +65,7 @@ class sources(JustWatchCore):
             r,
             flags=re.I | re.S,
         )
-        _season = [
-            s
-            for s in seasons
-            if int(re.findall(r">Season (.+?)</a>", s, flags=re.I | re.S)[0]) == season
-        ][0]
+        _season = [s for s in seasons if int(re.findall(r">Season (.+?)</a>", s, flags=re.I | re.S)[0]) == season][0]
         episodes = common.parseDOM(_season, "a", ret="data-title-id")
         episode_id = episodes[int(episode)]
 

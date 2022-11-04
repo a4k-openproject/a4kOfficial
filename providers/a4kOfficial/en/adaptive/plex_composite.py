@@ -13,20 +13,14 @@ class sources(PlexCore):
         self._episode_url = f"{self._base_url}" + "/?mode=5&url={base_url}{episode_id}"
 
     def episode(self, simple_info, all_info, **kwargs):
-        return super(PlexCore, self).episode(
-            simple_info, all_info, single=False, **kwargs
-        )
+        return super(PlexCore, self).episode(simple_info, all_info, single=False, **kwargs)
 
     def movie(self, simple_info, all_info, **kwargs):
-        return super(PlexCore, self).movie(
-            simple_info, all_info, single=False, **kwargs
-        )
+        return super(PlexCore, self).movie(simple_info, all_info, single=False, **kwargs)
 
     def _make_source(self, item, url, **kwargs):
         source = super(sources, self)._make_source(item, url, **kwargs)
 
-        source.update(
-            {"url": kwargs["base_url"].format(**{k: quote(v) for k, v in url.items()})}
-        )
+        source.update({"url": kwargs["base_url"].format(**{k: quote(v) for k, v in url.items()})})
 
         return source

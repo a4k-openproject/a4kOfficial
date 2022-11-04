@@ -61,9 +61,7 @@ class LibraryCore(Core):
         return file_info
 
     def __make_query(self, method, params, **kwargs):
-        result = common.execute_jsonrpc(method=method, params=params, **kwargs).get(
-            "result", {}
-        )
+        result = common.execute_jsonrpc(method=method, params=params, **kwargs).get("result", {})
 
         return result
 
@@ -178,9 +176,7 @@ class LibraryCore(Core):
 
         if all(
             [
-                int(external_ids.get(i, -1))
-                if not i == "imdb"
-                else external_ids.get(i, -1) in [-1, movie_ids[i]]
+                int(external_ids.get(i, -1)) if not i == "imdb" else external_ids.get(i, -1) in [-1, movie_ids[i]]
                 for i in movie_ids
             ]
         ):

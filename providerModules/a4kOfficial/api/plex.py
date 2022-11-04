@@ -60,19 +60,13 @@ class Plex:
         data = requests.post(url, headers=self._headers)
 
         if data.status_code != 201:
-            common.log(
-                "Failed to authorize Plex: {} response from {}".format(
-                    data.status_code, url
-                )
-            )
+            common.log("Failed to authorize Plex: {} response from {}".format(data.status_code, url))
 
         try:
             pin = data.json().get("pin", {})
             code = pin.get("code", "")
             self._device_id = pin.get("id", "")
-            self._expire_auth_time = datetime.strptime(
-                pin.get("expires_at", ""), "%Y-%m-%dT%H:%M:%SZ"
-            ).timestamp()
+            self._expire_auth_time = datetime.strptime(pin.get("expires_at", ""), "%Y-%m-%dT%H:%M:%SZ").timestamp()
         except Exception as e:
             common.log("a4kOfficial: Failed to authorize Plex: {}".format(e), "error")
             return
@@ -111,11 +105,7 @@ class Plex:
         data = requests.get(self._check_url, headers=self._headers)
 
         if data.status_code != 200:
-            common.log(
-                "Failed to authorize Plex: {} response from {}".format(
-                    data.status_code, self._check_url
-                )
-            )
+            common.log("Failed to authorize Plex: {} response from {}".format(data.status_code, self._check_url))
             return
 
         try:
@@ -149,11 +139,7 @@ class Plex:
         results = requests.get(url, headers=self._headers)
 
         if results.status_code != 200:
-            common.log(
-                "Failed to authorize Plex: {} response from {}".format(
-                    results.status_code, url
-                )
-            )
+            common.log("Failed to authorize Plex: {} response from {}".format(results.status_code, url))
             return
 
         try:
@@ -172,9 +158,7 @@ class Plex:
         results = self._get(url, params={"includeHttps": 1}, headers=self._headers)
 
         if results is not None and results.status_code != 200:
-            common.log(
-                f"Failed to list Plex resources: {results.status_code} response from {url}"
-            )
+            common.log(f"Failed to list Plex resources: {results.status_code} response from {url}")
             return
 
         listings = []
