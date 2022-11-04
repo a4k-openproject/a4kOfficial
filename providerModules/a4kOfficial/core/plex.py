@@ -144,7 +144,7 @@ class PlexCore(Core):
         if item_type != type:
             return
 
-        item = {
+        source = {
             "filename": filename,
             "info": info,
             "size": size,
@@ -164,18 +164,18 @@ class PlexCore(Core):
 
             url.update({"movie_id": key})
             return self._make_movie_source(
-                item,
+                source,
                 url,
                 **kwargs,
             )
         elif type == "episode":
             show_title = item.get("grandparentTitle", "")
             episode_title = item.get("title", "")
-            season = item.get("parentIndex", 0)
-            episode = item.get("index", 0)
+            season = int(item.get("parentIndex", 0))
+            episode = int(item.get("index", 0))
             titles = [simple_info["show_title"], *simple_info.get("show_aliases", [])]
 
-            if not (
+            if not (season == int(simple_info["season_number"]) and episode == int(simple_info["episode_number"])):
                 return
             elif not (
                 any([clean_title(show_title) == clean_title(title) for title in titles])
@@ -184,7 +184,7 @@ class PlexCore(Core):
                 return
 
             url.update({"episode_id": key})
-            return self._make_episode_source(item, url, **kwargs)
+            return self._make_episode_source(source, url, **kwargs)
 
     @staticmethod
     def get_listitem(return_data):
