@@ -50,9 +50,7 @@ class JustWatchCore(Core):
             if addon.getSettingBool(settings[setting]):
                 info.add(setting)
 
-        if drm.get_widevine_level() == "L3" or (
-            "4K" in settings and not addon.getSettingBool(settings["4K"])
-        ):
+        if drm.get_widevine_level() == "L3" or ("4K" in settings and not addon.getSettingBool(settings["4K"])):
             info.difference_update({"HDR", "DV", "HYBRID"})
 
         return info
@@ -79,9 +77,7 @@ class JustWatchCore(Core):
         return items
 
     def _make_show_query(self, **kwargs):
-        items = self.__make_query(
-            query=kwargs["simple_info"]["show_title"], type="show"
-        )
+        items = self.__make_query(query=kwargs["simple_info"]["show_title"], type="show")
 
         return items
 
@@ -90,15 +86,11 @@ class JustWatchCore(Core):
         if not self._get_service_offers(item):
             return None
 
-        jw_title = self._api.get_title(
-            title_id=item["id"], content_type="show" if type == "episode" else type
-        )
+        jw_title = self._api.get_title(title_id=item["id"], content_type="show" if type == "episode" else type)
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i["external_id"] for i in external_ids if i["provider"] == "tmdb"]
 
-        tmdb_id = all_info["info"].get(
-            "tmdb_show_id" if type == "episode" else "tmdb_id"
-        )
+        tmdb_id = all_info["info"].get("tmdb_show_id" if type == "episode" else "tmdb_id")
         season = int(simple_info.get("season_number", 0))
         episode = int(simple_info.get("episode_number", 0))
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
@@ -111,19 +103,14 @@ class JustWatchCore(Core):
             if type == "episode":
                 episodes = self._api.get_episodes(item["id"])["items"]
                 episode_item = [
-                    i
-                    for i in episodes
-                    if i["season_number"] == int(season)
-                    and i["episode_number"] == int(episode)
+                    i for i in episodes if i["season_number"] == int(season) and i["episode_number"] == int(episode)
                 ]
 
                 if not episode_item:
                     return None
                 episode_item = episode_item[0]
                 ids = {"show_id": service_id}
-                ids.update(
-                    self._get_service_ep_id(service_id, episode_item, season, episode)
-                )
+                ids.update(self._get_service_ep_id(service_id, episode_item, season, episode))
 
                 if not ids.get("episode_id"):
                     return None
@@ -150,8 +137,7 @@ class JustWatchCore(Core):
         service_offers = [
             o
             for o in offers
-            if o.get("package_short_name") in self._providers
-            and o.get("monetization_type") in self._monetization_types
+            if o.get("package_short_name") in self._providers and o.get("monetization_type") in self._monetization_types
         ]
         self._service_offers.extend(service_offers)
 
@@ -168,8 +154,7 @@ class JustWatchCore(Core):
         settings = ADDON_IDS[self._scraper].get("settings", {})
 
         if drm.get_widevine_level() == "L3" or (
-            "4K" in settings
-            and not xbmcaddon.Addon(self._plugin).getSettingBool(settings["4K"])
+            "4K" in settings and not xbmcaddon.Addon(self._plugin).getSettingBool(settings["4K"])
         ):
             resolutions.discard("4K")
 
@@ -194,14 +179,10 @@ class JustWatchCore(Core):
         return {"episode_id": self._get_service_id(item)}
 
     def episode(self, simple_info, all_info, **kwargs):
-        return super(JustWatchCore, self).episode(
-            simple_info, all_info, single=True, **kwargs
-        )
+        return super(JustWatchCore, self).episode(simple_info, all_info, single=True, **kwargs)
 
     def movie(self, simple_info, all_info, **kwargs):
-        return super(JustWatchCore, self).movie(
-            simple_info, all_info, single=True, **kwargs
-        )
+        return super(JustWatchCore, self).movie(simple_info, all_info, single=True, **kwargs)
 
     @staticmethod
     def get_listitem(return_data):

@@ -61,13 +61,11 @@ class LibraryCore(Core):
         return file_info
 
     def __make_query(self, method, params, **kwargs):
-        result = common.execute_jsonrpc(method=method, params=params, **kwargs).get(
-            "result", {}
-        )
+        result = common.execute_jsonrpc(method=method, params=params, **kwargs).get("result", {})
 
         return result
 
-    def _make_show_query(self, query):
+    def _make_show_query(self, **kwargs):
         result = self.__make_query(
             method="VideoLibrary.GetTVShows",
             params={
@@ -77,26 +75,26 @@ class LibraryCore(Core):
 
         return result.get("tvshows", {})
 
-    def _make_movie_query(self, title, year):
+    def _make_movie_query(self, **kwargs):
         result = self.__make_query(
             method="VideoLibrary.GetMovies",
             params={
                 "properties": ["uniqueid", "title", "originaltitle", "file"],
                 "filter": {
                     "and": [
-                        {"field": "title", "operator": "startswith", "value": title},
+                        {"field": "title", "operator": "startswith", "value": kwargs['title']},
                         {
                             "or": [
                                 {
                                     "field": "year",
                                     "operator": "is",
-                                    "value": str(year - 1),
+                                    "value": str(kwargs['year'] - 1),
                                 },
-                                {"field": "year", "operator": "is", "value": str(year)},
+                                {"field": "year", "operator": "is", "value": str(kwargs['year'])},
                                 {
                                     "field": "year",
                                     "operator": "is",
-                                    "value": str(year + 1),
+                                    "value": str(kwargs['year'] + 1),
                                 },
                             ]
                         },
@@ -178,9 +176,7 @@ class LibraryCore(Core):
 
         if all(
             [
-                int(external_ids.get(i, -1))
-                if not i == "imdb"
-                else external_ids.get(i, -1) in [-1, movie_ids[i]]
+                int(external_ids.get(i, -1)) if not i == "imdb" else external_ids.get(i, -1) in [-1, movie_ids[i]]
                 for i in movie_ids
             ]
         ):

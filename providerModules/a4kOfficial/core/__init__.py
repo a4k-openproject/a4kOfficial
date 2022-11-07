@@ -80,9 +80,7 @@ class Core:
 
     def movie(self, simple_info, all_info, **kwargs):
         try:
-            items = self._make_movie_query(
-                title=simple_info["title"], year=int(simple_info["year"])
-            )
+            items = self._make_movie_query(title=simple_info["title"], year=int(simple_info["year"]))
 
             for item in items:
                 source = self._process_movie_item(item, simple_info, all_info, **kwargs)

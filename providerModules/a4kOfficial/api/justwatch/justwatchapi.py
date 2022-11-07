@@ -64,10 +64,7 @@ class JustWatch:
             results = r.json()
 
         for result in results:
-            if (
-                result["iso_3166_2"] == self.country
-                or result["country"] == self.country
-            ):
+            if result["iso_3166_2"] == self.country or result["country"] == self.country:
 
                 return result["full_locale"]
 
@@ -160,11 +157,7 @@ class JustWatch:
     def get_season(self, season_id):
 
         header = HEADER
-        api_url = (
-            "https://apis.justwatch.com/content/titles/show_season/{}/locale/{}".format(
-                season_id, self.locale
-            )
-        )
+        api_url = "https://apis.justwatch.com/content/titles/show_season/{}/locale/{}".format(season_id, self.locale)
         r = self.requests.get(api_url, headers=header)
 
         # Client should deal with rate-limiting. JustWatch may send a 429 Too Many Requests response.
@@ -203,9 +196,7 @@ class JustWatch:
                 print("{} is not a valid keyword".format(key))
 
         header = HEADER
-        api_url = "https://apis.justwatch.com/content/titles/{}/{}/showtimes".format(
-            content_type, title_id
-        )
+        api_url = "https://apis.justwatch.com/content/titles/{}/{}/showtimes".format(content_type, title_id)
         r = self.requests.get(api_url, params=payload, headers=header)
 
         r.raise_for_status()  # Raises requests.exceptions.HTTPError if r.status_code != 200
@@ -246,9 +237,7 @@ class JustWatch:
         now_date = datetime.now()
         td = timedelta(weeks=weeks_offset)
         year_month_day = (now_date + td).isocalendar()
-        api_url = (
-            "https://apis.justwatch.com/content/titles/movie/upcoming/{}/{}/locale/{}"
-        )
+        api_url = "https://apis.justwatch.com/content/titles/movie/upcoming/{}/{}/locale/{}"
         api_url = api_url.format(year_month_day[0], year_month_day[1], self.locale)
 
         # this throws an error if you go too many weeks forward, so return a blank payload if we hit an error
@@ -281,9 +270,7 @@ class JustWatch:
         return r.json()
 
     def get_person_detail(self, person_id):
-        path = "titles/person/{person_id}/locale/{locale}".format(
-            person_id=person_id, locale=self.locale
-        )
+        path = "titles/person/{person_id}/locale/{locale}".format(person_id=person_id, locale=self.locale)
         api_url = self.api_base_template.format(path=path)
 
         r = self.requests.get(api_url, headers=HEADER)

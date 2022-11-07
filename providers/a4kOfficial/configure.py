@@ -20,10 +20,7 @@ def setup(*args, **kwargs):
     automatic = (
         [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
         if kwargs.get("first_run")
-        else [
-            True if p["status"] == "enabled" else False
-            for p in common.get_package_providers()
-        ]
+        else [True if p["status"] == "enabled" else False for p in common.get_package_providers()]
     )
 
     choices = (
@@ -48,12 +45,8 @@ def setup(*args, **kwargs):
                 ):
                     success = provider.setup()
                     if not success:
-                        common.log(
-                            f"a4kOfficial.{scraper}: Setup not complete; disabling"
-                        )
-                    common.change_provider_status(
-                        scraper, f"{'en' if success else 'dis'}abled"
-                    )
+                        common.log(f"a4kOfficial.{scraper}: Setup not complete; disabling")
+                    common.change_provider_status(scraper, f"{'en' if success else 'dis'}abled")
             else:
                 common.change_provider_status(scraper, "enabled")
         else:
