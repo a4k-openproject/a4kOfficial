@@ -17,8 +17,8 @@
     },
     {
       "id": "general.firstrun",
-      "type": "bool",
-      "default": true,
+      "type": "int",
+      "default": 1,
       "visible": false,
       "label": "First Run"
     },

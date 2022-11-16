@@ -49,7 +49,7 @@ def setup(*args, **kwargs):
         else:
             common.change_provider_status(scraper, "disabled")
 
-    return False
+    common.set_setting("general.firstrun", 0)
 
 
 def _get_current_ip():
@@ -75,5 +75,4 @@ def _get_provider_status(scraper=None, initial=False, providers=[]):
 
 
 if common.get_setting("general.firstrun"):
-    first_run = setup(first_run=True)
-    common.set_setting("general.firstrun", first_run)
+    setup(first_run=True)
