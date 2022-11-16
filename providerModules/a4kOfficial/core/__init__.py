@@ -78,7 +78,7 @@ class Core:
 
         return self._return_results("episode", self.sources)
 
-    def movie(self, simple_info, all_info, **kwargs):
+    def movie(self, title, year, imdb, simple_info, all_info, **kwargs):
         try:
             items = self._make_movie_query(title=simple_info["title"], year=int(simple_info["year"]))
 

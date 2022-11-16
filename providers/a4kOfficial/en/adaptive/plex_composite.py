@@ -15,8 +15,8 @@ class sources(PlexCore):
     def episode(self, simple_info, all_info, **kwargs):
         return super(PlexCore, self).episode(simple_info, all_info, single=False, **kwargs)
 
-    def movie(self, simple_info, all_info, **kwargs):
-        return super(PlexCore, self).movie(simple_info, all_info, single=False, **kwargs)
+    def movie(self, title, year, imdb, simple_info, all_info, **kwargs):
+        return super(PlexCore, self).movie(title, year, imdb, simple_info, all_info, single=False, **kwargs)
 
     def _make_source(self, item, url, **kwargs):
         source = super(sources, self)._make_source(item, url, **kwargs)

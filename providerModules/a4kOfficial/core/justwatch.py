@@ -181,8 +181,8 @@ class JustWatchCore(Core):
     def episode(self, simple_info, all_info, **kwargs):
         return super(JustWatchCore, self).episode(simple_info, all_info, single=True, **kwargs)
 
-    def movie(self, simple_info, all_info, **kwargs):
-        return super(JustWatchCore, self).movie(simple_info, all_info, single=True, **kwargs)
+    def movie(self, title, year, imdb, simple_info, all_info, **kwargs):
+        return super(JustWatchCore, self).movie(title, year, imdb, simple_info, all_info, single=True, **kwargs)
 
     @staticmethod
     def get_listitem(return_data):
