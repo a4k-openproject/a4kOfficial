@@ -34,7 +34,7 @@ class PlexCore(Core):
         self._episode_url = None
 
     def _get_auth(self):
-        if self._plugin:
+        if common.check_for_addon(self._plugin):
             addon = xbmcaddon.Addon(self._plugin)
             client_id = addon.getSetting("client_id")
 
