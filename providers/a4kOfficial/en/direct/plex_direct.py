@@ -21,8 +21,8 @@ class sources(PlexCore):
         self._movie_url = "{base_url}{movie_id}" + f"&X-Plex-Token={self._token}"
         self._episode_url = "{base_url}{episode_id}" + f"&X-Plex-Token={self._token}"
 
-    def episode(self, simple_info, all_info, **kwargs):
-        return super(PlexCore, self).episode(simple_info, all_info, single=False, **kwargs)
+    def episode(self, simple_info, info, **kwargs):
+        return super(PlexCore, self).episode(simple_info, info, single=False, **kwargs)
 
-    def movie(self, title, year, imdb, simple_info, all_info, **kwargs):
-        return super(PlexCore, self).movie(title, year, imdb, simple_info, all_info, single=False, **kwargs)
+    def movie(self, title, year, imdb, simple_info, info, **kwargs):
+        return super(PlexCore, self).movie(title, year, imdb, simple_info, info, single=False, **kwargs)
