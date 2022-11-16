@@ -178,11 +178,11 @@ class JustWatchCore(Core):
     def _get_service_ep_id(self, show_id, item, season, episode):
         return {"episode_id": self._get_service_id(item)}
 
-    def episode(self, simple_info, all_info, **kwargs):
-        return super(JustWatchCore, self).episode(simple_info, all_info, single=True, **kwargs)
+    def episode(self, simple_info, info, **kwargs):
+        return super(JustWatchCore, self).episode(simple_info, info, single=True, **kwargs)
 
-    def movie(self, simple_info, all_info, **kwargs):
-        return super(JustWatchCore, self).movie(simple_info, all_info, single=True, **kwargs)
+    def movie(self, title, year, imdb, simple_info, info, **kwargs):
+        return super(JustWatchCore, self).movie(title, year, imdb, simple_info, info, single=True, **kwargs)
 
     @staticmethod
     def get_listitem(return_data):
