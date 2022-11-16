@@ -17,11 +17,8 @@ def setup(*args, **kwargs):
     common.set_setting("justwatch.country", _get_country_code() or "US")
 
     dialog = xbmcgui.Dialog()
-    automatic = (
-        [_get_initial_provider_status(scraper) for scraper in ADDON_IDS]
-        if kwargs.get("first_run")
-        else [True if p["status"] == "enabled" else False for p in common.get_package_providers()]
-    )
+    providers = {p['provider_name']: p for p in common.get_package_providers()}
+    automatic = [_get_provider_status(scraper, kwargs.get("first_run"), providers) for scraper in ADDON_IDS]
 
     choices = (
         dialog.multiselect(
@@ -69,8 +66,11 @@ def _get_country_code():
         return data.json().get("country", "US")
 
 
-def _get_initial_provider_status(scraper=None):
-    status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
+def _get_provider_status(scraper=None, initial=False, providers=[]):
+    if initial:
+        status = common.check_for_addon(ADDON_IDS[scraper]["plugin"])
+    else:
+        status = True if providers[scraper]["status"] == "enabled" else False
     return (scraper, status)
 
 
