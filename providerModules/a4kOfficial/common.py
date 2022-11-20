@@ -33,8 +33,14 @@ def change_provider_status(scraper=None, status="enabled"):
 def check_for_addon(plugin):
     if plugin is None:
         return False
-    status = get_infolabel(f"System.HasAddon({plugin})")
-    return True if status == "true" else False
+
+    status = True
+    try:
+        xbmcaddon.Addon(plugin)
+    except RuntimeError:
+        status = False
+    finally:
+        return status
 
 
 def check_url(url):
@@ -115,7 +121,3 @@ def get_package_providers():
     providers = manager.known_providers
 
     return [p for p in providers if p["package"] == PACKAGE_NAME]
-
-
-def get_infolabel(label):
-    return xbmc.getInfoLabel(label)
