@@ -43,8 +43,8 @@ class Core:
 
         return source
 
-    def _make_episode_source(self, item, ids, **kwargs):
-        return self._make_source(item, ids, base_url=self._episode_url, type="episode", **kwargs)
+    def _make_episode_source(self, item, ids, simple_info, all_info, **kwargs):
+        return self._make_source(item, ids, simple_info, all_info, base_url=self._episode_url, type="episode", **kwargs)
 
     def _make_movie_source(self, item, ids, simple_info, all_info, **kwargs):
         return self._make_source(item, ids, simple_info, all_info, base_url=self._movie_url, type="movie", **kwargs)
