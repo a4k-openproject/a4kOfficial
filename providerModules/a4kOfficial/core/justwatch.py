@@ -23,11 +23,22 @@ class JustWatchCore(Core):
         self._movie_url = self._base_url + "{movie_url}"
         self._episode_url = self._base_url + "{episode_url}"
 
-    def _make_source(self, item, ids, **kwargs):
-        source = super(JustWatchCore, self)._make_source(item, ids, **kwargs)
+    @staticmethod
+    def _make_release_title(item, simple_info, all_info, type):
+        if type == "movie":
+            return simple_info['title']
+        elif type == "episode":
+            return f"{simple_info['show_title']}: \
+                     S{int(simple_info['season_number']):02}E{int(simple_info['season_number']):02} - \
+                     {simple_info['episode_title']}"
+        else:
+            return item['title']
+
+    def _make_source(self, item, ids, simple_info, all_info, **kwargs):
+        source = super(JustWatchCore, self)._make_source(item, ids, simple_info, all_info, **kwargs)
         source.update(
             {
-                "release_title": item["title"],
+                "release_title": JustWatchCore._make_release_title(item, simple_info, all_info, kwargs["type"]),
                 "quality": self._get_offered_resolutions(item),
                 "info": self._get_info_from_settings(),
                 "plugin": self._plugin,
@@ -98,7 +109,7 @@ class JustWatchCore(Core):
             if not service_id:
                 return None
 
-            source = self._make_movie_source(item, {"movie_id": service_id}, **kwargs)
+            source = self._make_movie_source(item, {"movie_id": service_id}, simple_info, all_info, **kwargs)
 
             if type == "episode":
                 episodes = self._api.get_episodes(item["id"])["items"]
@@ -115,7 +126,7 @@ class JustWatchCore(Core):
                 if not ids.get("episode_id"):
                     return None
 
-                source = self._make_episode_source(episode_item, ids, **kwargs)
+                source = self._make_episode_source(episode_item, ids, simple_info, all_info, **kwargs)
 
         return source
 
