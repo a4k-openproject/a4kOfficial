@@ -35,7 +35,7 @@ class Core:
 
         return sources
 
-    def _make_source(self, item, ids, **kwargs):
+    def _make_source(self, item, ids, simple_info, all_info, **kwargs):
         source = {
             "scraper": self._scraper,
         }
@@ -43,11 +43,11 @@ class Core:
 
         return source
 
-    def _make_episode_source(self, item, ids, **kwargs):
-        return self._make_source(item, ids, base_url=self._episode_url, **kwargs)
+    def _make_episode_source(self, item, ids, simple_info, all_info, **kwargs):
+        return self._make_source(item, ids, simple_info, all_info, base_url=self._episode_url, type="episode", **kwargs)
 
-    def _make_movie_source(self, item, ids, **kwargs):
-        return self._make_source(item, ids, base_url=self._movie_url, **kwargs)
+    def _make_movie_source(self, item, ids, simple_info, all_info, **kwargs):
+        return self._make_source(item, ids, simple_info, all_info, base_url=self._movie_url, type="movie", **kwargs)
 
     def _process_movie_item(self, item, simple_info, all_info, **kwargs):
         source = self._process_item(item, simple_info, all_info, type="movie", **kwargs)
