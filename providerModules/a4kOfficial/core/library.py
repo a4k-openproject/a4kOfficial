@@ -60,6 +60,20 @@ class LibraryCore(Core):
 
         return file_info
 
+    def _make_source(self, item, ids, source_info, db_details, **kwargs):
+        source = super(LibraryCore, self)._make_source(item, ids, source_info, db_details, **kwargs)
+        source.update(
+            {
+                "release_title": db_details["label"],
+                "info": source_info["info"],
+                "size": source_info["size"],
+                "quality": source_info["quality"],
+                "url": db_details.get("file", ""),
+            }
+        )
+
+        return source
+
     def __make_query(self, method, params, **kwargs):
         result = common.execute_jsonrpc(method=method, params=params, **kwargs).get("result", {})
 
@@ -105,89 +119,71 @@ class LibraryCore(Core):
 
         return result.get("movies", {})
 
-    def _process_show_item(self, db_item, simple_info, all_info):
+    def _process_item(self, db_item, simple_info, all_info, type, **kwargs):
         source = None
+        db_details = None
+        external_ids = None
+        ids = None
 
-        db_details = self.__make_query(
-            method="VideoLibrary.GetEpisodes",
-            params={
-                "properties": ["streamdetails", "file", "uniqueid"],
-                "tvshowid": db_item.get("tvshowid", ""),
-                "filter": {
-                    "and": [
-                        {
-                            "field": "season",
-                            "operator": "is",
-                            "value": str(all_info["info"]["season"]),
-                        },
-                        {
-                            "field": "episode",
-                            "operator": "is",
-                            "value": str(all_info["info"]["episode"]),
-                        },
-                    ]
+        if type == "movie":
+            db_details = self.__make_query(
+                method="VideoLibrary.GetMovieDetails",
+                params={
+                    "properties": ["streamdetails", "file", "uniqueid"],
+                    "movieid": db_item.get("movieid", ""),
                 },
-            },
-        )
+            ).get("moviedetails", {})
+            if not db_details:
+                return None
 
-        db_details = db_details.get("episodes", [])
-        if not db_details:
-            return None
-
-        db_details = db_details[0]
-        external_ids = db_item.get("uniqueid", {})
-        show_ids = {
-            "tmdb": all_info["info"].get("tmdb_show_id"),
-            "tvdb": all_info["info"].get("tvdb_show_id"),
-            "trakt": all_info["info"].get("trakt_show_id"),
-        }
-
-        if all([int(external_ids.get(i, -1)) in [-1, show_ids[i]] for i in show_ids]):
-            source_info = self.get_file_info(db_details)
-            source = {
-                "scraper": self._scraper,
-                "release_title": db_details["label"],
-                "info": source_info["info"],
-                "size": source_info["size"],
-                "quality": source_info["quality"],
-                "url": db_details.get("file", ""),
+            external_ids = db_details.get("uniqueid", {})
+            ids = {
+                "tmdb": all_info["info"].get("tmdb_id"),
+                "imdb": all_info["info"].get("imdb_id"),
+                "trakt": all_info["info"].get("trakt_id"),
             }
+        elif type == "episode":
+            db_details = self.__make_query(
+                method="VideoLibrary.GetEpisodes",
+                params={
+                    "properties": ["streamdetails", "file", "uniqueid"],
+                    "tvshowid": db_item.get("tvshowid", ""),
+                    "filter": {
+                        "and": [
+                            {
+                                "field": "season",
+                                "operator": "is",
+                                "value": str(all_info["info"]["season"]),
+                            },
+                            {
+                                "field": "episode",
+                                "operator": "is",
+                                "value": str(all_info["info"]["episode"]),
+                            },
+                        ]
+                    },
+                },
+            )
 
-        return source
+            db_details = db_details.get("episodes", [])
+            if not db_details:
+                return None
 
-    def _process_movie_item(self, db_item, simple_info, all_info):
-        source = None
-        if db_item.get("file", "").endswith(".strm"):
-            return None
-
-        db_details = self.__make_query(
-            method="VideoLibrary.GetMovieDetails",
-            params={
-                "properties": ["streamdetails", "file", "uniqueid"],
-                "movieid": db_item.get("movieid", ""),
-            },
-        ).get("moviedetails", {})
-        external_ids = db_details.get("uniqueid", {})
-        movie_ids = {
-            "tmdb": all_info["info"].get("tmdb_id"),
-            "imdb": all_info["info"].get("imdb_id"),
-            "trakt": all_info["info"].get("trakt_id"),
-        }
+            db_details = db_details[0]
+            external_ids = db_item.get("uniqueid", {})
+            ids = {
+                "tmdb": all_info["info"].get("tmdb_show_id"),
+                "tvdb": all_info["info"].get("tvdb_show_id"),
+                "trakt": all_info["info"].get("trakt_show_id"),
+            }
 
         if all(
             [
-                int(external_ids.get(i, -1)) if not i == "imdb" else external_ids.get(i, -1) in [-1, movie_ids[i]]
-                for i in movie_ids
+                int(external_ids.get(i, -1)) if not i == "imdb" else external_ids.get(i, -1) in [-1, ids[i]]
+                for i in ids
             ]
         ):
             source_info = self.get_file_info(db_details)
-            source = {
-                "scraper": self._scraper,
-                "release_title": db_details["label"],
-                "info": source_info["info"],
-                "size": source_info["size"],
-                "quality": source_info["quality"],
-                "url": db_details.get("file", ""),
-            }
-
+            source = self._make_source(None, ids, source_info, db_details)
+        
         return source
