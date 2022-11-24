@@ -11,7 +11,7 @@ from providerModules.a4kOfficial.api.justwatch import JustWatch
 
 class JustWatchCore(Core):
     def __init__(self, providers, scheme="standard_web"):
-        super(JustWatchCore, self).__init__()
+        super().__init__()
         self._country = common.get_setting("justwatch.country")
 
         try:
@@ -41,7 +41,7 @@ class JustWatchCore(Core):
             return item['title']
 
     def _make_source(self, item, ids, simple_info, all_info, **kwargs):
-        source = super(JustWatchCore, self)._make_source(item, ids, simple_info, all_info, **kwargs)
+        source = super()._make_source(item, ids, simple_info, all_info, **kwargs)
         source.update(
             {
                 "release_title": JustWatchCore._make_release_title(item, simple_info, all_info, kwargs["type"]),
@@ -196,10 +196,10 @@ class JustWatchCore(Core):
         return {"episode_id": self._get_service_id(item)}
 
     def episode(self, simple_info, info, **kwargs):
-        return super(JustWatchCore, self).episode(simple_info, info, single=True, **kwargs)
+        return super().episode(simple_info, info, single=True, **kwargs)
 
     def movie(self, title, year, imdb, simple_info, info, **kwargs):
-        return super(JustWatchCore, self).movie(title, year, imdb, simple_info, info, single=True, **kwargs)
+        return super().movie(title, year, imdb, simple_info, info, single=True, **kwargs)
 
     @staticmethod
     def get_listitem(return_data):

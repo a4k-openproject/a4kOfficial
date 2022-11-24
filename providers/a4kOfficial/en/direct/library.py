@@ -4,4 +4,4 @@ from providerModules.a4kOfficial.core.library import LibraryCore
 
 class sources(LibraryCore):
     def __init__(self):
-        super(sources, self).__init__()
+        super().__init__()

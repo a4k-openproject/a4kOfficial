@@ -10,7 +10,7 @@ from providerModules.a4kOfficial.core.justwatch import JustWatchCore
 
 class sources(JustWatchCore):
     def __init__(self):
-        super(sources, self).__init__(providers=["bbc"])
+        super().__init__(providers=["bbc"])
 
         self._movie_url = (
             f"{self._movie_url.format(movie_url='/?mode=202&name=null&url={movie_id}&iconimage=null&description=null')}"

@@ -7,7 +7,7 @@ from providerModules.a4kOfficial.core import Core
 
 class LibraryCore(Core):
     def __init__(self):
-        super(LibraryCore, self).__init__()
+        super().__init__()
 
     @staticmethod
     def get_quality(width):
@@ -61,7 +61,7 @@ class LibraryCore(Core):
         return file_info
 
     def _make_source(self, item, ids, source_info, db_details, **kwargs):
-        source = super(LibraryCore, self)._make_source(item, ids, source_info, db_details, **kwargs)
+        source = super()._make_source(item, ids, source_info, db_details, **kwargs)
         source.update(
             {
                 "release_title": db_details["label"],

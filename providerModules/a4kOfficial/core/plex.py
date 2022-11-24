@@ -24,7 +24,7 @@ PLEX_AUDIO = {"dca": "dts", "dca-ma": "hdma"}
 
 class PlexCore(Core):
     def __init__(self):
-        super(PlexCore, self).__init__()
+        super().__init__()
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._client_id, self._token = self._get_auth()
 
