@@ -24,7 +24,7 @@ PLEX_AUDIO = {"dca": "dts", "dca-ma": "hdma"}
 
 class PlexCore(Core):
     def __init__(self):
-        super(PlexCore, self).__init__()
+        super().__init__()
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._client_id, self._token = self._get_auth()
 
@@ -56,8 +56,8 @@ class PlexCore(Core):
 
         return client_id, token
 
-    def _make_source(self, item, url, **kwargs):
-        source = super(PlexCore, self)._make_source(item, url, **kwargs)
+    def _make_source(self, item, url, simple_info, info, **kwargs):
+        source = super()._make_source(item, url, simple_info, info, **kwargs)
 
         source.update(
             {
@@ -108,7 +108,7 @@ class PlexCore(Core):
 
         return result
 
-    def _process_item(self, item, simple_info, all_info, type, **kwargs):
+    def _process_item(self, item, simple_info, info, type, **kwargs):
         try:
             item_type = item.get("type", "")
             resource = item.get("resource", ())
@@ -172,6 +172,8 @@ class PlexCore(Core):
             return self._make_movie_source(
                 source,
                 url,
+                simple_info,
+                info,
                 **kwargs,
             )
         elif type == "episode":
@@ -190,7 +192,7 @@ class PlexCore(Core):
                 return
 
             url.update({"episode_id": key})
-            return self._make_episode_source(source, url, **kwargs)
+            return self._make_episode_source(source, url, simple_info, info, **kwargs)
 
     @staticmethod
     def get_listitem(return_data):

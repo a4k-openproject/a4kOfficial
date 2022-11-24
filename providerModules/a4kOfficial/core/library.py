@@ -7,7 +7,7 @@ from providerModules.a4kOfficial.core import Core
 
 class LibraryCore(Core):
     def __init__(self):
-        super(LibraryCore, self).__init__()
+        super().__init__()
 
     @staticmethod
     def get_quality(width):
@@ -61,7 +61,7 @@ class LibraryCore(Core):
         return file_info
 
     def _make_source(self, item, ids, source_info, db_details, **kwargs):
-        source = super(LibraryCore, self)._make_source(item, ids, source_info, db_details, **kwargs)
+        source = super()._make_source(item, ids, source_info, db_details, **kwargs)
         source.update(
             {
                 "release_title": db_details["label"],
@@ -119,7 +119,7 @@ class LibraryCore(Core):
 
         return result.get("movies", {})
 
-    def _process_item(self, db_item, simple_info, all_info, type, **kwargs):
+    def _process_item(self, db_item, simple_info, info, type, **kwargs):
         source = None
         db_details = None
         external_ids = None
@@ -138,9 +138,9 @@ class LibraryCore(Core):
 
             external_ids = db_details.get("uniqueid", {})
             ids = {
-                "tmdb": all_info["info"].get("tmdb_id"),
-                "imdb": all_info["info"].get("imdb_id"),
-                "trakt": all_info["info"].get("trakt_id"),
+                "tmdb": info["info"].get("tmdb_id"),
+                "imdb": info["info"].get("imdb_id"),
+                "trakt": info["info"].get("trakt_id"),
             }
         elif type == "episode":
             db_details = self.__make_query(
@@ -153,12 +153,12 @@ class LibraryCore(Core):
                             {
                                 "field": "season",
                                 "operator": "is",
-                                "value": str(all_info["info"]["season"]),
+                                "value": str(info["info"]["season"]),
                             },
                             {
                                 "field": "episode",
                                 "operator": "is",
-                                "value": str(all_info["info"]["episode"]),
+                                "value": str(info["info"]["episode"]),
                             },
                         ]
                     },
@@ -172,18 +172,15 @@ class LibraryCore(Core):
             db_details = db_details[0]
             external_ids = db_item.get("uniqueid", {})
             ids = {
-                "tmdb": all_info["info"].get("tmdb_show_id"),
-                "tvdb": all_info["info"].get("tvdb_show_id"),
-                "trakt": all_info["info"].get("trakt_show_id"),
+                "tmdb": info["info"].get("tmdb_show_id"),
+                "tvdb": info["info"].get("tvdb_show_id"),
+                "trakt": info["info"].get("trakt_show_id"),
             }
 
         if all(
-            [
-                int(external_ids.get(i, -1)) if not i == "imdb" else external_ids.get(i, -1) in [-1, ids[i]]
-                for i in ids
-            ]
+            [int(external_ids.get(i, -1)) if not i == "imdb" else external_ids.get(i, -1) in [-1, ids[i]] for i in ids]
         ):
             source_info = self.get_file_info(db_details)
             source = self._make_source(None, ids, source_info, db_details)
-        
+
         return source

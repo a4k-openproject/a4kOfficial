@@ -35,7 +35,7 @@ class Core:
 
         return sources
 
-    def _make_source(self, item, ids, simple_info, all_info, **kwargs):
+    def _make_source(self, item, ids, simple_info, info, **kwargs):
         source = {
             "scraper": self._scraper,
         }
@@ -43,27 +43,27 @@ class Core:
 
         return source
 
-    def _make_episode_source(self, item, ids, simple_info, all_info, **kwargs):
-        return self._make_source(item, ids, simple_info, all_info, base_url=self._episode_url, type="episode", **kwargs)
+    def _make_episode_source(self, item, ids, simple_info, info, **kwargs):
+        return self._make_source(item, ids, simple_info, info, base_url=self._episode_url, type="episode", **kwargs)
 
-    def _make_movie_source(self, item, ids, simple_info, all_info, **kwargs):
-        return self._make_source(item, ids, simple_info, all_info, base_url=self._movie_url, type="movie", **kwargs)
+    def _make_movie_source(self, item, ids, simple_info, info, **kwargs):
+        return self._make_source(item, ids, simple_info, info, base_url=self._movie_url, type="movie", **kwargs)
 
-    def _process_movie_item(self, item, simple_info, all_info, **kwargs):
-        source = self._process_item(item, simple_info, all_info, type="movie", **kwargs)
+    def _process_movie_item(self, item, simple_info, info, **kwargs):
+        source = self._process_item(item, simple_info, info, type="movie", **kwargs)
         return source
 
-    def _process_show_item(self, item, simple_info, all_info, **kwargs):
+    def _process_show_item(self, item, simple_info, info, **kwargs):
         source = self._process_item(
             item,
             simple_info,
-            all_info,
+            info,
             type="episode",
             **kwargs,
         )
         return source
 
-    def episode(self, simple_info, all_info, **kwargs):
+    def episode(self, simple_info, info, **kwargs):
         if self._api is None:
             return self._return_results("episode", self._return_results("episode", []))
 
@@ -71,7 +71,7 @@ class Core:
             items = self._make_show_query(simple_info=simple_info)
 
             for item in items:
-                source = self._process_show_item(item, simple_info, all_info, **kwargs)
+                source = self._process_show_item(item, simple_info, info, **kwargs)
                 if source is not None:
                     self.sources.append(source)
                 if kwargs.get("single"):
@@ -81,7 +81,7 @@ class Core:
 
         return self._return_results("episode", self.sources)
 
-    def movie(self, title, year, imdb, simple_info, all_info, **kwargs):
+    def movie(self, title, year, imdb, simple_info, info, **kwargs):
         if self._api is None:
             return self._return_results("movie", self._return_results("movie", []))
 
@@ -89,7 +89,7 @@ class Core:
             items = self._make_movie_query(title=simple_info["title"], year=int(simple_info["year"]))
 
             for item in items:
-                source = self._process_movie_item(item, simple_info, all_info, **kwargs)
+                source = self._process_movie_item(item, simple_info, info, **kwargs)
                 if source is not None:
                     self.sources.append(source)
                 if kwargs.get("single"):

@@ -25,11 +25,13 @@ re_type = type(re.compile(''))
 
 
 def __get_dom_content(html, name, match):
-    if match.endswith('/>'): return ''
+    if match.endswith('/>'):
+        return ''
 
     # override tag name with tag from match if possible
     tag = re.match('<([^\s/>]+)', match)
-    if tag: name = tag.group(1)
+    if tag:
+        name = tag.group(1)
 
     start_str = '<%s' % name
     end_str = "</%s" % name
@@ -48,11 +50,11 @@ def __get_dom_content(html, name, match):
     if start == -1 and end == -1:
         result = ''
     elif start > -1 and end > -1:
-        result = html[start + len(match):end]
+        result = html[start + len(match) : end]
     elif end > -1:
         result = html[:end]
     elif start > -1:
-        result = html[start + len(match):]
+        result = html[start + len(match) :]
     else:
         result = ''
 
@@ -97,22 +99,26 @@ def __get_dom_elements(item, name, attrs):
 
 def __get_attribs(element):
     attribs = {}
-    for match in re.finditer('''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element):
+    for match in re.finditer(
+        '''\s+(?P<key>[^=]+)=\s*(?:(?P<delim>["'])(?P<value1>.*?)(?P=delim)|(?P<value2>[^"'][^>\s]*))''', element
+    ):
         match = match.groupdict()
         value1 = match.get('value1')
         value2 = match.get('value2')
         value = value1 if value1 is not None else value2
-        if value is None: continue
+        if value is None:
+            continue
         attribs[match['key'].lower().strip()] = value
     return attribs
 
 
 def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
-    if attrs is None: attrs = {}
+    if attrs is None:
+        attrs = {}
     name = name.strip()
     if isinstance(html, str) or isinstance(html, DomMatch):
         html = [html]
-    elif isinstance(html, bytes):# and six.PY2:
+    elif isinstance(html, bytes):  # and six.PY2:
         try:
             html = [html.decode("utf-8")]  # Replace with chardet thingy
         except:
@@ -145,10 +151,11 @@ def parse_dom(html, name='', attrs=None, req=False, exclude_comments=False):
         results = []
         for element in __get_dom_elements(item, name, attrs):
             attribs = __get_attribs(element)
-            if req and not req <= set(attribs.keys()): continue
+            if req and not req <= set(attribs.keys()):
+                continue
             temp = __get_dom_content(item, name, element).strip()
             results.append(DomMatch(attribs, temp))
-            item = item[item.find(temp, item.find(element)):]
+            item = item[item.find(temp, item.find(element)) :]
         all_results += results
 
     return all_results

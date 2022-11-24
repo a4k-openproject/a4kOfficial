@@ -47,7 +47,7 @@ INSTANT_WATCHER_COUNTRIES = {
 
 class sources(JustWatchCore):
     def __init__(self):
-        super(sources, self).__init__(providers=["nfx", "nfk"])
+        super().__init__(providers=["nfx", "nfk"])
 
         self._movie_url = f"{self._movie_url.format(movie_url='/play/movie/{movie_id}/')}"
         self._episode_url = (
