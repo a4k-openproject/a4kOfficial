@@ -47,21 +47,14 @@ def check_url(url):
 
 def get_all_relative_py_files(file):
     files = os.listdir(os.path.dirname(file))
-    return [
-        filename[:-3]
-        for filename in files
-        if not filename.startswith("__") and filename.endswith(".py")
-    ]
+    return [filename[:-3] for filename in files if not filename.startswith("__") and filename.endswith(".py")]
 
 
 def parseDOM(html, name="", attrs=None, ret=False):
     if attrs:
         import re
 
-        attrs = dict(
-            (key, re.compile(value + ("$" if value else "")))
-            for key, value in attrs.items()
-        )
+        attrs = dict((key, re.compile(value + ("$" if value else ""))) for key, value in attrs.items())
     from providerModules.a4kOfficial import dom_parser
 
     results = dom_parser.parse_dom(html, name, attrs, ret)
