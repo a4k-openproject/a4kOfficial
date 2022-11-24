@@ -12,6 +12,7 @@ from resources.lib.common.source_utils import (
     get_quality,
     de_string_size,
 )
+from resources.lib.modules.exceptions import PreemptiveCancellation
 
 from providerModules.a4kOfficial import ADDON_IDS, common
 from providerModules.a4kOfficial.api.plex import Plex
@@ -26,8 +27,13 @@ class PlexCore(Core):
         super(PlexCore, self).__init__()
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._client_id, self._token = self._get_auth()
-        self._api = Plex(self._client_id, self._token)
-        self._resources = self._api.get_resources()
+
+        try:
+            self._api = Plex(self._client_id, self._token)
+            self._resources = self._api.get_resources()
+        except PreemptiveCancellation:
+            self._api = None
+            self._resources = None
 
         self._base_url = None
         self._movie_url = None
