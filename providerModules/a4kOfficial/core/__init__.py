@@ -64,6 +64,9 @@ class Core:
         return source
 
     def episode(self, simple_info, all_info, **kwargs):
+        if self._api is None:
+            return self._return_results("episode", self._return_results("episode", []))
+
         try:
             items = self._make_show_query(simple_info=simple_info)
 
@@ -79,6 +82,9 @@ class Core:
         return self._return_results("episode", self.sources)
 
     def movie(self, title, year, imdb, simple_info, all_info, **kwargs):
+        if self._api is None:
+            return self._return_results("movie", self._return_results("movie", []))
+
         try:
             items = self._make_movie_query(title=simple_info["title"], year=int(simple_info["year"]))
 

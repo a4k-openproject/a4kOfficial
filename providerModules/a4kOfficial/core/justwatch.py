@@ -2,6 +2,7 @@
 import xbmcaddon
 
 from resources.lib.common.source_utils import clean_title
+from resources.lib.modules.exceptions import PreemptiveCancellation
 
 from providerModules.a4kOfficial import ADDON_IDS, common, drm
 from providerModules.a4kOfficial.core import Core
@@ -12,7 +13,12 @@ class JustWatchCore(Core):
     def __init__(self, providers, scheme="standard_web"):
         super(JustWatchCore, self).__init__()
         self._country = common.get_setting("justwatch.country")
-        self._api = JustWatch(country=self._country)
+
+        try:
+            self._api = JustWatch(country=self._country)
+        except PreemptiveCancellation:
+            self._api = None
+
         self._monetization_types = ["free", "flatrate"]
         self._plugin = ADDON_IDS[self._scraper]["plugin"]
         self._service_offers = []
