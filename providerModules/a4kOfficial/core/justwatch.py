@@ -170,10 +170,13 @@ class JustWatchCore(Core):
 
         settings = ADDON_IDS[self._scraper].get("settings", {})
 
-        if drm.get_widevine_level() == "L3" or (
-            "4K" in settings and not xbmcaddon.Addon(self._plugin).getSettingBool(settings["4K"])
-        ):
-            resolutions.discard("4K")
+        try:
+            if drm.get_widevine_level() == "L3" or (
+                "4K" in settings and not xbmcaddon.Addon(self._plugin).getSettingBool(settings["4K"])
+            ):
+                resolutions.discard("4K")
+        except Exception:
+            common.log(f"Could not identify WV capabilities from {self._plugin}", "error")
 
         order = {key: i for i, key in enumerate(["4K", "1080p", "720p", "SD"])}
 
