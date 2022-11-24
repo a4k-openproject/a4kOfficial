@@ -56,8 +56,8 @@ class PlexCore(Core):
 
         return client_id, token
 
-    def _make_source(self, item, url, **kwargs):
-        source = super(PlexCore, self)._make_source(item, url, **kwargs)
+    def _make_source(self, item, url, simple_info, all_info, **kwargs):
+        source = super()._make_source(item, url, simple_info, all_info, **kwargs)
 
         source.update(
             {
@@ -172,6 +172,8 @@ class PlexCore(Core):
             return self._make_movie_source(
                 source,
                 url,
+                simple_info,
+                all_info,
                 **kwargs,
             )
         elif type == "episode":
@@ -190,7 +192,7 @@ class PlexCore(Core):
                 return
 
             url.update({"episode_id": key})
-            return self._make_episode_source(source, url, **kwargs)
+            return self._make_episode_source(source, url, simple_info, all_info, **kwargs)
 
     @staticmethod
     def get_listitem(return_data):
