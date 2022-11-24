@@ -30,7 +30,7 @@ class JustWatchCore(Core):
         self._episode_url = self._base_url + "{episode_url}"
 
     @staticmethod
-    def _make_release_title(item, simple_info, all_info, type):
+    def _make_release_title(item, simple_info, info, type):
         if type == "movie":
             return simple_info['title']
         elif type == "episode":
@@ -40,11 +40,11 @@ class JustWatchCore(Core):
         else:
             return item['title']
 
-    def _make_source(self, item, ids, simple_info, all_info, **kwargs):
-        source = super()._make_source(item, ids, simple_info, all_info, **kwargs)
+    def _make_source(self, item, ids, simple_info, info, **kwargs):
+        source = super()._make_source(item, ids, simple_info, info, **kwargs)
         source.update(
             {
-                "release_title": JustWatchCore._make_release_title(item, simple_info, all_info, kwargs["type"]),
+                "release_title": JustWatchCore._make_release_title(item, simple_info, info, kwargs["type"]),
                 "quality": self._get_offered_resolutions(item),
                 "info": self._get_info_from_settings(),
                 "plugin": self._plugin,
@@ -98,7 +98,7 @@ class JustWatchCore(Core):
 
         return items
 
-    def _process_item(self, item, simple_info, all_info, type, **kwargs):
+    def _process_item(self, item, simple_info, info, type, **kwargs):
         source = None
         if not self._get_service_offers(item):
             return None
@@ -107,7 +107,7 @@ class JustWatchCore(Core):
         external_ids = jw_title.get("external_ids", {})
         tmdb_ids = [i["external_id"] for i in external_ids if i["provider"] == "tmdb"]
 
-        tmdb_id = all_info["info"].get("tmdb_show_id" if type == "episode" else "tmdb_id")
+        tmdb_id = info["info"].get("tmdb_show_id" if type == "episode" else "tmdb_id")
         season = int(simple_info.get("season_number", 0))
         episode = int(simple_info.get("episode_number", 0))
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
@@ -115,7 +115,7 @@ class JustWatchCore(Core):
             if not service_id:
                 return None
 
-            source = self._make_movie_source(item, {"movie_id": service_id}, simple_info, all_info, **kwargs)
+            source = self._make_movie_source(item, {"movie_id": service_id}, simple_info, info, **kwargs)
 
             if type == "episode":
                 episodes = self._api.get_episodes(item["id"])["items"]
@@ -132,7 +132,7 @@ class JustWatchCore(Core):
                 if not ids.get("episode_id"):
                     return None
 
-                source = self._make_episode_source(episode_item, ids, simple_info, all_info, **kwargs)
+                source = self._make_episode_source(episode_item, ids, simple_info, info, **kwargs)
 
         return source
 

@@ -17,8 +17,8 @@ class sources(JustWatchCore):
         )
         self._episode_url = f"{self._episode_url.format(episode_url='/?mode=202&name=null&url={episode_id}&iconimage=null&description=null')}"
 
-    def _make_source(self, item, ids, simple_info, all_info, **kwargs):
-        source = self._make_source(item, ids, simple_info, all_info, **kwargs)
+    def _make_source(self, item, ids, simple_info, info, **kwargs):
+        source = self._make_source(item, ids, simple_info, info, **kwargs)
 
         base_url = kwargs["base_url"]
         source["url"] = base_url.format(**({k: quote_plus(v) for k, v in ids.items()}))
