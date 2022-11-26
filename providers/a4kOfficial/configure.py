@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import importlib
 import requests
+import time
 
+import xbmc
 import xbmcgui
 
 from resources.lib.modules.globals import g
@@ -41,6 +43,17 @@ def setup(*args, **kwargs):
         if i in choices:
             module = f"providers.a4kOfficial.en.{ADDON_IDS[scraper]['type']}.{scraper}"
             provider = importlib.import_module(module)
+
+            if (plugin := ADDON_IDS[scraper]['plugin']) is not None and not common.check_for_addon(plugin):
+                common.execute_builtin(f"InstallAddon({plugin})")
+                start = time.time()
+                timeout = 10
+                while not common.check_for_addon(plugin):
+                    if time.time() >= start + timeout:
+                        break
+
+                    xbmc.sleep(500)
+                pass
 
             if hasattr(provider, "setup"):
                 if dialog.yesno(
