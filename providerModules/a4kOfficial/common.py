@@ -140,6 +140,37 @@ def remove_file(path):
             log("Error removing {}: {}".format(path, e))
 
 
+def read_from_file(file_path, bytes=False):
+    content = None
+    try:
+        f = xbmcvfs.File(file_path, "r")
+        if bytes:
+            content = f.readBytes()
+        else:
+            content = f.read()
+    except IOError:
+        return None
+    finally:
+        try:
+            f.close()
+        except:
+            pass
+    return content
+
+
+def write_to_file(file_path, content):
+    try:
+        f = xbmcvfs.File(file_path, "w")
+        return f.write(content)
+    except IOError:
+        return None
+    finally:
+        try:
+            f.close()
+        except:
+            pass
+
+
 def ensure_path_is_dir(path):
     if not path.endswith("\\") and sys.platform == "win32":
         if path.endswith("/"):

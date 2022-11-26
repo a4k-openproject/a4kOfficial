@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 PACKAGE_NAME = "a4kOfficial"
-REPO_ADDRESS = "https://github.com/a4k-openproject/repository.a4kOfficial/raw/master/repo/zips/repository.a4kOfficial/repository.a4kOfficial-1.0.zip"
-REPO_ID = "repository.a4kOfficial"
 
 ADDON_IDS = {
     "iplayer": {
