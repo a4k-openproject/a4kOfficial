@@ -9,7 +9,7 @@ import xbmcgui
 from resources.lib.modules.globals import g
 
 from providerModules.a4kOfficial import common, ADDON_IDS
-from providerModules.a4kOfficial.repo import install_repo_zip
+from providerModules.a4kOfficial.repo import install_repo_zip, REPO_ID
 
 _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"
@@ -44,7 +44,11 @@ def setup(*args, **kwargs):
             module = f"providers.a4kOfficial.en.{ADDON_IDS[scraper]['type']}.{scraper}"
             provider = importlib.import_module(module)
 
-            if (plugin := ADDON_IDS[scraper]['plugin']) is not None and not common.check_for_addon(plugin):
+            if (
+                (plugin := ADDON_IDS[scraper]['plugin']) is not None
+                and not common.check_for_addon(plugin)
+                and common.check_for_addon(REPO_ID)
+            ):
                 common.execute_builtin(f"InstallAddon({plugin})")
                 start = time.time()
                 timeout = 10

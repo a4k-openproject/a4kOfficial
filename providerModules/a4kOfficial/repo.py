@@ -4,6 +4,7 @@ import sqlite3
 import time
 import zipfile
 
+import xbmc
 import xbmcvfs
 
 from providerModules.a4kOfficial import common
@@ -80,6 +81,8 @@ def install_repo_zip():
     _set_enabled(REPO_ID, True, _exists(REPO_ID))
     common.execute_builtin("UpdateLocalAddons()")
     common.execute_builtin("UpdateLocalRepos()")
+    while not common.check_for_addon(REPO_ID):
+        xbmc.sleep(500)
 
 
 def _extract_repo_zip(zip_path):
