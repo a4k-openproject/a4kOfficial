@@ -1,3 +1,4 @@
+from base64 import b64decode
 import os
 import sqlite3
 import time
@@ -83,8 +84,10 @@ def install_repo_zip():
 
 def _extract_repo_zip(zip_path):
     repo_content_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), REPO_CONTENT)
-    repo_content = common.read_from_file(repo_content_path, bytes=True)
-    common.write_to_file(zip_path, repo_content)
+    repo_content = b64decode(common.read_from_file(repo_content_path, bytes=True))
+
+    with open(zip_path, "wb+") as repo:
+        repo.write(repo_content)
 
     with zipfile.ZipFile(zip_path) as zip:
         base_directory = zip.namelist()[0].split('/')[0]
