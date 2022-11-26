@@ -3,9 +3,11 @@ import math
 import os
 import requests
 from requests.exceptions import RequestException
+import shutil
+import sys
 
 import xbmc
-import xbmcaddon
+import xbmcvfs
 
 from resources.lib.common import provider_tools
 from resources.lib.modules.globals import g
@@ -112,3 +114,49 @@ def get_package_providers():
 
 def get_infoboolean(label):
     return xbmc.getCondVisibility(label)
+
+
+def remove_folder(path):
+    if xbmcvfs.exists(ensure_path_is_dir(path)):
+        log("Removing {}".format(path))
+        try:
+            shutil.rmtree(path)
+        except Exception as e:
+            log("Error removing {}: {}".format(path, e))
+
+
+def remove_file(path):
+    if xbmcvfs.exists(path):
+        log("Removing {}".format(path))
+        try:
+            os.remove(path)
+        except Exception as e:
+            log("Error removing {}: {}".format(path, e))
+
+
+def ensure_path_is_dir(path):
+    if not path.endswith("\\") and sys.platform == "win32":
+        if path.endswith("/"):
+            path = path.split("/")[0]
+        return path + "\\"
+    elif not path.endswith("/"):
+        return path + "/"
+    return path
+
+
+def create_folder(path):
+    path = ensure_path_is_dir(path)
+    if not xbmcvfs.exists(path):
+        xbmcvfs.mkdir(path)
+
+
+def copytree(src, dst, symlinks=False, ignore=None):
+    create_folder(dst)
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            copytree(s, d, symlinks, ignore)
+        else:
+            remove_file(d)
+            shutil.copy2(s, d)
