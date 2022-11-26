@@ -69,13 +69,19 @@ def parseDOM(html, name="", attrs=None, ret=False):
     return results
 
 
-def execute_jsonrpc(method, params):
+def execute_jsonrpc(method, params=None):
     import json
 
-    call_params = {"id": 1, "jsonrpc": "2.0", "method": method, "params": params}
+    call_params = {"id": 1, "jsonrpc": "2.0", "method": method}
+    if params:
+        call_params.update({"params": params})
     call = json.dumps(call_params)
     response = xbmc.executeJSONRPC(call)
     return json.loads(response)
+
+
+def execute_builtin(method):
+    xbmc.executebuiltin(method)
 
 
 def convert_size(size_bytes):

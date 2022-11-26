@@ -19,7 +19,7 @@ _ipinfo = "https://ipinfo.io/{}/json"
 
 _home = xbmcvfs.translatePath("special://home")
 _addons = os.path.join(_home, "addons")
-_database = os.path.join(_addons, "database")
+_database = xbmcvfs.translatePath("special://database")
 _packages = os.path.join(_addons, "packages")
 _temp = xbmcvfs.translatePath("special://temp")
 
@@ -83,6 +83,8 @@ def _install_repo_zip(url):
     if download_path := _download_repo_zip(url):
         _extract_repo_zip(download_path)
         _set_enabled(REPO_ID, True, _exists(REPO_ID))
+        common.execute_builtin("UpdateLocalAddons()")
+        common.execute_builtin("UpdateLocalRepos()")
 
 
 def _download_repo_zip(url):
@@ -98,9 +100,9 @@ def _download_repo_zip(url):
             return path
 
 
-def _extract_repo_zip(zip_location, repo):
+def _extract_repo_zip(zip_location):
     with zipfile.ZipFile(zip_location) as file:
-        base_directory = os.path.join(file.namelist()[0], file.namelist()[0])
+        base_directory = file.namelist()[0].split('/')[0]
         for f in file.namelist():
             try:
                 file.extract(f, _temp)
