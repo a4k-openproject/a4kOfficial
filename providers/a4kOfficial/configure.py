@@ -9,7 +9,7 @@ import xbmcgui
 from resources.lib.modules.globals import g
 
 from providerModules.a4kOfficial import common, ADDON_IDS
-from providerModules.a4kOfficial.repo import install_repo_zip, REPO_ID
+from providerModules.a4kOfficial.repo import install_repo, REPO_ID
 
 _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"
