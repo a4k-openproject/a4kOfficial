@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from contextlib import contextmanager
 import math
 import os
 import requests
@@ -197,3 +198,13 @@ def copytree(src, dst, symlinks=False, ignore=None):
         else:
             remove_file(d)
             shutil.copy2(s, d)
+
+
+@contextmanager
+def busy_dialog():
+    execute_builtin("ActivateWindow(busydialognocancel)")
+    try:
+        yield
+    finally:
+        execute_builtin("Dialog.Close(busydialog)")
+        execute_builtin("Dialog.Close(busydialognocancel)")

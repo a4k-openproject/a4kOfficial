@@ -4,6 +4,7 @@ import sqlite3
 import time
 import zipfile
 
+import xbmc
 import xbmcvfs
 
 from providerModules.a4kOfficial import common
@@ -101,3 +102,15 @@ def _extract_repo_zip(zip_path):
     common.copytree(os.path.join(_temp, base_directory), install_path, ignore=True)
     common.remove_folder(os.path.join(_temp, base_directory))
     common.remove_file(zip_path)
+
+
+def install_addon(plugin):
+    common.execute_builtin(f"InstallAddon({plugin})")
+    start = time.time()
+    timeout = 10
+    while not common.check_for_addon(plugin):
+        if time.time() >= start + timeout:
+            break
+
+        xbmc.sleep(500)
+    pass
