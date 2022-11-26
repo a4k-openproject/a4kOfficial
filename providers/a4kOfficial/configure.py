@@ -9,7 +9,7 @@ import xbmcgui
 from resources.lib.modules.globals import g
 
 from providerModules.a4kOfficial import common, ADDON_IDS
-from providerModules.a4kOfficial import repo
+from providerModules.a4kOfficial.repo import install_repo_zip
 
 _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"
@@ -24,7 +24,7 @@ def setup(*args, **kwargs):
         "a4kOfficial: Repo Installation",
         "Do you want to install a4kOfficial Repository, for easier installation of supported add-ons?",
     ):
-        repo.install_repo_zip()
+        install_repo_zip()
 
     providers = {p['provider_name']: p for p in common.get_package_providers()}
     automatic = [_get_provider_status(scraper, kwargs.get("first_run"), providers) for scraper in ADDON_IDS]
@@ -45,8 +45,15 @@ def setup(*args, **kwargs):
             provider = importlib.import_module(module)
 
             if (plugin := ADDON_IDS[scraper]['plugin']) is not None and not common.check_for_addon(plugin):
-                with common.busy_dialog():
-                    repo.install_addon(plugin)
+                common.execute_builtin(f"InstallAddon({plugin})")
+                start = time.time()
+                timeout = 10
+                while not common.check_for_addon(plugin):
+                    if time.time() >= start + timeout:
+                        break
+
+                    xbmc.sleep(500)
+                pass
 
             if hasattr(provider, "setup"):
                 if dialog.yesno(
