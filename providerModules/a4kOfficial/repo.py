@@ -75,7 +75,7 @@ def _set_enabled(addon, enabled, exists=True):
 
 def install_repo():
     repo_path = os.path.join(_addons, REPO_ID)
-    xml_path = os.path.join(repo_path, REPO_XML)
+    xml_path = os.path.join(repo_path, "addon.xml")
     icon_path = os.path.join(repo_path, "icon.png")
     repo_xml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), REPO_XML)
     icon_content_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), REPO_ICON)
