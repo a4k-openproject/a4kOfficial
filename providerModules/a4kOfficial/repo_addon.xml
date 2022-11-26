@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.a4kOfficial" name="a4kOfficial Repository" version="1.0" provider-name="drinfernoo">
+    <extension point="xbmc.addon.repository" name="a4kOfficial Repository">
+        <!-- repository.a4kOfficial -->
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/a4k-openproject/repository.a4kOfficial/master/repo/zips/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/a4k-openproject/repository.a4kOfficial/master/repo/zips/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/a4k-openproject/repository.a4kOfficial/master/repo/zips/</datadir>
+        </dir>
+
+        <!-- repository.slyguy -->
+        <dir>
+            <info compressed="false">https://slyguy.uk/.repo/addons.xml</info>
+            <checksum>https://slyguy.uk/.repo/addons.xml.md5</checksum>
+            <datadir zip="true">https://slyguy.uk/.repo/</datadir>
+        </dir>
+
+        <!-- repository.castagnait -->
+        <dir minversion="18.0.0">
+            <info compressed="false">https://github.com/CastagnaIT/repository.castagnait/raw/kodi/kodi18/addons.xml</info>
+            <checksum>https://github.com/CastagnaIT/repository.castagnait/raw/kodi/kodi18/addons.xml.md5</checksum>
+            <datadir zip="true">https://github.com/CastagnaIT/repository.castagnait/raw/kodi/kodi18</datadir>
+            <hashes>false</hashes>
+        </dir>
+        <dir minversion="19.0.0">
+            <info compressed="false">https://github.com/CastagnaIT/repository.castagnait/raw/kodi/kodi19/addons.xml</info>
+            <checksum>https://github.com/CastagnaIT/repository.castagnait/raw/kodi/kodi19/addons.xml.md5</checksum>
+            <datadir zip="true">https://github.com/CastagnaIT/repository.castagnait/raw/kodi/kodi19</datadir>
+            <hashes>false</hashes>
+        </dir>
+
+        <!-- repository.sandmann79.plugins -->
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/Sandmann79/xbmc/master/packages/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/Sandmann79/xbmc/master/packages/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/Sandmann79/xbmc/master/packages/</datadir>
+        </dir>
+        <dir minversion="18.9.0">
+            <info compressed="false">https://raw.githubusercontent.com/Sandmann79/xbmc/master/packages-py3/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/Sandmann79/xbmc/master/packages-py3/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/Sandmann79/xbmc/master/packages-py3/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>a4kOfficial Repository</summary>
+        <description>An easy repository for official addons.</description>
+        <disclaimer></disclaimer>
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+        </assets>
+    </extension>
+</addon>

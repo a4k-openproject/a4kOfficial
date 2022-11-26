@@ -2,7 +2,6 @@ from base64 import b64decode
 import os
 import sqlite3
 import time
-import zipfile
 
 import xbmc
 import xbmcvfs
@@ -13,11 +12,10 @@ from providerModules.a4kOfficial import common
 _home = xbmcvfs.translatePath("special://home")
 _addons = os.path.join(_home, "addons")
 _database = xbmcvfs.translatePath("special://database")
-_packages = os.path.join(_addons, "packages")
-_temp = xbmcvfs.translatePath("special://temp")
 
 REPO_ID = "repository.a4kOfficial"
-REPO_CONTENT = "repo_content.b64"
+REPO_XML = "repo_addon.xml"
+REPO_ICON = "repo_icon.b64"
 
 
 def _exists(addon):
@@ -75,32 +73,21 @@ def _set_enabled(addon, enabled, exists=True):
     return new_status
 
 
-def install_repo_zip():
-    zip_path = os.path.join(_packages, f"{REPO_ID}.zip")
-    _extract_repo_zip(zip_path)
+def install_repo():
+    repo_path = os.path.join(_addons, REPO_ID)
+    xml_path = os.path.join(repo_path, REPO_XML)
+    icon_path = os.path.join(repo_path, "icon.png")
+    repo_xml_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), REPO_XML)
+    icon_content_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), REPO_ICON)
+    repo_xml_content = common.read_from_file(repo_xml_path)
+    icon_content = common.read_from_file(icon_content_path, bytes=True)
+
+    common.create_folder(repo_path)
+    common.write_to_file(xml_path, repo_xml_content)
+    common.write_to_file(icon_path, icon_content)
+
     _set_enabled(REPO_ID, True, _exists(REPO_ID))
     common.execute_builtin("UpdateLocalAddons()")
     common.execute_builtin("UpdateLocalRepos()")
     while not common.check_for_addon(REPO_ID):
         xbmc.sleep(500)
-
-
-def _extract_repo_zip(zip_path):
-    repo_content_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), REPO_CONTENT)
-    repo_content = b64decode(common.read_from_file(repo_content_path, bytes=True))
-
-    with open(zip_path, "wb+") as repo:
-        repo.write(repo_content)
-
-    with zipfile.ZipFile(zip_path) as zip:
-        base_directory = zip.namelist()[0].split('/')[0]
-        for file in zip.namelist():
-            try:
-                zip.extract(file, _temp)
-            except Exception as e:
-                common.log("Could not extract {}: {}".format(file, e))
-
-    install_path = os.path.join(_addons, REPO_ID)
-    common.copytree(os.path.join(_temp, base_directory), install_path, ignore=True)
-    common.remove_folder(os.path.join(_temp, base_directory))
-    common.remove_file(zip_path)

@@ -24,7 +24,7 @@ def setup(*args, **kwargs):
         "a4kOfficial: Repo Installation",
         "Do you want to install a4kOfficial Repository, for easier installation of supported add-ons?",
     ):
-        install_repo_zip()
+        install_repo()
 
     providers = {p['provider_name']: p for p in common.get_package_providers()}
     automatic = [_get_provider_status(scraper, kwargs.get("first_run"), providers) for scraper in ADDON_IDS]
