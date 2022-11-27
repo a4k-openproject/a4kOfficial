@@ -35,8 +35,13 @@ def change_provider_status(scraper=None, status="enabled"):
 def check_for_addon(plugin):
     if plugin is None:
         return False
-    status = get_infoboolean(f"System.AddonIsEnabled({plugin})")
-    return status
+
+    status = execute_jsonrpc("Addon.GetAddonDetails", {"addonid": plugin, "properties": ["enabled", "installed"]})
+    if status.get("error"):
+        return False
+    else:
+        addon = status.get("result", {}).get("addon", {})
+        return addon.get("installed") and addon.get("installed")
 
 
 def check_url(url):
