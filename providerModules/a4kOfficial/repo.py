@@ -88,6 +88,7 @@ def install_repo():
 
     _set_enabled(REPO_ID, True, _exists(REPO_ID))
     common.execute_builtin("UpdateLocalAddons()")
+    time.sleep(0.5)
     common.execute_builtin("UpdateLocalRepos()")
     while not common.check_for_addon(REPO_ID):
-        xbmc.sleep(500)
+        time.sleep(0.5)

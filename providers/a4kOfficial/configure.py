@@ -59,7 +59,7 @@ def setup(*args, **kwargs):
                     if time.time() >= start + timeout:
                         break
 
-                    xbmc.sleep(500)
+                    time.sleep(0.5)
                 pass
 
             if hasattr(provider, "setup"):
