@@ -132,7 +132,7 @@ class Plex:
             if device_id is not None:
                 common.set_setting("plex.device_id", device_id)
 
-            self.dialog.ok("a4kOfficial", "Successfully authenticated with Plex.")
+            self.dialog.ok("a4kOfficial: Plex Authentication", "Successfully authenticated with Plex.")
 
     def get_device_id(self):
         url = self._base_url + "/devices.xml"

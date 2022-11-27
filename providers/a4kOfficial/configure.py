@@ -34,7 +34,7 @@ def setup(*args, **kwargs):
 
     choices = (
         dialog.multiselect(
-            "a4kOfficial: Choose providers to enable",
+            "a4kOfficial: Service Selection",
             [ADDON_IDS[i[0]]["name"] for i in automatic],
             preselect=[i for i in range(len(automatic)) if automatic[i][1]],
         )
@@ -60,11 +60,10 @@ def setup(*args, **kwargs):
                         break
 
                     time.sleep(0.5)
-                pass
 
             if hasattr(provider, "setup"):
                 if dialog.yesno(
-                    "a4kOfficial",
+                    "a4kOfficial: Provider Setup",
                     f"Do you want to enable and setup {g.color_string(ADDON_IDS[scraper]['name'])}?",
                 ):
                     success = provider.setup()
