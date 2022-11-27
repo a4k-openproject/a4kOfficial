@@ -208,7 +208,7 @@ class JustWatchCore(Core):
     def get_listitem(return_data):
         scraper = return_data["scraper"]
         plugin = ADDON_IDS[scraper]["plugin"]
-        if not common.check_for_addon(plugin):
+        if not common.check_for_addon(plugin) == True:
             common.log(
                 f"a4kOfficial: '{plugin}' is not installed; disabling '{scraper}'",
                 "info",

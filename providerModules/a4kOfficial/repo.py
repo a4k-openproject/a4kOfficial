@@ -36,7 +36,7 @@ def _get_addons_db():
             return os.path.join(_database, db)
 
 
-def _set_enabled(addon, enabled, exists=True):
+def set_enabled(addon, enabled, exists=True):
     enabled_params = {
         "method": "Addons.GetAddonDetails",
         "params": {"addonid": addon, "properties": ["enabled"]},
@@ -86,9 +86,9 @@ def install_repo():
     common.write_to_file(xml_path, repo_xml_content)
     common.write_to_file(icon_path, icon_content)
 
-    _set_enabled(REPO_ID, True, _exists(REPO_ID))
+    set_enabled(REPO_ID, True, _exists(REPO_ID))
     common.execute_builtin("UpdateLocalAddons()")
     time.sleep(0.5)
     common.execute_builtin("UpdateLocalRepos()")
-    while not common.check_for_addon(REPO_ID):
+    while not common.check_for_addon(REPO_ID) == True:
         time.sleep(0.5)

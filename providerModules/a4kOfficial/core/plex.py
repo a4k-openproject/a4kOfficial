@@ -40,7 +40,7 @@ class PlexCore(Core):
         self._episode_url = None
 
     def _get_auth(self):
-        if common.check_for_addon(self._plugin):
+        if common.check_for_addon(self._plugin) == True:
             addon = xbmcaddon.Addon(self._plugin)
             client_id = addon.getSetting("client_id")
 
@@ -197,7 +197,7 @@ class PlexCore(Core):
     @staticmethod
     def get_listitem(return_data):
         scraper = return_data["scraper"]
-        if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]):
+        if not common.check_for_addon(ADDON_IDS[scraper]["plugin"]) == True:
             common.log(
                 f"a4kOfficial: '{ADDON_IDS[scraper]['plugin']}' is not installed; disabling '{scraper}'",
                 "info",

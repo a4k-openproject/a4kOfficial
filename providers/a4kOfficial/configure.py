@@ -9,7 +9,7 @@ import xbmcgui
 from resources.lib.modules.globals import g
 
 from providerModules.a4kOfficial import common, ADDON_IDS
-from providerModules.a4kOfficial.repo import install_repo, REPO_ID
+from providerModules.a4kOfficial import repo
 
 _ipify = "https://api.ipify.org?format=json"
 _ipinfo = "https://ipinfo.io/{}/json"
@@ -20,14 +20,14 @@ def setup(*args, **kwargs):
 
     dialog = xbmcgui.Dialog()
 
-    if not common.check_for_addon(REPO_ID):
+    if not common.check_for_addon(repo.REPO_ID):
         if dialog.yesno(
             "a4kOfficial: Repo Installation",
             "Do you want to install a4kOfficial Repository, for easier installation of supported add-ons?"
             " This repository serves all of the third-party add-ons that are supported by this package, from their official sources."
             " Services which are enabled in the following prompt will be offered for installation, but only if this repository is installed.",
         ):
-            install_repo()
+            repo.install_repo()
 
     providers = {p['provider_name']: p for p in common.get_package_providers()}
     automatic = [_get_provider_status(scraper, kwargs.get("first_run"), providers) for scraper in ADDON_IDS]
@@ -47,10 +47,18 @@ def setup(*args, **kwargs):
             module = f"providers.a4kOfficial.en.{ADDON_IDS[scraper]['type']}.{scraper}"
             provider = importlib.import_module(module)
 
-            if (
-                (plugin := ADDON_IDS[scraper]['plugin']) is not None
-                and not common.check_for_addon(plugin)
-                and common.check_for_addon(REPO_ID)
+            status = common.check_for_addon(plugin)
+            if status == "disabled":
+                if dialog.yesno(
+                    "a4kOfficial: Add-on Setup",
+                    f"The add-on for {g.color_string(ADDON_IDS[scraper]['name'])} is installed, but disabled."
+                    " The corresponding provider will be disabled unless the add-on is enabled. Do you want to enable it?",
+                ):
+                    repo.set_enabled(ADDON_IDS[scraper]['plugin'], True)
+            elif (
+                not status
+                and (plugin := ADDON_IDS[scraper]['plugin']) is not None
+                and common.check_for_addon(repo.REPO_ID)
             ):
                 common.execute_builtin(f"InstallAddon({plugin})")
                 start = time.time()
