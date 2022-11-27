@@ -20,11 +20,14 @@ def setup(*args, **kwargs):
 
     dialog = xbmcgui.Dialog()
 
-    if dialog.yesno(
-        "a4kOfficial: Repo Installation",
-        "Do you want to install a4kOfficial Repository, for easier installation of supported add-ons?",
-    ):
-        install_repo()
+    if not common.check_for_addon(REPO_ID):
+        if dialog.yesno(
+            "a4kOfficial: Repo Installation",
+            "Do you want to install a4kOfficial Repository, for easier installation of supported add-ons?"
+            " This repository serves all of the third-party add-ons that are supported by this package, from their official sources."
+            " Services which are enabled in the following prompt will be offered for installation, but only if this repository is installed.",
+        ):
+            install_repo()
 
     providers = {p['provider_name']: p for p in common.get_package_providers()}
     automatic = [_get_provider_status(scraper, kwargs.get("first_run"), providers) for scraper in ADDON_IDS]
