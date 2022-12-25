@@ -18,7 +18,7 @@ Also included is a Kodi library scraper for local files, which needs no extra ad
 
 # Requirements
 * Kodi Matrix 19.0 or greater
-* Seren 2.2.2 or greater
+* Seren 3.0.0 or greater
 
 # Installation
 This package can be installed from "Web Location" in Seren, using the url: https://github.com/a4k-openproject/a4kOfficial/zipball/master.
