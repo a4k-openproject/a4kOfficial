@@ -1,10 +1,10 @@
 {
   "author": "a4k-openproject",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "name": "a4kOfficial",
-  "update_directory": "",
-  "remote_meta": "",
-  "seren_version": "2.2.4",
+  "update_directory": "https://www.github.com/a4k-openproject/a4kOfficial/archive/",
+  "remote_meta": "https://raw.githubusercontent.com/a4k-openproject/a4kOfficial/main/meta.json",
+  "seren_version": "3.0.0",
   "setup_extension": "configure.py",
   "services": [],
   "settings": [
