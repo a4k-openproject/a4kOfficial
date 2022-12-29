@@ -115,9 +115,9 @@ class JustWatchCore(Core):
             if not service_id:
                 return None
 
-            source = self._make_movie_source(item, {"movie_id": service_id}, simple_info, info, **kwargs)
-
-            if type == "episode":
+            if type == "movie":
+                source = self._make_movie_source(item, {"movie_id": service_id}, simple_info, info, **kwargs)
+            elif type == "episode":
                 episodes = self._api.get_episodes(item["id"])["items"]
                 episode_item = [
                     i for i in episodes if i["season_number"] == int(season) and i["episode_number"] == int(episode)
