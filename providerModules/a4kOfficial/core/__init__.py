@@ -14,12 +14,14 @@ class Core:
         self.sources = []
         self._scraper = self.__module__.split(".")[-1]
 
-    def _return_results(self, source_type, sources, preemptive=False):
+    def _return_results(self, source_type, sources, preemptive=False, extra=None):
         if preemptive:
             common.log(
                 f"a4kOfficial.{source_type}.{self._scraper}: cancellation requested",
                 "info",
             )
+        if extra:
+            common.log(f"a4kOfficial.{source_type}.{self._scraper}: {extra}", "info")
         common.log(
             f"a4kOfficial.{source_type}.{self._scraper}: {len(sources)}",
             "info",
@@ -65,7 +67,7 @@ class Core:
 
     def episode(self, simple_info, info, **kwargs):
         if self._api is None:
-            return self._return_results("episode", self._return_results("episode", []))
+            return self._return_results("episode", [])
 
         try:
             items = self._make_show_query(simple_info=simple_info)
@@ -78,12 +80,14 @@ class Core:
                     break
         except PreemptiveCancellation:
             return self._return_results("episode", self.sources, preemptive=True)
-
-        return self._return_results("episode", self.sources)
+        except Exception as e:
+            return self._return_results("episode", self.sources, extra=e)
+        else:
+            return self._return_results("episode", self.sources)
 
     def movie(self, title, year, imdb, simple_info, info, **kwargs):
         if self._api is None:
-            return self._return_results("movie", self._return_results("movie", []))
+            return self._return_results("movie", [])
 
         try:
             items = self._make_movie_query(title=simple_info["title"], year=int(simple_info["year"]))
@@ -96,8 +100,10 @@ class Core:
                     break
         except PreemptiveCancellation:
             return self._return_results("movie", self.sources, preemptive=True)
-
-        return self._return_results("movie", self.sources)
+        except Exception as e:
+            return self._return_results("episode", self.sources, extra=e)
+        else:
+            return self._return_results("movie", self.sources)
 
     @staticmethod
     def get_listitem(return_data):
