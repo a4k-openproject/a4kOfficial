@@ -36,7 +36,7 @@ class JustWatchCore(Core):
         elif type == "episode":
             return (
                 f"{simple_info['show_title']}: "
-                f"S{int(simple_info['season_number']):02}E{int(simple_info['season_number']):02} - "
+                f"S{int(simple_info['season_number']):02}E{int(simple_info['episode_number']):02} - "
                 f"{simple_info['episode_title']}"
             )
         else:
