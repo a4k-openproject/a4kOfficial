@@ -102,7 +102,7 @@ class JustWatchCore(Core):
 
     def _process_item(self, item, simple_info, info, type, **kwargs):
         source = None
-        if not self._get_service_offers(item):
+        if not (offers := self._get_service_offers(item)):
             return None
 
         jw_title = self._api.get_title(title_id=item["id"], content_type="show" if type == "episode" else type)
@@ -113,6 +113,7 @@ class JustWatchCore(Core):
         season = int(simple_info.get("season_number", 0))
         episode = int(simple_info.get("episode_number", 0))
         if len(tmdb_ids) >= 1 and int(tmdb_ids[0]) == tmdb_id:
+            
             service_id = self._get_service_id(item, season, episode)
             if not service_id:
                 return None
@@ -128,6 +129,7 @@ class JustWatchCore(Core):
                 if not episode_item:
                     return None
                 episode_item = episode_item[0]
+                
                 ids = {"show_id": service_id}
                 ids.update(self._get_service_ep_id(service_id, episode_item, season, episode))
 
@@ -158,16 +160,15 @@ class JustWatchCore(Core):
             for o in offers
             if o.get("package_short_name") in self._providers and o.get("monetization_type") in self._monetization_types
         ]
-        self._service_offers.extend(service_offers)
 
         return service_offers
 
     def _get_offered_resolutions(self, item):
-        if not self._service_offers:
+        if not (offers := self._get_service_offers(item)):
             return None
 
         resolutions = set()
-        for offer in self._service_offers:
+        for offer in offers:
             resolutions.update(self._get_quality(offer))
 
         settings = ADDON_IDS[self._scraper].get("settings", {})
@@ -185,14 +186,11 @@ class JustWatchCore(Core):
         return "/".join(sorted(list(resolutions), key=lambda x: order[x]))
 
     def _get_service_id(self, item, season=0, episode=0):
-        if not self._service_offers:
+        if not (offers := self._get_service_offers(item)):
             return None
 
-        offer = self._service_offers[0]
+        offer = offers[0]
         url = offer.get("urls", {}).get(self._scheme, "")
-        if not common.check_url(url):
-            return None
-
         id = url.rstrip("/").split("/")[-1]
 
         return id
